@@ -304,7 +304,7 @@ function sopac_request_item() {
 		$hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, NULL); // TODO - pickup locations
 		
 		if ($hold_result[success]) {
-			$request_result_msg = 'You have successfully requested a copy of <span class="req_bib_title"> ' . $bib_item[title] . '</span>';
+			$request_result_msg = 'You have successfully requested a copy of <span class="req_bib_title"> ' . $bib_item[title] . '</span>.  We will notify you when it becomes available to you and is ready to be picked up.';
 		} else {
 			$request_result_msg = 'We were unable to fulfill your request for <span class="req_bib_title">' . $bib_item[title] . '</span>';
 		}
