@@ -1,0 +1,525 @@
+/*
+ * Hitlist Styles
+ */
+
+.hitlist-content {
+	margin-top: 25px;
+}
+
+.hitlist-item {
+	margin-top: 0pt;
+	margin-right: 0pt;
+	margin-bottom: 1.5em;
+	margin-left: 0pt;
+	padding-bottom: 15px;
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #cccccc;
+}
+
+.hitlist-top-bar {
+	padding-bottom: 20px;
+	margin-top: -20px;
+}
+
+.hitlist-range {
+	float: left;
+	margin-left: 15px;
+}
+
+.hitlist-sorter {
+	float: right;
+	text-align: right;
+	margin-right: 15px;
+}
+
+.hitlist-info {
+	list-style: none;
+	margin-top: 0px;
+	margin-left: 25px;
+	padding-left: 0px;
+}
+
+.hitlist-number {
+	margin-left: 5px;
+	padding-right: 10px;
+}
+
+.hitlist-cover {
+	float: left;
+	border: 1px solid #666;
+	padding: 2px;
+}
+
+.hitlist-format-icon {
+	float: right;
+	list-style: none;
+	font-size: 8pt;
+	text-align: center;
+	margin-right: 20px;
+	color: #8D8A81;
+	margin-top: 5px;
+}
+
+.hitlist-title {
+	color: #366B8E;
+	font-size: 12pt;
+	margin-top: 3px;
+}
+
+.hitlist-nohits {
+	font-size: 12pt;
+	margin-left: 25px;
+	margin-top: -5px;
+}
+
+.hitlist-suggestions {
+	font-size: 12pt;
+	margin-left: 25px;
+}
+
+/*
+ * Item record styles
+ */
+
+.item-cover-block {
+	float: right;
+	list-style: none;
+	font-size: 8pt;
+	text-align: center;
+	margin-right: 10px;
+	margin-top: 25px;
+}
+
+.item-cover {
+	border: 1px solid #666;
+	padding: 2px;
+}
+
+.item-info-list {
+	list-style: none;
+	margin-left: 0px;
+	padding-left: 10px;
+}
+
+.item-info-block {
+	padding-top: 0px;
+}
+
+.item-title {
+	color: #366B8E;
+	font-size: 12pt;
+	margin-top: 0px;
+}
+
+.item-detail-block th {
+	font-weight: bold;
+	padding-right: 20px;
+	width: 9em;
+	border-bottom-width: 0;
+	vertical-align: top;
+}
+
+.item-detail-block td {
+	font-color: #A9A99E;
+	padding-right: 20px;
+	vertical-align: top;
+}
+
+.item-details-list {
+	margin-top: 10px;
+}
+
+.item-request {
+	color: #E45A19;
+}
+
+.item-avail-label th {
+	padding:3px 20px;
+	border-bottom-width:1;
+}
+
+.item-avail-disp td {
+	border-bottom:1px solid #ba9;
+	padding:2px 20px;
+	text-align:left;
+	vertical-align:top;
+	border-bottom-width:0;
+}
+
+/* Request Template Styles */
+
+.non_circ_msg {
+	color: #E45A19;
+}
+
+.req_bib_title {
+	text-decoration: underline;
+}
+
+.req_error_msg {
+	color: #E87119;
+	margin-bottom: 15px;
+	font-size: 12pt;
+}
+
+.req_result_msg {
+	color: #366B8E;
+	margin-bottom: 15px;
+	font-size: 12pt;
+}
+
+/* Search Tracker Block styles */
+
+.search-block-attr {
+	color: #585858;
+	margin-left: 5px;
+}
+
+/* Facet block styles */
+
+.facet-item-selected {
+	color: #585858;
+}
+
+.adv_search_crit {
+	float:left;
+	margin-left: 20px;
+}
+
+/* Various Table-formatted Information styles */
+
+#patroninfo, #reqlist {
+	width: 100%;
+}
+
+#patroninfo-summary {
+	width: 70%;
+}
+
+#patroninfo th, #patroninfo-summary th, #reqlist th {
+	padding: 2px 8px;
+}
+
+#patroninfo tbody tr td, #patroninfo-summary tbody tr td, #reqlist tbody tr td {
+	background-color: #EEEEE9;
+	vertical-align: middle;
+	padding: 2px 8px;
+	border: 0px;
+}
+
+#patroninfo tbody tr.odd td, #patroninfo-summary tbody tr.odd td, #reqlist tbody tr.odd td {
+	background-color: #fff;
+	padding: 2px 8px;
+	border: 0px;
+}
+
+#patroninfo tbody td.attr_name, #patroninfo-summary tbody td.attr_name, #reqlist tbody td.attr_name {
+	font-weight: bold;
+}
+
+#patroninfo tbody tr.profile_button td, #patroninfo-summary tbody tr.profile_button td, #reqlist tbody tr.req_button td {
+	text-align: right;
+	padding: 10px 8px;
+	background-color: #fff;
+}
+
+.profile .error {
+	width: 70%;
+}
+
+/* Fine template styles */
+
+.fine-notice {
+	margin: 20px;
+	font-size: 12pt;
+}
+
+.fines-form-table td{
+	padding-right: 15px;
+}
+
+/* Facet Tree View */
+
+#facet {
+	margin-left: -10px;
+}
+
+#sidetreecontrol {
+	font-size: 10px;
+	text-align: center;
+}
+
+.treeview, .treeview ul { 
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+.treeview ul {
+	margin-top: 4px;
+}
+
+.treeview .hitarea {
+	height: 16px;
+	width: 16px;
+	margin-left: -16px;
+	float: left;
+	cursor: pointer;
+	background-image: url(images/treeview/treeview-facet.gif);
+}
+/* fix for IE6 */
+* html .hitarea {
+	display: inline;
+	float:none;
+}
+
+.treeview li { 
+	margin: 0;
+	padding: 3px 0pt 3px 16px;
+}
+
+.treeview a.selected {
+	background-color: #eee;
+}
+
+#treecontrol { margin: 1em 0; display: none; }
+#tree-kid { 
+	padding: 3px 0pt 3px 0px;
+	margin-left: -5px;
+}
+
+.treeview .hover { cursor: pointer; }
+
+.treeview li { background: url(images/treeview/treeview-facet-line.gif) 0 0 no-repeat; }
+.treeview li.collapsable, .treeview li.expandable { background-position: 0 -176px; }
+
+.treeview .expandable-hitarea { background-position: -80px -3px; }
+.treeview .collapsable-hitarea { background-position: 0 -114px; }
+
+.treeview li.last { background-position: 0 -1766px }
+.treeview li.lastCollapsable, .treeview li.lastExpandable { background-image: url(images/treeview/treeview-facet.gif); }
+.treeview li.lastCollapsable { background-position: 0 -111px }
+.treeview li.lastExpandable { background-position: -32px -67px }
+
+.treeview div.lastCollapsable-hitarea, .treeview div.lastExpandable-hitarea { background-position: 0; }
+
+/* Star Rating Styles */
+
+div.rating {
+	cursor:pointer;
+	margin:2em;
+	clear:both;
+	display:block;
+}
+
+div.rating:after {
+	content:'.';
+	display:block;
+	height:0;
+	width:0;
+	clear:both;
+	visibility:hidden;
+}
+
+div.cancel, div.star {
+	float:left;
+	width:17px;
+	height:15px;
+	text-indent:-999em;
+	cursor:pointer;
+	display:block;
+	background:transparent;
+	overflow:hidden;
+}
+
+div.cancel,div.cancel a {
+	background:url(images/stars/delete.gif) no-repeat 0 -16px;
+}
+
+div.star,div.star a {
+	background:url(images/stars/star.gif) no-repeat 0 0px;
+}
+
+div.cancel a,div.star a {
+	display:block;
+	width:16px;
+	height:100%;
+	background-position:0 0px;
+	border:1 solid #FF0000;
+}
+
+div.star_on a {
+	background-position:0 -16px!important;
+}
+
+div.star_hover a,div.star_live a:hover {
+	background-position:0 -32px;
+}
+
+/* Read Only CSS */
+
+div.star_readonly a,div.star_readonly a:hover {
+	cursor:default !important;
+}
+
+/* Partial Star CSS */
+
+div.star {
+	background:transparent!important;
+	overflow:hidden!important;
+}
+
+#star_vote_count {
+	margin-left: 10px;
+}
+
+/* Tags */
+
+input.tagsubmit {
+	font-size:9px;
+	font-family:Arial,sans-serif;
+	vertical-align: text-top;
+	height:16px;
+	border-style:dotted;
+	border-color:#E45A19;
+	margin-left: -5px;
+}
+
+.tags-table td {
+	padding-top: 3px;
+}
+
+.big-tag-label {
+	font-size: 26pt;
+	font-family:Arial,sans-serif;
+	font-weight: bold;
+	padding-right: 10px;
+	color: #E45A19;
+}
+
+.tag-cloud {
+	text-align: center;
+}
+
+.tag-personal-list-head {
+	color: #ED7119;
+	margin-bottom: 5px;
+}
+
+.tag-personal-list {
+	list-style: none;
+}
+
+#nowrap {
+	white-space:nowrap;
+}
+
+/* Reviews */
+
+.review-page {
+	margin-top: 20px;
+}
+
+.review-block {
+	margin-bottom: 15px;
+}
+
+.review-header {
+	border-bottom: 1px outset #CCCCCC;
+	margin-bottom: 5px;
+	margin-left: 5px;
+	margin-right: 5px;
+	padding-bottom: 3px;
+}
+
+.review-title {
+	font-size: 12pt;
+	color: #366B8E;
+}
+
+.review-item-title {
+	font-size: 13pt;
+	font-weight: bold;
+	margin-bottom: 5px;
+	color: #E45A19;
+}
+
+.review-byline {
+	margin-left: 5px;
+}
+
+.review-body {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.review-login {
+	margin-left: 5px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+
+.review-block-list-item {
+	margin-bottom: 5px;
+}
+
+.review-block-revtitle {
+	font-weight: bold;
+}
+
+.review-block-itemtitle {
+	font-size: 8pt;
+	font-weight: normal;
+	padding-left: 3px;
+	width: 125px;
+}
+
+.review-block-itemtitle-title {
+	font-style: italic;
+}
+
+/* Overview Page */
+
+.overview-ratings th {
+	font-size: 9pt;
+}
+
+.overview-ratings td {
+	font-size: 9pt;
+}
+
+.overview-ratings table {
+	padding-bottom: 3px;
+}
+
+.overview-stars {
+	margin-left: -5px;
+	margin-bottom: 0px;
+	display: inline;
+}
+
+.overview-rating-title {
+	font-size: 8pt;
+	margin-top -5px;
+	margin-bottom 5px;
+}
+
+.overview-title {
+	font-size: 13pt;
+	font-weight: bold;
+	margin-bottom: 5px;
+	color: #E45A19;
+}
+
+.overview-more-info {
+	float: right;
+	margin-bottom: 5px;
+	margin-top: 7px;
+}
+
+.overview-nodata {
+	
+}
+
+

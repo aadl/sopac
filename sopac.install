@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function sopac_install() {
+	
+	// Install the SOPAC tables
+	drupal_install_schema('sopac');
+	
+	// Mondify custom attributes
+	sopac_install_custom_table_mods();
+	
+	// Initialize the SOPAC profile elements
+	sopac_profile_setup();
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function sopac_uninstall() {
+	
+	// Undo custom table changes.. Just in case.
+	sopac_install_custom_table_mods(FALSE);
+	
+	// Remove the SOPAC tables
+	drupal_uninstall_schema('sopac');
+	
+	// Delete and remove SOPAC profile values and fields
+	sopac_profile_destroy();
+}
+
+/**     
+ * Implementation of hook_schema().
+ */   
+function sopac_schema() {
+	$schema['sopac_card_verify'] = array(
+		'description' => t('Stores profile field information.'),
+		'fields' => array(
+			'uid' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'size' => 'medium',
+				'description' => t('Drupal user ID.'),
+			),
+			'cardnum' => array(
+				'type' => 'varchar',
+				'not null' => TRUE,
+				'length' => 24,
+				'description' => t('Library card number.'),
+			),
+			'verified' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => 0,
+				'size' => 'tiny',
+				'description' => t('Verified boolean. 0 = NO, 1 = YES'),
+			),
+			'vdate' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+			),
+		),
+		'indexes' => array(
+			'uid' => array('uid'),
+			'cardnum' => array('cardnum'),
+			'verified' => array('verified'),
+		),
+	);
+	
+	$schema['sopac_fines_paid'] = array(
+		'description' => t('Stores information about fines paid.'),
+		'fields' => array(
+			'payment_id' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'size' => 'medium',
+				'description' => t('Payment ID #'),
+			),
+			'uid' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'size' => 'medium',
+				'description' => t('Drupal user ID.'),
+			),
+			'trans_date' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'description' => t('Transaction timestamp.'),
+			),
+			'amount' => array(
+				'type' => 'float',
+				'not null' => TRUE,
+				'size' => 'medium',
+				'description' => t('Transaction amount.'),
+			),
+			'fine_desc' => array(
+				'type' => 'char',
+				'not null' => TRUE,
+				'length' => 254,
+				'description' => t('Description of fine payment.'),
+			),
+		),
+		'primary key' => array('payment_id'),
+		'indexes' => array(
+			'uid' => array('uid'),
+		),
+	);
+	
+	$schema['sopac_saved_searches'] = array(
+		'description' => t('Stores users saved searches.'),
+		'fields' => array(
+			'search_id' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'size' => 'medium',
+				'description' => t('Search ID #'),
+			),
+			'uid' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'size' => 'medium',
+				'description' => t('Drupal user ID.'),
+			),
+			'savedate' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'description' => t('Date the search was saved.'),
+			),
+			'search_desc' => array(
+				'type' => 'char',
+				'not null' => TRUE,
+				'length' => 128,
+				'description' => t('Search description.'),
+			),
+			'search_url' => array(
+				'type' => 'char',
+				'not null' => TRUE,
+				'length' => 254,
+				'description' => t('Search URL.'),
+			),
+		),
+		'primary key' => array('search_id'),
+		'indexes' => array(
+			'uid' => array('uid'),
+			'savedate' => array('savedate'),
+		),
+	);
+	
+	return $schema;
+}
+
+/**
+ * Because Drupal's schema API doesn't take in to account every MySQL field type, we're compensating here.
+ */
+function sopac_install_custom_table_mods($install = TRUE) {
+	if ($install) {
+		db_query('ALTER TABLE {sopac_fines_paid} CHANGE trans_date trans_date TIMESTAMP NOT NULL');
+		db_query('ALTER TABLE {sopac_fines_paid} CHANGE trans_date trans_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
+	} else {
+		db_query('ALTER TABLE {sopac_fines_paid} CHANGE trans_date trans_date DATETIME NOT NULL');
+	}
+}
+
+/**
+ * Initializes the profile fields that SOPAC uses
+ */
+function sopac_profile_setup() {
+	
+	// Default message to the user about this profile field.  This can be changed from the admin menu.
+	$profile_desc_cardnum = "This is the 14 digit number that is located on the back of your Darien Library library card.<br /><br />If you put it in here, you will be able to do all kinds of great things like reserve material online, see what you have checked out, renew material, and more.<br /><br />Providing a library card number is <strong>not required!</strong>  We invite anyone to come participate in our online community.  If you don't have your library card number handy, don't worry, you can always add it later.<br />";
+	
+	// Insert the profile field configuration into the database.
+	db_query("INSERT INTO {profile_fields} (title, name, explanation, category, type, weight, required, register, visibility, autocomplete, options, page) VALUES ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s')", 'Library Card Number', 'profile_pref_cardnum', $profile_desc_cardnum, 'Preferences', 'textfield', 0, 0, 1, 1, 0, '', '');
+	
+}
+
+/**
+ * Destroys the profile fields that SOPAC uses
+ */
+function sopac_profile_destroy() {
+	$result = db_query("SELECT fid FROM {profile_fields} WHERE name = 'profile_pref_cardnum' LIMIT 1");
+	$db_obj = db_fetch_object($result);
+	db_query('DELETE FROM {profile_fields} WHERE fid = %d', $db_obj->fid);
+	db_query('DELETE FROM {profile_values} WHERE fid = %d', $db_obj->fid);
+}
+
+
