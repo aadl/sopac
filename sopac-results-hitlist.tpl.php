@@ -8,6 +8,9 @@
 
 $new_author_str = sopac_author_format($locum_result[author], $locum_result[addl_author]);
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
+if (!$cover_img_url) {
+	$cover_img_url = '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png';
+}
 ?>
 <div class="hitlist-item">
 

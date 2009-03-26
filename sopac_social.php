@@ -299,7 +299,8 @@ function sopac_user_tag_hitlist() {
 	$result_body = '<div class="overview-title">Items tagged with "' . $tag . '"</div><br />';
 	$bnum_arr = $insurge->get_tagged_items($user->uid, $tag, $page_limit, $offset);
 	sopac_pager_init($bnum_arr[total], 0, $page_limit);
-	$result_body .= $result_page .= theme('pager', NULL, $page_limit, 0, NULL, 6) . '<br />';
+	$pager_body = theme('pager', NULL, $page_limit, 0, NULL, 6);
+	$result_body .= $pager_body . '<br />';
 	$hitnum = $page_offset + 1;
 	foreach ($bnum_arr[bnums] as $bnum) {
 		$locum_result = $locum->get_bib_item($bnum);
@@ -307,14 +308,11 @@ function sopac_user_tag_hitlist() {
 		$locum_result[copies] = $item_status[copies];
 		$locum_result[avail_details] = $item_status[details];
 		$cover_img_url = $locum_result[cover_img];
-		if (!$cover_img_url) {
-			$cover_img_url = '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png';
-		}
 		$result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum->locum_config, $no_circ);
 		$hitnum++;
 	}
-	$result_body .= theme('pager', NULL, $page_limit, 0, NULL, 6);
-	
+	$result_body .= $pager_body;
+		
 	return $result_body;
 }
 

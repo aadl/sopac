@@ -100,6 +100,25 @@ function sopac_admin() {
 		'#description' => t("Check this box if you would like to enable community-driven reviews, ratings, comments, and tagging in the catalog."),
 	);
 	
+	// the next two settings to support giving users ability to select a home branch
+	
+	$description = 	t('Check this box if your library has multiple branches, and you would like each user to be able to select a home branch.');
+	$description .= t(' NOTE: If you check this box, you must also enter a valid library card number in the next field.');
+	$description .= t(' NOTE: the user option will be set up during the first cron job after at least 1 bib record has been harvested.');
+	$form['sopac_general']['sopac_home_branch_enable'] = array(
+		'#type' => 'checkbox',
+		'#title' => 'Allow Users to Select a Home Branch',
+		'#default_value' => variable_get('sopac_home_branch_enable', 0),
+		'#description' => $description,
+	);
+	
+	$form['sopac_general']['sopac_admin_card'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Library Card Number For Use in Setup',
+		'#default_value' => variable_get('sopac_admin_card', ''),
+		'#description' => t("Enter a valid library card number for use in setting up user's and build you to select a home branch."),
+	);
+	
 	$form['sopac_general']['sopac_ssl_enable'] = array(
 		'#type' => 'checkbox',
 		'#title' => 'Enable SSL for Account Management',
@@ -243,5 +262,34 @@ function sopac_admin() {
 	// Return the SOPAC configuration form
 	return system_settings_form($form);
 	
+}
+
+// Part of supporting user home branch in multibranch situation
+function sopac_setup_user_home_selector() {
+	$admin_card = variable_get('sopac_admin_card', '');
+	if (!variable_get('sopac_home_branch_enable', 0) || !$admin_card || variable_get('sopac_home_selector_options', false)) {
+		return false;
+	}
+	$locum = new locum_client;
+	$bib_numbers = $locum->get_bib_numbers();
+	if (!count($bib_numbers)) {
+		return false;
+	}
+	foreach ($bib_numbers as $bnum) {
+		$hold_result = $locum->place_hold($admin_card, $bnum);
+		if (is_array($hold_result['choose_location'])) {
+			$options = $hold_result['choose_location']['options'];
+			variable_set('sopac_home_selector_options', $options);
+			$options = join("\n\r", $options);
+			$description = t('Choose a branch as your home. This will be the default pickup location when you place holds.');
+			db_query("
+				INSERT INTO {profile_fields} (title, name, explanation, category, type, weight, required, register, visibility, autocomplete, options, page) 
+				VALUES ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s')", 
+				'Home Branch', 'profile_pref_home_branch', $description, 'Preferences', 'selection', 1, 0, 1, 1, 0, $options, ''
+			);
+			return true;
+		}
+	}
+	return false;
 }
 

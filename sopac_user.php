@@ -67,6 +67,16 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 function sopac_user_info_table(&$account, &$locum) {
 
 	$rows = array();
+	
+	// create home branch link if appropriate
+	if ($account->profile_pref_home_branch) {
+		$home_branch_link = l($account->profile_pref_home_branch, 'user/' . $account->uid . '/edit/Preferences');
+	}
+	elseif (variable_get('sopac_home_selector_options', false)) {
+		$home_branch_link = l(t('Click to select your home branch'), 'user/' . $account->uid . '/edit/Preferences');
+	}
+	else {$home_branch_link = null;}
+	
 	if ($account->profile_pref_cardnum) {
 		$cardnum = $account->profile_pref_cardnum;
 		$cardnum_link = '<a href="/user/' . $account->uid . '/edit/Preferences">' . $cardnum . '</a>';
@@ -83,6 +93,10 @@ function sopac_user_info_table(&$account, &$locum) {
 			}
 			if (variable_get('sopac_lcard_enable', 1)) {
 				$rows[] = array(array('data' => 'Library Card Number', 'class' => 'attr_name'), $cardnum_link);
+			}
+			// add row for home branch if appropriate
+			if ($home_branch_link) {
+				$rows[] = array(array('data' => 'Home Branch', 'class' => 'attr_name'), $home_branch_link);
 			}
 			if (variable_get('sopac_numco_enable', 1)) {
 				$rows[] = array(array('data' => 'Items Checked Out', 'class' => 'attr_name'), $userinfo[checkouts]);
@@ -103,6 +117,10 @@ function sopac_user_info_table(&$account, &$locum) {
 	} else {
 		$cardnum_link = '<a href="/user/' . $account->uid . '/edit/Preferences">Click to add your library card</a>';
 		$rows[] = array(array('data' => 'Library Card Number', 'class' => 'attr_name'), $cardnum_link);
+		// add row for home branch if appropriate
+		if ($home_branch_link) {
+			$rows[] = array(array('data' => 'Home Branch', 'class' => 'attr_name'), $home_branch_link);
+		}
 	}
 
 	if ($account->mail && variable_get('sopac_email_enable', 1)) { 
@@ -209,6 +227,14 @@ function sopac_user_holds_table(&$account, &$locum) {
 		if (!count($holds)) { return 'No items on hold.'; }
 		$header = array('', 'Title', 'Status', 'Pickup Location');
 		foreach ($holds as $hold) {
+			// Show only the name of the pickup location, not a select list of all branches
+			$options = preg_split('/\<\/option\>/i', $hold['pickuploc']);
+			foreach($options as $option) {
+				if (preg_match('/selected=["\']?selected/', $option) && preg_match('/.*\>(.+)$/', $option, $matches)) {
+					$hold['pickuploc'] = $matches[1];
+					break;
+				}
+			}
 			$rows[] = array(
 				'<input type="checkbox" name="bnum[' . $hold[bnum] . ']" value="' . $hold[varname] . '">',
 				'<a href="/catalog/record/' . $hold[bnum] . '">' . $hold[title] . '</a>',

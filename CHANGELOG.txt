@@ -1,0 +1,35 @@
+sid_m: 
+sopac.module:
+
+  --add 'hold/location' url to help handle selecting from multiple pickup locations
+  --declare the following themes in hook_theme:
+      sopac_tag_block
+      sopac_review_block
+      sopac_tag_cloud
+      sopac_get_rating_stars
+  --add cron job to support user home branch in multibranch situation
+
+sopac_admin.php:
+
+  --add settings sopac_home_branch_enable and sopac_admin_card to  support giving users ability to select a home branch
+  --add sopac_setup_user_home_selector() which adds home branch selection to user profile, and creates a drupal variable containing the branch options.
+
+sopac_catalog.php:
+
+  --modify sopac_request_item() to support user selecting pickup location in multi-branch situations
+  --added sopac_hold_location_page(), sopac_hold_location_form(), and sopac_hold_location_form_submit() functions for form where user selects branch to pickup item
+  --remove hard coding of path to nocover.png so tpl can override with a theme- or site-specific version
+
+sopac-results-hitlist.tpl.php:
+
+  --add setting of path to nocover.png so can override with a theme- or site-specific version
+
+sopac_social.php:
+
+  --clean up sopac_user_tag_hitlist() so uses same pager at top and bottom
+  --remove hard coding of path to nocover.png so tpl can override with a theme- or site-specific version
+
+sopac_user.php:
+
+  --add support for link displaying user's home branch in sopac_user_info_table()
+  --modify sopac_user_holds_table() so in the list of holds, each hold displays the pickup branch as text, not a select control of all branches

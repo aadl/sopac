@@ -97,9 +97,6 @@ function sopac_catalog_search() {
 			$locum_result[avail_details] = $item_status[details];
 
 			$cover_img_url = $locum_result[cover_img];
-			if (!$cover_img_url) {
-				$cover_img_url = '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png';
-			}
 		
 			$result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
 			$hitnum++;
@@ -284,11 +281,12 @@ function sopac_prev_search_url($override = FALSE) {
  */
 function sopac_request_item() {
 	global $user;
+	// avoid php errors when debugging
+	$varname = $request_result_msg = $request_error_msg = $item_form = $bnum = null;
 	
 	$button_txt = 'Request Selected Item';
 	profile_load_profile(&$user);
 	if ($user->uid && sopac_bcode_isverified(&$user)) {
-		
 		if ($_POST[sub_type] == $button_txt) {
 			if ($_POST[varname]) {
 				$varname = $_POST[varname];
@@ -297,15 +295,38 @@ function sopac_request_item() {
 			}
 		}
 		
-		$locum = new locum_client;
+		// support multi-branch & user home branch
 		$actions = sopac_parse_uri();
 		$bnum = $actions[1];
-		$bib_item = $locum->get_bib_item($bnum);
-		$hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, NULL); // TODO - pickup locations
+		$pickup_arg = $actions[2] ? $actions[2] : null;
+		$stored_pickup_options = variable_get('sopac_home_selector_options', array());
+		if (!$pickup_arg && count($stored_pickup_options)) {
+			$hold_result['choose_location']['options'] = $stored_pickup_options;
+		}
+		else {
+			$pickup_name = $actions[3] ? $actions[3] : null;
+			$locum = new locum_client;
+			$bib_item = $locum->get_bib_item($bnum);
+			$hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
+		}
 		
 		if ($hold_result[success]) {
-			$request_result_msg = 'You have successfully requested a copy of <span class="req_bib_title"> ' . $bib_item[title] . '</span>.  We will notify you when it becomes available to you and is ready to be picked up.';
-		} else {
+			// handling multi-branch scenario
+			$request_result_msg = 'You have successfully requested a copy of <span class="req_bib_title"> ' . $bib_item[title] . '</span>';
+			if ($pickup_name) {
+				$request_result_msg .= ' for pickup at ' . $pickup_name;
+			}
+		}
+		// more multibranch
+		elseif (is_array($hold_result['choose_location'])) {
+			// pickup location
+			$form_data = array(
+				'options' => $hold_result['choose_location']['options'],
+				'bnum' => $bnum,
+			);
+			$request_result_msg = drupal_build_form('sopac_hold_location_form', $form_data);
+		}
+		else {
 			$request_result_msg = 'We were unable to fulfill your request for <span class="req_bib_title">' . $bib_item[title] . '</span>';
 		}
 		
@@ -353,6 +374,47 @@ function sopac_request_item() {
 	}
 	$result_page = theme('sopac_request', $request_result_msg, $request_error_msg, $item_form, $bnum);
 	return '<p>'. t($result_page) .'</p>';
+}
+
+// allow user to select branch at which to pickup hold
+function sopac_hold_location_page() {
+	$output = drupal_get_form('sopac_hold_location_form');
+	return $output;
+}
+
+function sopac_hold_location_form($form_data = null) {
+	global $user;
+	if (isset($form_data['bnum'])) {
+		$form_data['storage']['options'] = $form_data['options'];
+		$form_data['storage']['bnum'] = $form_data['bnum'];
+	}
+	$options = $form_data['storage']['options'];
+	$form = array();
+	$form['#action'] = '/hold/location';
+	$form['hold_location'] = array(
+		'#type' => 'select',
+		'#title' => 'Choose a pickup location',
+		'#options' => $options,
+	);
+	if (isset($user->profile_pref_home_branch)) {
+		$options = array_flip($options);
+		if (array_key_exists($user->profile_pref_home_branch, $options)) {
+			$form['hold_location']['#default_value'] = $options[$user->profile_pref_home_branch];
+		}
+	}
+	$form['op'] = array(
+		'#type' => 'submit',
+		'#value' => 'Submit',
+	);
+	return $form;
+}
+
+function sopac_hold_location_form_submit($form, &$form_state) {
+	$location_name = $form['hold_location']['#options'][$form_state['values']['hold_location']];
+	//drupal_set_message(t('You chose ' . $location_name));
+	$bnum = $form_state['storage']['bnum'];
+	unset($form_state['storage']);
+	drupal_goto('catalog/request/' . $bnum . '/' . $form_state['values']['hold_location'] . '/' . $location_name);
 }
 
 /**

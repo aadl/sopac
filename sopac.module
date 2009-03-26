@@ -268,6 +268,15 @@ function sopac_menu() {
 		'type' => MENU_CALLBACK,
 	);
 	
+	// url to help handle selecting from multiple pickup locations
+	$items['hold/location'] = array(
+		'title' => 'Select Pickup Location',
+		'page callback' => 'sopac_hold_location_page',
+		'access arguments' => array('access user pages'),
+		'file' => 'sopac_catalog.php',
+		'type' => MENU_CALLBACK,
+	);
+	
 	$items['user/checkouts'] = array(
 		'title' => 'My Checkouts',
 		'page callback' => 'sopac_checkouts_page',
@@ -491,6 +500,18 @@ function sopac_theme() {
 		'sopac_tags_page' => array(
 			'template' => 'sopac-tags-page',
 			'arguments' => array('tags_arr' => NULL),
+		),
+		'sopac_tag_block' => array(
+			'arguments' => array('block_type' => NULL),
+		),
+		'sopac_review_block' => array(
+			'arguments' => array('block_type' => NULL),
+		),
+		'sopac_tag_cloud' => array(
+			'arguments' => array('tags' => NULL, 'cloud_type' => 'catalog', 'min_size' => 10, 'max_size' => 24, 'wraplength' => 19),
+		),
+		'sopac_get_rating_stars' => array(
+			'arguments' => array('bnum' => NULL, 'rating' => NULL, 'show_label' => TRUE, 'post_redirect' => FALSE, 'id' => 'default'),
 		),
 	);
 }
@@ -742,5 +763,11 @@ function sopac_user_block_disp_query() {
 	return FALSE;
 }
 
-
+function sopac_cron() {
+	// Part of supporting user home branch in multibranch situation
+	if (variable_get('sopac_home_branch_enable', false) && !variable_get('sopac_home_selector_options', false)) {
+		require_once('sopac_admin.php');
+		sopac_setup_user_home_selector();
+	}
+}
 
