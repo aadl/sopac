@@ -1,4 +1,4 @@
-sid_m: 
+sid_m committed on 3/26/2009: 
 sopac.module:
 
   --add 'hold/location' url to help handle selecting from multiple pickup locations
