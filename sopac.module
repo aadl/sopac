@@ -587,6 +587,8 @@ function theme_sopac_search_handler() {
 
 	$search_query = trim($_POST[search_query]);
 	if (!$search_query) { $search_query = '*'; }
+	// enforce encoding of user-entered data
+	else {$search_query = drupal_urlencode($search_query);}
 	$search_type = $_POST[search_type];
 	$search_type_arr = explode('_', $search_type);
 	if ($search_type_arr[0] == 'cat') {
