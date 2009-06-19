@@ -38,7 +38,7 @@ if (!$cover_img_url) {
 				?><li>Call number: <strong><?php print key($locum_result[avail_details]); ?></strong></li><?php
 			} ?>
 			<br />
-			<li> <?php print $locum_result[copies]; $copy_tag = ($locum_result[copies] == '1') ? 'copy' : 'copies'; print " $copy_tag"; ?> available</li>
+			<li> <?php print $locum_result[copies] . ' of ' . $locum_result[totalcopies]; $copy_tag = ($locum_result[copies] == '1') ? 'copy' : 'copies'; print " $copy_tag"; ?> available</li>
 			
 			<?php 
 			if (!in_array($locum_result[loc_code], $no_circ)) {

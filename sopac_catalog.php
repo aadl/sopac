@@ -94,6 +94,7 @@ function sopac_catalog_search() {
 			// Grab item status from Locum
 			$item_status = $locum->get_item_status($locum_result[bnum]);
 			$locum_result[copies] = $item_status[copies];
+			$locum_result[totalcopies] = $item_status[total];
 			$locum_result[avail_details] = $item_status[details];
 
 			$cover_img_url = $locum_result[cover_img];

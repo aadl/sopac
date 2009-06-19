@@ -74,7 +74,7 @@ $location_label = $item[loc_code] || ($item[loc_code] != 'none') ? $locum_config
 				}
 				if (!$no_avail_mat_codes) {
 					print '<tr><th style="padding-top:5px;">Copies Available</th><td style="padding-top:5px;">';
-					print $item_status[copies];
+					print $item_status[copies] . ' of ' . $item_status[total];
 					print '</td></tr>';
 				}
 				if ($item_status[holds]) { print '<tr><th># of Holds</th><td>' . $item_status[holds] . '</td></tr>'; }
