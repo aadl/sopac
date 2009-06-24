@@ -1,3 +1,7 @@
+sid_m committed on 6/23/2009:
+sopac_user.php:
+  --comment out line creating broken RSS feed link for saved search list display. Added TODO and placeholder variable.
+
 sid_m committed on 5/18/2009:
 sopac.module:
   --add url-encoding of user-entered search text in theme_sopac_search_handler()

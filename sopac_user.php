@@ -576,7 +576,9 @@ function sopac_saved_searches_page() {
 		while ($search_arr = db_fetch_array($dbq)) {
 			$checkbox = '<input type="checkbox" name="search_id[]" value="' . $search_arr[search_id] . '">';
 			$search_desc = '<a href="' . $search_arr[search_url] . '">' . $search_arr[search_desc]. '</a>';
-			$search_feed = theme_feed_icon('/feed' . $search_arr[search_url], 'RSS Feed: ' . $search_arr[search_desc]);
+			// TODO: implement RSS feeds for saved searches.
+			$search_feed = '';
+			// $search_feed = theme_feed_icon('/feed' . $search_arr[search_url], 'RSS Feed: ' . $search_arr[search_desc]);
 			$rows[] = array($checkbox, $search_desc, $search_feed);
 		}
 		$submit_button = '<input type="submit" value="Remove Selected Searches">';
