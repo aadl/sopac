@@ -21,7 +21,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 	// Patron information table (top of the page)
 	$patron_details_table = sopac_user_info_table($account, $locum);
 	if (variable_get('sopac_summary_enable', 1)) {
-		$result[patroninfo]['#title'] = 'Account Summary';
+		$result[patroninfo]['#title'] = t('Account Summary');
 		$result[patroninfo]['#weight'] = 1;
 		$result[patroninfo]['#type'] = 'user_profile_category';
 		$result[patroninfo][details]['#value'] = $patron_details_table;
@@ -31,7 +31,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 	if ($account->valid_card && $account->bcode_verify) {
 		$co_table = sopac_user_chkout_table($account, $locum);
 		if ($co_table) {
-			$result[patronco]['#title'] = 'Checked-out Items';
+			$result[patronco]['#title'] = t('Checked-out Items');
 			$result[patronco]['#weight'] = 2;
 			$result[patronco]['#type'] = 'user_profile_category';
 			$result[patronco][details]['#value'] = $co_table;
@@ -42,7 +42,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 	if ($account->valid_card && $account->bcode_verify) {
 		$holds_table = sopac_user_holds_table($account, $locum);
 		if ($holds_table) {
-			$result[patronholds]['#title'] = 'Requested Items';
+			$result[patronholds]['#title'] = t('Requested Items');
 			$result[patronholds]['#weight'] = 3;
 			$result[patronholds]['#type'] = 'user_profile_category';
 			$result[patronholds][details]['#value'] = $holds_table;
@@ -89,42 +89,42 @@ function sopac_user_info_table(&$account, &$locum) {
 		// Construct the user details table based on what is configured in the admin interface
 		if ($account->valid_card && $bcode_verify) {
 			if (variable_get('sopac_pname_enable', 1)) {
-				$rows[] = array(array('data' => 'Patron Name', 'class' => 'attr_name'), $userinfo[name]);
+				$rows[] = array(array('data' => t('Patron Name'), 'class' => 'attr_name'), $userinfo[name]);
 			}
 			if (variable_get('sopac_lcard_enable', 1)) {
-				$rows[] = array(array('data' => 'Library Card Number', 'class' => 'attr_name'), $cardnum_link);
+				$rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
 			}
 			// add row for home branch if appropriate
 			if ($home_branch_link) {
-				$rows[] = array(array('data' => 'Home Branch', 'class' => 'attr_name'), $home_branch_link);
+				$rows[] = array(array('data' => t('Home Branch'), 'class' => 'attr_name'), $home_branch_link);
 			}
 			if (variable_get('sopac_numco_enable', 1)) {
-				$rows[] = array(array('data' => 'Items Checked Out', 'class' => 'attr_name'), $userinfo[checkouts]);
+				$rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo[checkouts]);
 			}
 			if (variable_get('sopac_fines_enable', 1)) {
 				$amount_link = '<a href="/user/fines">$' . number_format($userinfo[balance], 2, '.', '') . '</a>';
-				$rows[] = array(array('data' => 'Fine Balance', 'class' => 'attr_name'), $amount_link);
+				$rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $amount_link);
 			}
 			if (variable_get('sopac_cardexp_enable', 1)) {
-				$rows[] = array(array('data' => 'Card Expiration Date', 'class' => 'attr_name'), date('m-d-Y', $userinfo[expires]));
+				$rows[] = array(array('data' => t('Card Expiration Date'), 'class' => 'attr_name'), date('m-d-Y', $userinfo[expires]));
 			}
 			if (variable_get('sopac_tel_enable', 1)) {
-				$rows[] = array(array('data' => 'Telephone', 'class' => 'attr_name'), $userinfo[tel1]);
+				$rows[] = array(array('data' => t('Telephone'), 'class' => 'attr_name'), $userinfo[tel1]);
 			}
 		} else {
-			$rows[] = array(array('data' => 'Library Card Number', 'class' => 'attr_name'), $cardnum_link);
+			$rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
 		}
 	} else {
-		$cardnum_link = '<a href="/user/' . $account->uid . '/edit/Preferences">Click to add your library card</a>';
-		$rows[] = array(array('data' => 'Library Card Number', 'class' => 'attr_name'), $cardnum_link);
+		$cardnum_link = '<a href="/user/' . $account->uid . '/edit/Preferences">' . t('Click to add your library card') . '</a>';
+		$rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
 		// add row for home branch if appropriate
 		if ($home_branch_link) {
-			$rows[] = array(array('data' => 'Home Branch', 'class' => 'attr_name'), $home_branch_link);
+			$rows[] = array(array('data' => t('Home Branch'), 'class' => 'attr_name'), $home_branch_link);
 		}
 	}
 
 	if ($account->mail && variable_get('sopac_email_enable', 1)) { 
-		$rows[] = array(array('data' => 'Email', 'class' => 'attr_name'), $account->mail);
+		$rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $account->mail);
 	}
 
 	// Begin creating the user information display content
@@ -132,11 +132,11 @@ function sopac_user_info_table(&$account, &$locum) {
 	
 	if ($account->valid_card && !$bcode_verify) {
 		
-		$user_info_disp .= '<div class="error">' . variable_get('sopac_uv_cardnum', 'The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.') . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
+		$user_info_disp .= '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
 		
 	} else if ($cardnum && !$account->valid_card) {
 		
-		$user_info_disp .= '<div class="error">' . variable_get('sopac_invalid_cardnum', 'It appears that your card number is invalid.  If you feel that this is in error, please contact us.') . '</div>';
+		$user_info_disp .= '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that your card number is invalid.  If you feel that this is in error, please contact us.')) . '</div>';
 		
 	}
 
@@ -171,8 +171,8 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 		$cardnum = $account->profile_pref_cardnum;
 		$checkouts = $locum->get_patron_checkouts($cardnum, $locum_pass);
 
-		if (!count($checkouts)) { return 'No items checked out.'; }
-		$header = array('','Title','Due Date');
+		if (!count($checkouts)) { return t('No items checked out.'); }
+		$header = array('',t('Title'),t('Due Date'));
 		foreach ($checkouts as $co) {
 			if ($renew_status[$co[inum]][error]) {
 				$duedate = '<span style="color: red;">' . $renew_status[$co[inum]][error] . '</span>';
@@ -190,7 +190,7 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 				$duedate,
 			);
 		}
-		$submit_buttons = '<input type="submit" name="sub_type" value="Renew Selected"> <input type="submit" name="sub_type" value="Renew All">';
+		$submit_buttons = '<input type="submit" name="sub_type" value="' . t('Renew Selected') . '"> <input type="submit" name="sub_type" value="' . t('Renew All') . '">';
 		$rows[] = array( 'data' => array(array('data' => $submit_buttons, 'colspan' => 3)), 'class' => 'profile_button' );
 	} else {
 		return FALSE;
@@ -224,8 +224,8 @@ function sopac_user_holds_table(&$account, &$locum) {
 	if ($account->profile_pref_cardnum) {
 		$cardnum = $account->profile_pref_cardnum;
 		$holds = $locum->get_patron_holds($cardnum, $locum_pass);
-		if (!count($holds)) { return 'No items on hold.'; }
-		$header = array('', 'Title', 'Status', 'Pickup Location');
+		if (!count($holds)) { return t('No items on hold.'); }
+		$header = array('', t('Title'), t('Status'), t('Pickup Location'));
 		foreach ($holds as $hold) {
 			// Show only the name of the pickup location, not a select list of all branches
 			$options = preg_split('/\<\/option\>/i', $hold['pickuploc']);
@@ -242,7 +242,7 @@ function sopac_user_holds_table(&$account, &$locum) {
 				$hold[pickuploc],
 			);
 		}
-		$submit_button = '<input type="submit" name="sub_type" value="Cancel Selected Holds">';
+		$submit_button = '<input type="submit" name="sub_type" value="' . t('Cancel Selected Holds') . '">';
 		$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 4)), 'class' => 'profile_button' );
 	} else {
 		return FALSE;
@@ -290,9 +290,9 @@ function sopac_fines_page() {
 		$fines = $locum->get_patron_fines($cardnum, $locum_pass);
 		
 		if (!count($fines)) {
-			$notice = 'You do not have any fines, currently.';
+			$notice = t('You do not have any fines, currently.');
 		} else {
-			$header = array('','Amount','Description');
+			$header = array('',t('Amount'),t('Description'));
 			$fine_total = (float) 0;
 			foreach ($fines as $fine) {
 				$rows[] = array(
@@ -305,13 +305,13 @@ function sopac_fines_page() {
 				$fine_total = $fine_total + $fine[amount];
 			}
 			$rows[] = array('<strong>Total:</strong>', '$' . number_format($fine_total, 2), '');
-			$submit_button = '<input type="submit" value="Pay Selected Charges">';
+			$submit_button = '<input type="submit" value="' . t('Pay Selected Charges') . '">';
 			$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 3)), 'class' => 'profile_button' );
 			$fine_table = '<form method="post" action="/user/fines/pay">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . $hidden_vars . '</form>';
-			$notice = 'Your current fine balance is $' . number_format($fine_total, 2) . '.';
+			$notice = t('Your current fine balance is $') . number_format($fine_total, 2) . '.';
 		}
 	} else {
-		$notice = 'You do not yet have a library card validated with our system.  You can add and validate a card using your <a href="/user">account page</a>.';
+		$notice = t('You do not yet have a library card validated with our system.  You can add and validate a card using your <a href="/user">account page</a>.');
 	}
 	
 	$result_page = theme('sopac_fines', $notice, $fine_table, &$user);
@@ -345,7 +345,7 @@ function sopac_finespaid_page() {
 		$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 4)), 'class' => 'profile_button' );
 		$page_disp = '<form method="post">' . theme('pager', NULL, $limit, 0, NULL, 6) . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . '</form>';
 	} else {
-		$page_disp = "You do not have any payments on record.";
+		$page_disp = t('You do not have any payments on record.');
 	}
 
 	return $page_disp;
@@ -367,9 +367,9 @@ function sopac_makepayment_page() {
 		$cardnum = $user->profile_pref_cardnum;
 		$fines = $locum->get_patron_fines($cardnum, $locum_pass);
 		if (!count($fines) || !count($varname)) {
-			$notice = 'You did not select any payable fines.';
+			$notice = t('You did not select any payable fines.');
 		} else {
-			$header = array('', 'Amount','Description');
+			$header = array('', t('Amount'),t('Description'));
 			$fine_total = (float) 0;
 			foreach ($fines as $fine) {
 				if (in_array($fine[varname], $varname)) {
@@ -386,10 +386,10 @@ function sopac_makepayment_page() {
 			$payment_form = drupal_get_form('sopac_fine_payment_form', $varname, (string) $fine_total, $hidden_vars_arr);
 			$rows[] = array('<strong>Total:</strong>', '$' . number_format($fine_total, 2), '') ;
 			$fine_table = theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0'));
-			$notice = 'You have selected to pay the following fines:';
+			$notice = t('You have selected to pay the following fines:');
 		}
 	} else {
-		$notice = 'You do not yet have a library card validated with our system.  You can add and validate a card using your <a href="/user">account page</a>.';
+		$notice = t('You do not yet have a library card validated with our system.  You can add and validate a card using your <a href="/user">account page</a>.');
 	}
 	
 	$result_page = theme('sopac_fines', $notice, $fine_table, &$user, $payment_form);
@@ -407,7 +407,7 @@ function sopac_fine_payment_form() {
 	$form['#redirect'] = 'user/fines';
 	$form['sopac_payment_billing_info'] = array(
 		'#type' => 'fieldset',
-		'#title' => 'Billing Information',
+		'#title' => t('Billing Information'),
 		'#collapsible' => FALSE,
 	);
 
@@ -461,7 +461,7 @@ function sopac_fine_payment_form() {
 	
 	$form['sopac_payment_cc_info'] = array(
 		'#type' => 'fieldset',
-		'#title' => 'Credit Card Information',
+		'#title' => t('Credit Card Information'),
 		'#collapsible' => FALSE,
 	);
 
@@ -536,9 +536,9 @@ function sopac_fine_payment_form_submit($form, &$form_state) {
 
 		if (!$payment_result[approved]) {
 			if ($payment_result[reason]) {
-				$error = '<strong>Your payment was not processed:</strong> ' . $payment_result[reason];
+				$error = '<strong>' . t('Your payment was not processed:') . '</strong> ' . $payment_result[reason];
 			} else {
-				$error = 'We were unable to process your payment.';
+				$error = t('We were unable to process your payment.');
 			}
 			drupal_set_message(t('<span class="fine-notice">' . $error . '</span>'));
 			if ($payment_result[error]) {
@@ -551,7 +551,7 @@ function sopac_fine_payment_form_submit($form, &$form_state) {
 				db_query($sql);
 			}
 			$amount = '$' . number_format($form_state[values][total], 2);
-			drupal_set_message(t('<span class="fine-notice">Your payment of ' . $amount . ' was successful.  Thank-you!</span>'));
+			drupal_set_message('<span class="fine-notice">' . t('Your payment of ') . $amount . t(' was successful.  Thank-you!') . '</span>');
 		}
 	}
 }
@@ -581,11 +581,11 @@ function sopac_saved_searches_page() {
 			// $search_feed = theme_feed_icon('/feed' . $search_arr[search_url], 'RSS Feed: ' . $search_arr[search_desc]);
 			$rows[] = array($checkbox, $search_desc, $search_feed);
 		}
-		$submit_button = '<input type="submit" value="Remove Selected Searches">';
+		$submit_button = '<input type="submit" value="' . t('Remove Selected Searches') . '">';
 		$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 3)), 'class' => 'profile_button' );
 		$page_disp = '<form method="post">' . theme('pager', NULL, $limit, 0, NULL, 6) . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . '</form>';
 	} else {
-		$page_disp = '<div class="overview-nodata">You do not currently have any saved searches.</div>';
+		$page_disp = '<div class="overview-nodata">' . t('You do not currently have any saved searches.') . '</div>';
 	}
 
 	return $page_disp;
@@ -604,7 +604,7 @@ function sopac_savesearch_form() {
 	$uri_arr = sopac_parse_uri();
 	$term_arr = explode('?', $uri_arr[2]);
 	
-	$form_desc = 'How would you like to label your ' . $uri_arr[1] . ' search for "<a href="' . $search_args . '">'. $term_arr[0] . '</a>" ?';
+	$form_desc = t('How would you like to label your ') . $uri_arr[1] . t(' search for ') . '"<a href="' . $search_args . '">'. $term_arr[0] . '</a>" ?';
 	$form['#redirect'] = 'user/library/searches';
 	$form['sopac_savesearch_form'] = array(
 		'#type' => 'fieldset',
@@ -618,7 +618,7 @@ function sopac_savesearch_form() {
 		'#size' => 48,
 		'#maxlength' => 128,
 		'#required' => TRUE,
-		'#default_value' => 'My custom ' . $uri_arr[1] . ' search for "' . $term_arr[0] . '"',
+		'#default_value' => t('My custom ') . $uri_arr[1] . t(' search for ') . '"' . $term_arr[0] . '"',
 	);
 	
 	$form['sopac_savesearch_form']['uri'] = array('#type' => 'hidden', '#value' => $search_args);
@@ -635,7 +635,7 @@ function sopac_savesearch_form_submit($form, &$form_state) {
 	$desc = db_escape_string($form_state[values][searchname]);
 	db_query('INSERT INTO {sopac_saved_searches} VALUES (0, ' . $user->uid . ', NOW(), "' . $desc . '", "' . $form_state[values][uri] . '")');
 
-	$submsg = '<strong>»</strong> You have saved this search.<br /><strong>»</strong> <a href="' . $form_state[values][uri] . '">Return to your search</a><br /><br />';
+	$submsg = '<strong>»</strong> ' . t('You have saved this search.') . '<br /><strong>»</strong> <a href="' . $form_state[values][uri] . '">' . t('Return to your search') . '</a><br /><br />';
 	drupal_set_message($submsg);
 
 }
@@ -672,10 +672,10 @@ function sopac_bcode_verify_form() {
 
 	if (variable_get('sopac_require_cfg', 'one') == 'one') { 
 		$req_flds = FALSE;
-		$form_desc = 'Please correctly <strong>answer <u>one</u> of the following questions</strong>:';
+		$form_desc = t('Please correctly <strong>answer <u>one</u> of the following questions</strong>:');
 	} else {
 		$req_flds = TRUE;
-				$form_desc = 'Please correctly <strong>answer <u>all</u> of the following questions</strong>:';
+				$form_desc = t('Please correctly <strong>answer <u>all</u> of the following questions</strong>:');
 	}
 	
 	$form['sopac_card_verify'] = array(
@@ -749,10 +749,10 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 			if (preg_match('/\b' . $sub_name . '\b/i', $locum_name)) {
 				$correct++;
 			} else {
-				$error[] = 'The last name you entered does not appear to match what we have on file.';
+				$error[] = t('The last name you entered does not appear to match what we have on file.');
 			}
 		} else {
-			$error[] = 'You did not provide a last name.';
+			$error[] = t('You did not provide a last name.');
 		}
 		$numreq++;
 	}
@@ -770,10 +770,10 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 			if (preg_match('/\b' . $sub_addr . '\b/i', $locum_addr)) {
 				$correct++;
 			} else {
-				$error[] = 'The street name you entered does not appear to match what we have on file.';
+				$error[] = t('The street name you entered does not appear to match what we have on file.');
 			}
 		} else {
-			$error[] = 'You did not provide a street name.';
+			$error[] = t('You did not provide a street name.');
 		}
 		$numreq++;
 	}
@@ -785,10 +785,10 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 			if (preg_match('/\b' . $sub_tel . '\b/i', $locum_tel)) {
 				$correct++;
 			} else {
-				$error[] = 'The telephone number you entered does not appear to match what we have on file.';
+				$error[] = t('The telephone number you entered does not appear to match what we have on file.');
 			}
 		} else {
-			$error[] = 'You did not provide a telephone number.';
+			$error[] = t('You did not provide a telephone number.');
 		}
 		$numreq++;
 	}

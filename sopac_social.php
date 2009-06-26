@@ -36,14 +36,14 @@ function sopac_personal_overview_page() {
 			$i++;
 		}
 	}
-	$review_norev = '<div class="overview-nodata">You have not written any reviews yet.</div>';
+	$review_norev = '<div class="overview-nodata">'.t('You have not written any reviews yet.').'</div>';
 	$rev_bib_info = $locum->get_bib_items_arr($rev_bnums);
 	$review_display = theme('sopac_review', $user, NULL, $rev_arr, NULL, NULL, NULL, $review_norev, $rev_bib_info);
 	
 	// Pull together the ratings
 	$ratings_arr_top = $insurge->get_rating_list($user->uid, NULL, $num_ratings, NULL, 'ORDER BY rating DESC, rate_date DESC');
 	$ratings_arr_new = $insurge->get_rating_list($user->uid, NULL, $num_ratings, NULL, 'ORDER BY rate_date DESC');
-	$ratings_chunk[nodata] = '<div class="overview-nodata">You have not rated any items yet.</div>';
+	$ratings_chunk[nodata] = '<div class="overview-nodata">'.t('You have not rated any items yet.').'</div>';
 	$ratings_chunk[top][total] = $ratings_arr_top[total];
 	$ratings_chunk[top][ratings] = $ratings_arr_top[ratings];
 	$ratings_chunk[latest][total] = $ratings_arr_new[total];
@@ -65,7 +65,7 @@ function sopac_personal_overview_page() {
 		}
 		$tag_cloud = theme_sopac_tag_cloud($tags, 'personal');
 	} else {
-		$tag_cloud = '<div class="overview-nodata">You have not tagged any items yet.</div>';
+		$tag_cloud = '<div class="overview-nodata">'.t('You have not tagged any items yet.').'</div>';
 	}
 	
 	$result_page =  theme('sopac_pat_overview', $review_display, $ratings_chunk, $tag_cloud);
@@ -106,7 +106,7 @@ function sopac_tags_page_cloud() {
 	if (count($tags)) {
 		$cloud = theme_sopac_tag_cloud($tags);
 	} else {
-		$cloud = '<div class="overview-nodata">You have not tagged any items yet.</div>';
+		$cloud = '<div class="overview-nodata">'.t('You have not tagged any items yet.').'</div>';
 	}
 	return $cloud;
 }
@@ -123,7 +123,7 @@ function sopac_tags_page_list() {
 	if (count($tags)) {
 		$result_page = theme('sopac_tags_page', $tags);
 	} else {
-		$result_page = '<div class="overview-nodata">You have not tagged any items yet.</div>';
+		$result_page = '<div class="overview-nodata">'.t('You have not tagged any items yet.').'</div>';
 	}
 	return $result_page;
 }
@@ -167,12 +167,12 @@ function theme_sopac_tag_block($block_type) {
 		}
 	} else {
 		if ($put_tag_form) {
-			$block_suffix = '<br /><br /><a href="/user/login">Login</a> to add tags.</a>';
+			$block_suffix = '<br /><br /><a href="/user/login">' . t('Login') . '</a>' . t(' to add tags.') . '</a>';
 		}
 	}
 	
 	if ($user->uid && $put_personal_tag_list && count($tag_arr_user)) {
-		$block_suffix .= '<div class="tag-personal-list-head">Your tags</div>';
+		$block_suffix .= '<div class="tag-personal-list-head">' . t('Your tags') . '</div>';
 		$block_suffix .= '<div class="tag-personal-list-block"><ul class="tag-personal-list">';
 		foreach ($tag_arr_user as $tag_user) {
 			$block_suffix .= '<li class="tag-personal-list-item">' . $tag_user[tag] . ' <span class="tag-personal-list-x">[<a href="?deltag=' . urlencode($tag_user[tag]) . '">x</a>]</li>';
@@ -186,7 +186,7 @@ function theme_sopac_tag_block($block_type) {
 		}
 		$cloud = theme_sopac_tag_cloud($tags, $block_type);
 	} else {
-		$cloud = 'No tags, currently.';
+		$cloud = t('No tags, currently.');
 	}
 	$cloud .= $block_suffix;
 	
@@ -203,7 +203,7 @@ function sopac_user_tag_edit() {
 	}
 	$form['tagform'] = array(
 		'#type' => 'fieldset',
-		'#title' => t('Change your tag "' . $tag . '" to something else'),
+		'#title' => t('Change your tag "') . $tag . t('" to something else'),
 		'#collapsible' => FALSE,
 		'#collapsed' => FALSE,
 	);	 
@@ -243,16 +243,16 @@ function sopac_user_tag_delete() {
 	$tag = $pathinfo[3];
 	$tag_total_arr = $insurge->get_tag_totals($user->uid, NULL, $tag);
 	$tag_total = $tag_total_arr[0][count];
-	$tag_total_str = ($tag_total > 1) ? $tag_total . ' things' : $tag_total . ' thing';
+	$tag_total_str = ($tag_total > 1) ? $tag_total . t(' things') : $tag_total . t(' thing');
 
-	drupal_set_message('You have tagged ' . $tag_total_str . ' with "' . $tag . '".  If you delete this tag, it will be removed completely.', 'warning');
+	drupal_set_message(t('You have tagged ') . $tag_total_str . t(' with "') . $tag . t('".  If you delete this tag, it will be removed completely.'), 'warning');
 	
 	if ($_GET[ref]) {
 		$form['#redirect'] = substr(urldecode($_GET[ref]), 1);
 	}
 	$form['tagform'] = array(
 		'#type' => 'fieldset',
-		'#title' => t('Really delete "' . $tag . '" from your collection?'),
+		'#title' => t('Really delete "') . $tag . t('" from your collection?'),
 		'#collapsible' => FALSE,
 		'#collapsed' => FALSE,
 	);	 
@@ -296,7 +296,7 @@ function sopac_user_tag_hitlist() {
 	$actions = sopac_parse_uri();
 	$tag = $actions[2];
 
-	$result_body = '<div class="overview-title">Items tagged with "' . $tag . '"</div><br />';
+	$result_body = '<div class="overview-title">'.t('Items tagged with "') . $tag . '"</div><br />';
 	$bnum_arr = $insurge->get_tagged_items($user->uid, $tag, $page_limit, $offset);
 	sopac_pager_init($bnum_arr[total], 0, $page_limit);
 	$pager_body = theme('pager', NULL, $page_limit, 0, NULL, 6);
@@ -349,7 +349,7 @@ function sopac_tag_form() {
 function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $max_size = 24, $wraplength = 19) {
 
 	if (!count($tags)) {
-		return 'No tags.';
+		return t('No tags.');
 	}
 
 	// largest and smallest array values
@@ -399,8 +399,8 @@ function sopac_review_page($page_type) {
 			$ratings = theme_sopac_get_rating_stars($bnum);
 			$reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL, $page_limit, $offset);
 			sopac_pager_init($reviews[total], 0, $page_limit);
-			$title = 'Reviews for ' . ucwords($item[title]);
-			$no_rev_msg = 'No reviews have been written yet for <i>' . ucwords($item[title]) . '</i>';
+			$title = t('Reviews for ') . ucwords($item[title]);
+			$no_rev_msg = t('No reviews have been written yet for ') . '<i>' . ucwords($item[title]) . '</i>';
 			$i = 0;
 			foreach ($reviews[reviews] as $insurge_review) {
 				$rev_arr[$i][rev_id] = $insurge_review[rev_id];
@@ -415,27 +415,27 @@ function sopac_review_page($page_type) {
 				if (!$insurge->check_reviewed($user->uid, $item[bnum]) && $user->uid) {
 					$rev_form = drupal_get_form('sopac_review_form', $item[bnum]);
 				} else if (!$user->uid) {
-					$rev_form = '<div class="review-login"><a href="/user/login">Login</a> to write a review</div>';
+					$rev_form = '<div class="review-login"><a href="/user/login">' . t('Login') . '</a>' . t(' to write a review') . '</div>';
 				}
 				$result_page = theme('sopac_review', $user, $title, $rev_arr, $page_type, $rev_form, $ratings, $no_rev_msg);
 				$result_page .= theme('pager', NULL, $page_limit, 0, NULL, 6);
 			} else {
-				$result_page = 'This record does not exist.';
+				$result_page = t('This record does not exist.');
 			}
 			break;
 		case 'personal':
 			$rev_uid = $user->uid;
-			$no_rev_msg = 'You have not submitted any reviews yet.';
+			$no_rev_msg = t('You have not submitted any reviews yet.');
 			$reviewer_name = $user->name;
 		case 'user':
 			$actions = sopac_parse_uri(FALSE);
 			$rev_uid = $rev_uid ? $rev_uid : $actions[2];
 			$rev_user = user_load(array('uid' => $rev_uid));
-			$no_rev_msg = $no_rev_msg ? $no_rev_msg : $rev_user->name . ' has not submitted any reviews yet.';
+			$no_rev_msg = $no_rev_msg ? $no_rev_msg : $rev_user->name . t(' has not submitted any reviews yet.');
 			$reviewer_name = $reviewer_name ? $reviewer_name : $rev_user->name;
 			$reviews = $insurge->get_reviews($rev_uid, NULL, NULL, $page_limit, $offset);
 			sopac_pager_init($reviews[total], 0, $page_limit);
-			$title = 'Reviews by ' . $reviewer_name;
+			$title = t('Reviews by ') . $reviewer_name;
 			$i = 0;
 			$bib_item_arr = array();
 			foreach ($reviews[reviews] as $insurge_review) {
@@ -457,7 +457,7 @@ function sopac_review_page($page_type) {
 			$rev_id[] = $actions[2];
 			$reviews = $insurge->get_reviews(NULL, NULL, $rev_id);
 			sopac_pager_init($reviews[total], 0, $page_limit);
-			$no_rev_msg = 'This review does not exist.';
+			$no_rev_msg = t('This review does not exist.');
 			$i = 0;
 			foreach ($reviews[reviews] as $insurge_review) {
 				$bib_item_arr = $locum->get_bib_items_arr(array($insurge_review[bnum]));
@@ -482,7 +482,7 @@ function sopac_review_form() {
 	
 	$pathinfo = explode('/', trim($_GET[q]));
 	if ($pathinfo[1] == 'edit') {
-		$title = 'Edit this Review';
+		$title = t('Edit this Review');
 		$insurge = new insurge_client;
 		$rev_id = $pathinfo[2];
 		$insurge_review = $insurge->get_reviews($user->uid, NULL, array($rev_id));
@@ -493,7 +493,7 @@ function sopac_review_form() {
 		$bnum = $review[bnum];
 		$form['#redirect'] = substr(urldecode($_GET[ref]), 1);
 	} else {
-		$title = 'Write a Review!';
+		$title = t('Write a Review!');
 		$args = func_get_args();
 		$collapsible = TRUE;
 		$collapsed = TRUE;
@@ -567,18 +567,18 @@ function theme_sopac_review_block($block_type) {
 	switch ($block_type) {
 		case 'personal':
 			$reviews = $insurge->get_reviews($user->uid, NULL, NULL, $max_shown);
-			$no_rev = 'You have not written any reviews yet.';
+			$no_rev = t('You have not written any reviews yet.');
 			break;
 		case 'record':
 			$bnum_arr[] = $uri[1];
 			$locum_result = $locum->get_bib_item($uri[1]);
 			$reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL, $max_shown);
-			$no_rev = 'No reviews have been written yet for <i>' . $locum_result[title] . '</i>.';
+			$no_rev = t('No reviews have been written yet for ') . '<i>' . $locum_result[title] . '</i>.';
 			break;
 		case 'overview':
 		default:
 			$reviews = $insurge->get_reviews(NULL, NULL, NULL, $max_shown);
-			$no_rev = 'No reviews have been written yet.';
+			$no_rev = t('No reviews have been written yet.');
 			break;
 	}
 	
@@ -592,7 +592,7 @@ function theme_sopac_review_block($block_type) {
 			$item_link = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $insurge_review[bnum];
 			$result_page .= '<div class="review-block-list-item">';
 			$result_page .= '<div class="review-block-revtitle"><a href="' . $review_link . '">' . htmlentities($insurge_review[rev_title]) . '</a></div>';
-			$result_page .= '<div class="review-block-itemtitle">A review of <span class="review-block-itemtitle-title"><a href="' . $item_link . '">' . $title . '</a></span></div>';
+			$result_page .= '<div class="review-block-itemtitle">' . t('A review of ') . '<span class="review-block-itemtitle-title"><a href="' . $item_link . '">' . $title . '</a></span></div>';
 			$result_page .= "</div>\n";
 		}
 	} else {
@@ -667,7 +667,7 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
 	
 	if (!$user->uid) {
 		$disable_flag = ' disabled="disabled" ';
-		$login_string = ' - <a href="/user/login">Login</a> to add yours';
+		$login_string = ' - <a href="/user/login">' . t('Login') . '</a>' . t(' to add yours');
 	}
 	
 	$ratings_info_arr = $insurge->get_rating($bnum);
@@ -702,11 +702,11 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
 
 	if ($show_label) {
 		if (!$ratings_info_arr[count]) {
-			$count_msg = 'No votes yet';
+			$count_msg = t('No votes yet');
 		} else if ($ratings_info_arr[count] == 1) {
 			$count_msg = '1 vote';
 		} else {
-			$count_msg = $ratings_info_arr[count] . ' votes';
+			$count_msg = $ratings_info_arr[count] . t(' votes');
 		}
 		$count_msg .= $login_string;
 		$star_code .= '<span id="star_vote_count">(' . $count_msg . ')</span>';
