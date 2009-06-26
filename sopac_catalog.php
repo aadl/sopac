@@ -137,7 +137,7 @@ function sopac_bib_record() {
 	if ($item[bnum]) {
 		$result_page = theme('sopac_record', $item, $item_status, $locum->locum_config, $no_circ, &$locum);
 	} else {
-		$result_page = 'This record does not exist.';
+		$result_page = t('This record does not exist.');
 	}
 
 	return '<p>'. t($result_page) .'</p>';
@@ -159,7 +159,7 @@ function sopac_search_block($locum_results_all, $locum_cfg) {
 
 	$search[term] = trim($term_arr[0]);
 	$search[type] = trim($uri[1]);
-	$search[sortby] = $getvars[sort] ? $getvars[sort] : 'Most relevant';
+	$search[sortby] = $getvars[sort] ? $getvars[sort] : t('Most relevant');
 	$search[format] = count($getvars[search_format]) && ($getvars[search_format][0] != 'all') ? $getvars[search_format] : array();
 	$search[series] = count($getvars[facet_series]) ? $getvars[facet_series] : array();
 	$search[lang] = count($getvars[facet_lang]) ? $getvars[facet_lang] : array();
@@ -245,19 +245,19 @@ function sopac_put_request_link($bnum) {
 		if (sopac_bcode_isverified(&$user)) {
 			// User is logged in and has a verified card number
 			$link = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum;
-			$link_text = 'Request this item';
+			$link_text = t('Request this item');
 		} else if ($user->profile_pref_cardnum) {
 			// User is logged in but does not have a verified card number
 			$link = '/user/' . $user->uid;
-			$link_text = 'Verify your card to request this item';
+			$link_text = t('Verify your card to request this item');
 		} else {
 			// User is logged in but does not have a card number.
 			$link = '/user/' . $user->uid;
-			$link_text = 'Register your card to request this item';
+			$link_text = t('Register your card to request this item');
 		}
 	} else {
 		$link = '/user/login';
-		$link_text = 'Please log in to request this item';
+		$link_text = t('Please log in to request this item');
 	}
 
 	return '<a href="' . $link . '">' . $link_text . '</a>';
@@ -285,14 +285,14 @@ function sopac_request_item() {
 	// avoid php errors when debugging
 	$varname = $request_result_msg = $request_error_msg = $item_form = $bnum = null;
 	
-	$button_txt = 'Request Selected Item';
+	$button_txt = t('Request Selected Item');
 	profile_load_profile(&$user);
 	if ($user->uid && sopac_bcode_isverified(&$user)) {
 		if ($_POST[sub_type] == $button_txt) {
 			if ($_POST[varname]) {
 				$varname = $_POST[varname];
 			} else {
-				$request_error_msg = 'You need to select an item to request.';
+				$request_error_msg = t('You need to select an item to request.');
 			}
 		}
 		
@@ -313,9 +313,9 @@ function sopac_request_item() {
 		
 		if ($hold_result[success]) {
 			// handling multi-branch scenario
-			$request_result_msg = 'You have successfully requested a copy of <span class="req_bib_title"> ' . $bib_item[title] . '</span>';
+			$request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item[title] . '</span>';
 			if ($pickup_name) {
-				$request_result_msg .= ' for pickup at ' . $pickup_name;
+				$request_result_msg .= t(' for pickup at ') . $pickup_name;
 			}
 		}
 		// more multibranch
@@ -328,7 +328,7 @@ function sopac_request_item() {
 			$request_result_msg = drupal_build_form('sopac_hold_location_form', $form_data);
 		}
 		else {
-			$request_result_msg = 'We were unable to fulfill your request for <span class="req_bib_title">' . $bib_item[title] . '</span>';
+			$request_result_msg = t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item[title] . '</span>';
 		}
 		
 		if ($hold_result[error]) {
@@ -337,7 +337,7 @@ function sopac_request_item() {
 		
 		if ($hold_result[selection]  && !$hold_result[success]) {
 			$requestable = 0;
-			$header = array('','Location','Call Number', 'Status');
+			$header = array('',t('Location'),t('Call Number'),t('Status'));
 			foreach ($hold_result[selection] as $selection) {
 				$status = $selection[status];
 				if ($selection[varname]) {
@@ -357,11 +357,11 @@ function sopac_request_item() {
 			}
 			if ($requestable) {
 				$submit_button = '<input type="submit" name="sub_type" value="' . $button_txt . '">';
-				$request_result_msg = 'Please select the item you would like to request.';
+				$request_result_msg = t('Please select the item you would like to request.');
 			} else {
 				$submit_button = NULL;
 				$request_result_msg = '';
-				$request_error_msg = 'There are no copies of this item available for circulation.';
+				$request_error_msg = t('There are no copies of this item available for circulation.');
 			}
 			if ($submit_button){
 				$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 4)), 'class' => 'req_button' );
@@ -371,7 +371,7 @@ function sopac_request_item() {
 		
 		// TODO - add a tally for top items data recovery
 	} else {
-		$request_error_msg = "You must have a valid library card number registered with our system.";
+		$request_error_msg = t("You must have a valid library card number registered with our system.");
 	}
 	$result_page = theme('sopac_request', $request_result_msg, $request_error_msg, $item_form, $bnum);
 	return '<p>'. t($result_page) .'</p>';
@@ -394,7 +394,7 @@ function sopac_hold_location_form($form_data = null) {
 	$form['#action'] = '/hold/location';
 	$form['hold_location'] = array(
 		'#type' => 'select',
-		'#title' => 'Choose a pickup location',
+		'#title' => t('Choose a pickup location'),
 		'#options' => $options,
 	);
 	if (isset($user->profile_pref_home_branch)) {
@@ -405,7 +405,7 @@ function sopac_hold_location_form($form_data = null) {
 	}
 	$form['op'] = array(
 		'#type' => 'submit',
-		'#value' => 'Submit',
+		'#value' => t('Submit'),
 	);
 	return $form;
 }
@@ -446,20 +446,20 @@ function sopac_search_form_basic() {
 	$sformat_selected = $_GET[search_format] ? $_GET[search_format] : 'all';
 
 	$stypes = array(
-		'cat_keyword' => 'Keyword',
-		'cat_title' => 'Title',
-		'cat_author' => 'Author',
-		'cat_series' => 'Series',
-		'cat_tags' => 'Tags',
-		'cat_reviews' => 'Reviews',
-		'cat_subject' => 'Subject',
-		'cat_callnum' => 'Call Number',
+		'cat_keyword' => t('Keyword'),
+		'cat_title' => t('Title'),
+		'cat_author' => t('Author'),
+		'cat_series' => t('Series'),
+		'cat_tags' => t('Tags'),
+		'cat_reviews' => t('Reviews'),
+		'cat_subject' => t('Subject'),
+		'cat_callnum' => t('Call Number'),
 	);
 
 	$sortopts = array(
-		'relevance' => 'Relevance',
-		'newest' => 'Newest First',
-		'oldest' => 'Oldest First',
+		'relevance' => t('Relevance'),
+		'newest' => t('Newest First'),
+		'oldest' => t('Oldest First'),
 	);
 
 	foreach ($locum_cfg[format_groups] as $sfmt => $sfmt_codes) {
@@ -480,7 +480,7 @@ function sopac_search_form_basic() {
 	$form['basic']['inline'] = array('#prefix' => '<div class="container-inline">', '#suffix' => '</div>');
 	$form['basic']['inline']['search_query'] = array(
 		'#type' => 'textfield',
-		'#title' => 'Search ',
+		'#title' => t('Search '),
 		'#default_value' => $search_args,
 		'#size' => 25,
 		'#maxlength' => 255,
@@ -528,29 +528,29 @@ function sopac_search_form_adv() {
 	}
 
 	$stypes = array(
-		'cat_keyword' => 'Keyword',
-		'cat_title' => 'Title',
-		'cat_author' => 'Author',
-		'cat_series' => 'Series',
-		'cat_tags' => 'Tags',
-		'cat_reviews' => 'Reviews',
-		'cat_subject' => 'Subject',
-		'cat_callnum' => 'Call Number',
+		'cat_keyword' => t('Keyword'),
+		'cat_title' => t('Title'),
+		'cat_author' => t('Author'),
+		'cat_series' => t('Series'),
+		'cat_tags' => t('Tags'),
+		'cat_reviews' => t('Reviews'),
+		'cat_subject' => t('Subject'),
+		'cat_callnum' => t('Call Number'),
 	);
 
 	$sortopts = array(
-		'' => 'Relevance',
-		'catalog_newest' => 'Newest in Collection',
-		'catalog_oldest' => 'Oldest in Collection',
-		'newest' => 'Pub date: Newest',
-		'oldest' => 'Pub date: Oldest',
-		'title' => 'Alphabetically by Title',
-		'author' => 'Alphabetically by Author',
-		'top_rated' => 'Top Rated Items',
-		'popular_week' => 'Most Popular this Week',
-		'popular_month' => 'Most Popular this Month',
-		'popular_year' => 'Most Popular this Year',
-		'popular_total' => 'All Time Most Popular',
+		'' => t('Relevance'),
+		'catalog_newest' => t('Newest in Collection'),
+		'catalog_oldest' => t('Oldest in Collection'),
+		'newest' => t('Pub date: Newest'),
+		'oldest' => t('Pub date: Oldest'),
+		'title' => t('Alphabetically by Title'),
+		'author' => t('Alphabetically by Author'),
+		'top_rated' => t('Top Rated Items'),
+		'popular_week' => t('Most Popular this Week'),
+		'popular_month' => t('Most Popular this Month'),
+		'popular_year' => t('Most Popular this Year'),
+		'popular_total' => t('All Time Most Popular'),
 	);
 
 	// Initialize the form

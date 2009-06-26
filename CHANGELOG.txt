@@ -1,6 +1,7 @@
 jsantoni commited on 6/26/2009:
 sopac_user.php:
 sopac_social.php:
+sopac_catalog.php:
   --add forgotten t() functions
 
 sid_m committed on 6/23/2009:
