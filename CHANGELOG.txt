@@ -1,3 +1,10 @@
+jsantoni commited on 6/27/2009:
+sopac-results.tpl.php
+sopac-record.tpl.php
+sopac-results-hitlist.tpl.php
+sopac-ratings-page.tpl.php
+  --add forgotten t() functions
+
 jsantoni commited on 6/26/2009:
 sopac_user.php:
 sopac_social.php:

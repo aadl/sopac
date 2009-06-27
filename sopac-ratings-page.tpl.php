@@ -14,7 +14,7 @@
 if (count($ratings_arr[ratings])) {
 	print '
 		<table class="overview-ratings" width="100%">
-		<tr><th></th><th>Title</th><th>Date Rated</th></tr>
+		<tr><th></th><th>' . t('Title') . '</th><th>' . t('Date Rated') . '</th></tr>
 		<tr><td colspan="3" style="padding-top:5px;"></td></tr>
 	';
 	foreach ($ratings_arr[ratings] as $rating) {
@@ -29,5 +29,5 @@ if (count($ratings_arr[ratings])) {
 	}
 	print '</table>';
 } else {
-	print '<div class="overview-nodata">You have not rated any items yet.</div>';
+	print '<div class="overview-nodata">' . t('You have not rated any items yet.') . '</div>';
 }

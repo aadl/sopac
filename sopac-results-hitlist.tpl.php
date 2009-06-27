@@ -33,12 +33,12 @@ if (!$cover_img_url) {
 			</li>
 			<li><?php print $locum_result[pub_info]; ?></li>
 			<?php if ($locum_result[callnum]) { 
-				?><li>Call number: <strong><?php print $locum_result[callnum]; ?></strong></li><?php
+				?><li><?php print t('Call number: '); ?><strong><?php print $locum_result[callnum]; ?></strong></li><?php
 			} else if (count($locum_result[avail_details])) {
-				?><li>Call number: <strong><?php print key($locum_result[avail_details]); ?></strong></li><?php
+				?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result[avail_details]); ?></strong></li><?php
 			} ?>
 			<br />
-			<li> <?php print $locum_result[copies] . ' of ' . $locum_result[totalcopies]; $copy_tag = ($locum_result[copies] == '1') ? 'copy' : 'copies'; print " $copy_tag"; ?> available</li>
+			<li> <?php print $locum_result[copies] . t(' of ') . $locum_result[totalcopies]; print ($locum_result[copies] == '1') ? t('copy available') : t('copies available'); ?></li>
 			
 			<?php 
 			if (!in_array($locum_result[loc_code], $no_circ)) {

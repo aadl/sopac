@@ -31,15 +31,15 @@ $uri = $uri_arr[0];
 <?php } ?>
 
 	<span class="hitlist-range">
-		<strong>»</strong> Showing results <?php print $result_info[hit_lowest] . ' to ' . $result_info[hit_highest] . ' of ' . $result_info[num_results]; ?>
+		<strong>»</strong><?php print t(' Showing results ') .$result_info[hit_lowest] . t(' to ') . $result_info[hit_highest] . t(' of ') . $result_info[num_results]; ?>
 	</span>
 	<span class="hitlist-sorter">
-		Sort by: 
-		[ <?php print $sorted_by ? '<a href="' . $uri . $sort_rel . '">Relevance</a>' : '<strong>Relevance</strong>' ?> ] 
-		[ <?php print $sorted_by != 'top_rated' ? '<a href="' . $uri . $sort_toprated . '">Top Rated</a>' : '<strong>Top Rated</strong>' ?> ]
+		<?php print t('Sort by: '); ?>
+		[ <?php print $sorted_by ? '<a href="' . $uri . $sort_rel . '">' . t('Relevance') . '</a>' : '<strong>' . t('Relevance') . '</strong>' ?> ] 
+		[ <?php print $sorted_by != 'top_rated' ? '<a href="' . $uri . $sort_toprated . '">' . t('Top Rated') . '</a>' : '<strong>' . t('Top Rated') . '</strong>' ?> ]
 		<br />
-		[ <?php print $sorted_by != 'catalog_newest' ? '<a href="' . $uri . $sort_justadded . '">Just Added</a>' : '<strong>Just Added</strong>' ?> ]
-		[ <?php print $sorted_by != 'popular_week' ? '<a href="' . $uri . $sort_popular . '">Hot this Week</a>' : '<strong>Hot this Week</strong>' ?> ]
+		[ <?php print $sorted_by != 'catalog_newest' ? '<a href="' . $uri . $sort_justadded . '">' . t('Just Added') . '</a>' : '<strong>' . t('Just Added') . '</strong>' ?> ]
+		[ <?php print $sorted_by != 'popular_week' ? '<a href="' . $uri . $sort_popular . '">' . t('Hot this Week') . '</a>' : '<strong>' . t('Hot this Week') . '</strong>' ?> ]
 	</span>
 </div>
 <br />
