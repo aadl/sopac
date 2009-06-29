@@ -26,23 +26,23 @@ function sopac_catalog_search() {
 	drupal_add_js(drupal_get_path('module', 'sopac') .'/js/facet-browser.js');
 
 	$getvars = sopac_parse_get_vars();
+	$actions = sopac_parse_uri();
 	$locum = new locum_client;
 	$locum_cfg = $locum->locum_config;
-	$no_circ = $locum->csv_parser($locum_cfg[location_limits][no_request]);
+	$no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
 	$valid_search_types = array('title', 'author', 'keyword', 'subject', 'series', 'callnum', 'tags', 'reviews'); // TODO handle this more dynamically
-	$actions = sopac_parse_uri();
 
-	$sort = $getvars[sort];
-	$format = $getvars[search_format];
-	$location = $getvars[location];
-	$pager_page_array = explode(',', $getvars[page]);
+	$sort = $getvars['sort'];
+	$format = $getvars['search_format'];
+	$location = $getvars['location'];
+	$pager_page_array = explode(',', $getvars['page']);
 
 	// If there is a proper search query, we get that data here.
 	if (in_array($actions[1], $valid_search_types)) {
 		$valid_search = TRUE;
-		$_SESSION[search_url] = $_SERVER[REQUEST_URI];
-		if ($addl_search_args[limit]) { 
-			$limit = $addl_search_args[limit]; 
+		$_SESSION['search_url'] = $_SERVER['REQUEST_URI'];
+		if ($addl_search_args['limit']) { 
+			$limit = $addl_search_args['limit']; 
 		} else { 
 			$limit = variable_get('sopac_results_per_page', 20);
 		}
@@ -53,20 +53,25 @@ function sopac_catalog_search() {
 
 		// Grab the faceted search arguments from the URL
 		$facet_args = array();
-		if (count($getvars[facet_series])) { $facet_args[facet_series] = $getvars[facet_series]; }
-		if (count($getvars[facet_lang])) { $facet_args[facet_lang] = $getvars[facet_lang]; }
-		if (count($getvars[facet_year])) { $facet_args[facet_year] = $getvars[facet_year]; }
+		if (count($getvars['facet_series'])) { $facet_args['facet_series'] = $getvars['facet_series']; }
+		if (count($getvars['facet_lang'])) { $facet_args['facet_lang'] = $getvars['facet_lang']; }
+		if (count($getvars['facet_year'])) { $facet_args['facet_year'] = $getvars['facet_year']; }
 
 		// Get the search results from Locum
 		$locum_results_all = $locum->search($actions[1], utf8_urldecode($actions[2]), $limit, $page_offset, $sort, $format, $location, $facet_args);
-		$num_results = $locum_results_all[num_hits];
-		$result_info[num_results] = $num_results;
-		$result_info[hit_lowest] = $page_offset + 1;
+		$num_results = $locum_results_all['num_hits'];
+		$result_info['num_results'] = $num_results;
+		$result_info['hit_lowest'] = $page_offset + 1;
 		if (($page_offset + $limit) < $num_results) { 
-			$result_info[hit_highest] = $page_offset + $limit; 
+			$result_info['hit_highest'] = $page_offset + $limit; 
 		} else { 
-			$result_info[hit_highest] = $num_results; 
+			$result_info['hit_highest'] = $num_results; 
 		}
+	}
+	
+	if ($actions[0] == 'searchrss') {
+		sopac_catalog_rss_feed($locum_results_all);
+		return;
 	}
 
 	// Construct the search form
@@ -80,24 +85,24 @@ function sopac_catalog_search() {
 		$hitlist = '';
 		$hitnum = $page_offset + 1;
 
-		foreach ($locum_results_all[results] as $locum_result) {
+		foreach ($locum_results_all['results'] as $locum_result) {
 
 			// Format stdnum as best we can
-			if (preg_match('/ /', $locum_result[stdnum])) {
-				$stdnum_arr = explode(' ', $locum_result[stdnum]);
+			if (preg_match('/ /', $locum_result['stdnum'])) {
+				$stdnum_arr = explode(' ', $locum_result['stdnum']);
 				$stdnum = $stdnum_arr[0];
-				$locum_result[stdnum] = $stdnum;
+				$locum_result['stdnum'] = $stdnum;
 			} else {
-				$stdnum = $locum_result[stdnum];
+				$stdnum = $locum_result['stdnum'];
 			}
 
 			// Grab item status from Locum
-			$item_status = $locum->get_item_status($locum_result[bnum]);
-			$locum_result[copies] = $item_status[copies];
-			$locum_result[totalcopies] = $item_status[total];
-			$locum_result[avail_details] = $item_status[details];
+			$item_status = $locum->get_item_status($locum_result['bnum']);
+			$locum_result['copies'] = $item_status['copies'];
+			$locum_result['totalcopies'] = $item_status['total'];
+			$locum_result['avail_details'] = $item_status['details'];
 
-			$cover_img_url = $locum_result[cover_img];
+			$cover_img_url = $locum_result['cover_img'];
 		
 			$result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
 			$hitnum++;
@@ -113,6 +118,19 @@ function sopac_catalog_search() {
 
 	return '<p>'. t($result_page) .'</p>';
 
+}
+
+function sopac_catalog_rss_feed($locum_results_all) {
+	
+	$items = array();
+	$i = 0;
+	foreach ($locum_results_all['results'] as $locum_result) {
+		$item[$i]['title'] = ''; // Item title
+		$item[$i]['link'] = ''; // link to the catalog record
+		$item[$i]['description'] = theme('sopac_record_rss', $locaum_result);
+		$i++;
+	}
+	
 }
 
 /**
@@ -131,10 +149,10 @@ function sopac_bib_record() {
 	// Load social function
 	require_once('sopac_social.php');
 	
-	$no_circ = $locum->csv_parser($locum->locum_config[location_limits][no_request]);
+	$no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
 	$item = $locum->get_bib_item($bnum);
 	$item_status = $locum->get_item_status($bnum);
-	if ($item[bnum]) {
+	if ($item['bnum']) {
 		$result_page = theme('sopac_record', $item, $item_status, $locum->locum_config, $no_circ, &$locum);
 	} else {
 		$result_page = t('This record does not exist.');
@@ -154,16 +172,16 @@ function sopac_search_block($locum_results_all, $locum_cfg) {
 
 	$getvars = sopac_parse_get_vars();
 	$uri = sopac_parse_uri();
-	$format = $getvars[search_format];
+	$format = $getvars['search_format'];
 	$term_arr = explode('?', trim(preg_replace('/\//', ' ', $uri[2])));
 
-	$search[term] = trim($term_arr[0]);
-	$search[type] = trim($uri[1]);
-	$search[sortby] = $getvars[sort] ? $getvars[sort] : t('Most relevant');
-	$search[format] = count($getvars[search_format]) && ($getvars[search_format][0] != 'all') ? $getvars[search_format] : array();
-	$search[series] = count($getvars[facet_series]) ? $getvars[facet_series] : array();
-	$search[lang] = count($getvars[facet_lang]) ? $getvars[facet_lang] : array();
-	$search[year] = count($getvars[facet_year]) ? $getvars[facet_year] : array();
+	$search['term'] = trim($term_arr[0]);
+	$search['type'] = trim($uri[1]);
+	$search['sortby'] = $getvars['sort'] ? $getvars['sort'] : t('Most relevant');
+	$search['format'] = count($getvars['search_format']) && ($getvars['search_format'][0] != 'all') ? $getvars['search_format'] : array();
+	$search['series'] = count($getvars['facet_series']) ? $getvars['facet_series'] : array();
+	$search['lang'] = count($getvars['facet_lang']) ? $getvars['facet_lang'] : array();
+	$search['year'] = count($getvars['facet_year']) ? $getvars['facet_year'] : array();
 
 	return theme('sopac_search_block', $search, $locum_results_all, $locum_cfg, $user);
 
@@ -208,7 +226,7 @@ function sopac_author_format($author, $addl_author_ser) {
 function suggestion_link($locum_result) {
 	$pagevars = sopac_make_pagevars(sopac_parse_get_vars());
 	$url_prefix = variable_get('sopac_url_prefix', 'cat/seek'); 
-	$sugg_link = '/' . $url_prefix . '/search/' . $locum_result[type] . '/' . $locum_result[suggestion] . '?' . $pagevars;
+	$sugg_link = '/' . $url_prefix . '/search/' . $locum_result['type'] . '/' . $locum_result['suggestion'] . '?' . $pagevars;
 	return $sugg_link;
 }
 
@@ -269,10 +287,10 @@ function sopac_put_request_link($bnum) {
  * @return string|bool Search URL or FALSE
  */
 function sopac_prev_search_url($override = FALSE) {
-	if (!$_SESSION[search_url]) { return FALSE; }
-	$referer = substr($_SERVER[HTTP_REFERER], 7 + strlen($_SERVER[HTTP_HOST]));
-	$search = $_SESSION[search_url];
-	if ((($search == $referer) || $override) && $_SESSION[search_url]) { return $search; } else { return FALSE; }
+	if (!$_SESSION['search_url']) { return FALSE; }
+	$referer = substr($_SERVER['HTTP_REFERER'], 7 + strlen($_SERVER['HTTP_HOST']));
+	$search = $_SESSION['search_url'];
+	if ((($search == $referer) || $override) && $_SESSION['search_url']) { return $search; } else { return FALSE; }
 }
 
 /**
@@ -288,9 +306,9 @@ function sopac_request_item() {
 	$button_txt = t('Request Selected Item');
 	profile_load_profile(&$user);
 	if ($user->uid && sopac_bcode_isverified(&$user)) {
-		if ($_POST[sub_type] == $button_txt) {
-			if ($_POST[varname]) {
-				$varname = $_POST[varname];
+		if ($_POST['sub_type'] == $button_txt) {
+			if ($_POST['varname']) {
+				$varname = $_POST['varname'];
 			} else {
 				$request_error_msg = t('You need to select an item to request.');
 			}
@@ -311,9 +329,9 @@ function sopac_request_item() {
 			$hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
 		}
 		
-		if ($hold_result[success]) {
+		if ($hold_result['success']) {
 			// handling multi-branch scenario
-			$request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item[title] . '</span>';
+			$request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item['title'] . '</span>';
 			if ($pickup_name) {
 				$request_result_msg .= t(' for pickup at ') . $pickup_name;
 			}
@@ -328,20 +346,20 @@ function sopac_request_item() {
 			$request_result_msg = drupal_build_form('sopac_hold_location_form', $form_data);
 		}
 		else {
-			$request_result_msg = t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item[title] . '</span>';
+			$request_result_msg = t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item['title'] . '</span>';
 		}
 		
-		if ($hold_result[error]) {
-			$request_result_msg = $hold_result[error];
+		if ($hold_result['error']) {
+			$request_result_msg = $hold_result['error'];
 		}
 		
-		if ($hold_result[selection]  && !$hold_result[success]) {
+		if ($hold_result['selection']  && !$hold_result['success']) {
 			$requestable = 0;
 			$header = array('',t('Location'),t('Call Number'),t('Status'));
-			foreach ($hold_result[selection] as $selection) {
-				$status = $selection[status];
-				if ($selection[varname]) {
-					$radio = '<input type="radio" name="varname" value="' . $selection[varname] . '">';
+			foreach ($hold_result['selection'] as $selection) {
+				$status = $selection['status'];
+				if ($selection['varname']) {
+					$radio = '<input type="radio" name="varname" value="' . $selection['varname'] . '">';
 					$non_circ = NULL;
 					$requestable++;
 				} else {
@@ -350,8 +368,8 @@ function sopac_request_item() {
 				}
 				$rows[] = array(
 					$radio,
-					$selection[location],
-					$selection[callnum],
+					$selection['location'],
+					$selection['callnum'],
 					$status,
 				);
 			}
@@ -424,7 +442,7 @@ function sopac_hold_location_form_submit($form, &$form_state) {
  * @return string URL
  */
 function sopac_savesearch_url() {
-	$search_url = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/savesearch' . substr($_SERVER[REQUEST_URI], 8 + strlen(variable_get('sopac_url_prefix', 'cat/seek')));
+	$search_url = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/savesearch' . substr($_SERVER['REQUEST_URI'], 8 + strlen(variable_get('sopac_url_prefix', 'cat/seek')));
 	return $search_url;
 }
 
@@ -443,7 +461,7 @@ function sopac_search_form_basic() {
 	$search_args_raw = explode('?', $actions[2]);
 	$search_args = trim($search_args_raw[0]);
 	$stype_selected = $actions[1] ? 'cat_' . $actions[1] : 'cat_keyword';
-	$sformat_selected = $_GET[search_format] ? $_GET[search_format] : 'all';
+	$sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : 'all';
 
 	$stypes = array(
 		'cat_keyword' => t('Keyword'),
@@ -462,7 +480,7 @@ function sopac_search_form_basic() {
 		'oldest' => t('Oldest First'),
 	);
 
-	foreach ($locum_cfg[format_groups] as $sfmt => $sfmt_codes) {
+	foreach ($locum_cfg['format_groups'] as $sfmt => $sfmt_codes) {
 		$sformats[preg_replace('/,[ ]*/', '|', trim($sfmt_codes))] = ucfirst($sfmt);
 	}
 	if (is_null($prompt)) {
@@ -522,8 +540,8 @@ function sopac_search_form_adv() {
 	$search_args_raw = explode('?', $actions[2]);
 	$search_args = trim($search_args_raw[0]);
 	$stype_selected = $actions[1] ? 'cat_' . $actions[1] : 'cat_keyword';
-	$sformat_selected = $_GET[search_format] ? $_GET[search_format] : 'all';
-	foreach ($locum_cfg[format_groups] as $sfmt => $sfmt_codes) {
+	$sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : 'all';
+	foreach ($locum_cfg['format_groups'] as $sfmt => $sfmt_codes) {
 		$sformats[preg_replace('/,[ ]*/', '|', trim($sfmt_codes))] = ucfirst($sfmt);
 	}
 
@@ -590,7 +608,7 @@ function sopac_search_form_adv() {
 		'#type' => 'select',
 		'#title' => t('Sorted by'),
 		'#default_value' => '',
-		'#value' => $getvars[sort],
+		'#value' => $getvars['sort'],
 		'#options' => $sortopts,
 	);
 
@@ -599,9 +617,9 @@ function sopac_search_form_adv() {
 		'#suffix' => '</div>',
 	);
 
-	if (count($locum_cfg[collections])) {
+	if (count($locum_cfg['collections'])) {
 		
-		foreach ($locum_cfg[collections] as $loc_collect_key => $loc_collect_var) {
+		foreach ($locum_cfg['collections'] as $loc_collect_key => $loc_collect_var) {
 			$loc_collect[$loc_collect_key] = $loc_collect_key;
 		}
 		
@@ -609,7 +627,7 @@ function sopac_search_form_adv() {
 			'#type' => 'select',
 			'#title' => t('In these collections'),
 			'#size' => 5,
-			'#value' => $getvars[collection],
+			'#value' => $getvars['collection'],
 			'#options' => $loc_collect,
 			'#multiple' => TRUE,
 		);
@@ -619,8 +637,8 @@ function sopac_search_form_adv() {
 		'#type' => 'select',
 		'#title' => t('In these locations'),
 		'#size' => 5,
-		'#value' => $getvars[location],
-		'#options' => $locum_cfg[locations],
+		'#value' => $getvars['location'],
+		'#options' => $locum_cfg['locations'],
 		'#multiple' => TRUE,
 	);
 	
@@ -628,8 +646,8 @@ function sopac_search_form_adv() {
 		'#type' => 'select',
 		'#title' => t('In these formats'),
 		'#size' => 5,
-		'#value' => $getvars[search_format],
-		'#options' => $locum_cfg[formats],
+		'#value' => $getvars['search_format'],
+		'#options' => $locum_cfg['formats'],
 		'#multiple' => TRUE,
 	);
 	

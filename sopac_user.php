@@ -21,20 +21,20 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 	// Patron information table (top of the page)
 	$patron_details_table = sopac_user_info_table($account, $locum);
 	if (variable_get('sopac_summary_enable', 1)) {
-		$result[patroninfo]['#title'] = t('Account Summary');
-		$result[patroninfo]['#weight'] = 1;
-		$result[patroninfo]['#type'] = 'user_profile_category';
-		$result[patroninfo][details]['#value'] = $patron_details_table;
+		$result['patroninfo']['#title'] = t('Account Summary');
+		$result['patroninfo']['#weight'] = 1;
+		$result['patroninfo']['#type'] = 'user_profile_category';
+		$result['patroninfo']['details']['#value'] = $patron_details_table;
 	}
 	
 	// Patron checkouts (middle of the page)
 	if ($account->valid_card && $account->bcode_verify) {
 		$co_table = sopac_user_chkout_table($account, $locum);
 		if ($co_table) {
-			$result[patronco]['#title'] = t('Checked-out Items');
-			$result[patronco]['#weight'] = 2;
-			$result[patronco]['#type'] = 'user_profile_category';
-			$result[patronco][details]['#value'] = $co_table;
+			$result['patronco']['#title'] = t('Checked-out Items');
+			$result['patronco']['#weight'] = 2;
+			$result['patronco']['#type'] = 'user_profile_category';
+			$result['patronco']['details']['#value'] = $co_table;
 		}
 	}
 
@@ -42,10 +42,10 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 	if ($account->valid_card && $account->bcode_verify) {
 		$holds_table = sopac_user_holds_table($account, $locum);
 		if ($holds_table) {
-			$result[patronholds]['#title'] = t('Requested Items');
-			$result[patronholds]['#weight'] = 3;
-			$result[patronholds]['#type'] = 'user_profile_category';
-			$result[patronholds][details]['#value'] = $holds_table;
+			$result['patronholds']['#title'] = t('Requested Items');
+			$result['patronholds']['#weight'] = 3;
+			$result['patronholds']['#type'] = 'user_profile_category';
+			$result['patronholds']['details']['#value'] = $holds_table;
 		}
 	}
 
@@ -53,8 +53,8 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 	$account->content[] = $result;
 	
 	// The Summary is not really needed.
-	if (variable_get('sopac_history_hide', 1)) { unset($account->content[summary]); }
-	unset($account->content[Preferences]);
+	if (variable_get('sopac_history_hide', 1)) { unset($account->content['summary']); }
+	unset($account->content['Preferences']);
 }
 
 /**
@@ -84,12 +84,12 @@ function sopac_user_info_table(&$account, &$locum) {
 		$bcode_verify = sopac_bcode_isverified($account);
 
 		if ($bcode_verify) { $account->bcode_verify = TRUE; } else { $account->bcode_verify = FALSE; }
-		if ($userinfo[pnum]) { $account->valid_card = TRUE; } else { $account->valid_card = FALSE; }
+		if ($userinfo['pnum']) { $account->valid_card = TRUE; } else { $account->valid_card = FALSE; }
 
 		// Construct the user details table based on what is configured in the admin interface
 		if ($account->valid_card && $bcode_verify) {
 			if (variable_get('sopac_pname_enable', 1)) {
-				$rows[] = array(array('data' => t('Patron Name'), 'class' => 'attr_name'), $userinfo[name]);
+				$rows[] = array(array('data' => t('Patron Name'), 'class' => 'attr_name'), $userinfo['name']);
 			}
 			if (variable_get('sopac_lcard_enable', 1)) {
 				$rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
@@ -99,17 +99,17 @@ function sopac_user_info_table(&$account, &$locum) {
 				$rows[] = array(array('data' => t('Home Branch'), 'class' => 'attr_name'), $home_branch_link);
 			}
 			if (variable_get('sopac_numco_enable', 1)) {
-				$rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo[checkouts]);
+				$rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo['checkouts']);
 			}
 			if (variable_get('sopac_fines_enable', 1)) {
-				$amount_link = '<a href="/user/fines">$' . number_format($userinfo[balance], 2, '.', '') . '</a>';
+				$amount_link = '<a href="/user/fines">$' . number_format($userinfo['balance'], 2, '.', '') . '</a>';
 				$rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $amount_link);
 			}
 			if (variable_get('sopac_cardexp_enable', 1)) {
-				$rows[] = array(array('data' => t('Card Expiration Date'), 'class' => 'attr_name'), date('m-d-Y', $userinfo[expires]));
+				$rows[] = array(array('data' => t('Card Expiration Date'), 'class' => 'attr_name'), date('m-d-Y', $userinfo['expires']));
 			}
 			if (variable_get('sopac_tel_enable', 1)) {
-				$rows[] = array(array('data' => t('Telephone'), 'class' => 'attr_name'), $userinfo[tel1]);
+				$rows[] = array(array('data' => t('Telephone'), 'class' => 'attr_name'), $userinfo['tel1']);
 			}
 		} else {
 			$rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
@@ -153,14 +153,14 @@ function sopac_user_info_table(&$account, &$locum) {
 function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 
 	// Process any renew requests that have been submitted
-	if ($_POST[sub_type] == 'Renew Selected') {
-		if (count($_POST[inum])) {
-			foreach ($_POST[inum] as $inum => $varname) {
+	if ($_POST['sub_type'] == 'Renew Selected') {
+		if (count($_POST['inum'])) {
+			foreach ($_POST['inum'] as $inum => $varname) {
 				$items[$inum] = $varname;
 			}
 			$renew_status = $locum->renew_items($account->profile_pref_cardnum, $account->locum_pass, $items);
 		}
-	} else if ($_POST[sub_type] == 'Renew All') {
+	} else if ($_POST['sub_type'] == 'Renew All') {
 		$renew_status = $locum->renew_items($account->profile_pref_cardnum, $account->locum_pass, 'all');
 	}
 
@@ -174,19 +174,19 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 		if (!count($checkouts)) { return t('No items checked out.'); }
 		$header = array('',t('Title'),t('Due Date'));
 		foreach ($checkouts as $co) {
-			if ($renew_status[$co[inum]][error]) {
-				$duedate = '<span style="color: red;">' . $renew_status[$co[inum]][error] . '</span>';
+			if ($renew_status[$co['inum']]['error']) {
+				$duedate = '<span style="color: red;">' . $renew_status[$co['inum']]['error'] . '</span>';
 			} else {
-				if (time() > $co[duedate]) {
-					$duedate = '<span style="color: red;">' . date('m-d-Y', $co[duedate]) . '</span>';
+				if (time() > $co['duedate']) {
+					$duedate = '<span style="color: red;">' . date('m-d-Y', $co['duedate']) . '</span>';
 				} else {
-					$duedate = date('m-d-Y', $co[duedate]);
+					$duedate = date('m-d-Y', $co['duedate']);
 				}
 			}
 			
 			$rows[] = array(
-				'<input type="checkbox" name="inum[' . $co[inum] . ']" value="' . $co[varname] . '">',
-				'<a href="/catalog/record/' . $co[bnum] . '">' . $co[title] . '</a>',
+				'<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">',
+				'<a href="/catalog/record/' . $co['bnum'] . '">' . $co['title'] . '</a>',
 				$duedate,
 			);
 		}
@@ -211,9 +211,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 function sopac_user_holds_table(&$account, &$locum) {
 	
 	// Process any holds deletions that have been submitted
-	if ($_POST[sub_type] == 'Cancel Selected Holds') {
-		if (count($_POST[bnum])) {
-			foreach ($_POST[bnum] as $bnum => $varname) {
+	if ($_POST['sub_type'] == 'Cancel Selected Holds') {
+		if (count($_POST['bnum'])) {
+			foreach ($_POST['bnum'] as $bnum => $varname) {
 				$items[$bnum] = $varname;
 			}
 			$locum->cancel_holds($account->profile_pref_cardnum, $account->locum_pass, $items);
@@ -236,10 +236,10 @@ function sopac_user_holds_table(&$account, &$locum) {
 				}
 			}
 			$rows[] = array(
-				'<input type="checkbox" name="bnum[' . $hold[bnum] . ']" value="' . $hold[varname] . '">',
-				'<a href="/catalog/record/' . $hold[bnum] . '">' . $hold[title] . '</a>',
-				$hold[status],
-				$hold[pickuploc],
+				'<input type="checkbox" name="bnum[' . $hold['bnum'] . ']" value="' . $hold['varname'] . '">',
+				'<a href="/catalog/record/' . $hold['bnum'] . '">' . $hold['title'] . '</a>',
+				$hold['status'],
+				$hold['pickuploc'],
 			);
 		}
 		$submit_button = '<input type="submit" name="sub_type" value="' . t('Cancel Selected Holds') . '">';
@@ -296,13 +296,13 @@ function sopac_fines_page() {
 			$fine_total = (float) 0;
 			foreach ($fines as $fine) {
 				$rows[] = array(
-					'<input type="checkbox" name="varname[]" value="' . $fine[varname] . '">',
-					'$' . number_format($fine[amount], 2),
-					$fine[desc],
+					'<input type="checkbox" name="varname[]" value="' . $fine['varname'] . '">',
+					'$' . number_format($fine['amount'], 2),
+					$fine['desc'],
 				);
-				$hidden_vars .= '<input type="hidden" name="fine_summary[' . $fine[varname] . '][amount]" value="' . addslashes($fine[amount]) . '">';
-				$hidden_vars .= '<input type="hidden" name="fine_summary[' . $fine[varname] . '][desc]" value="' . addslashes($fine[desc]) . '">';
-				$fine_total = $fine_total + $fine[amount];
+				$hidden_vars .= '<input type="hidden" name="fine_summary[' . $fine['varname'] . '][amount]" value="' . addslashes($fine['amount']) . '">';
+				$hidden_vars .= '<input type="hidden" name="fine_summary[' . $fine['varname'] . '][desc]" value="' . addslashes($fine['desc']) . '">';
+				$fine_total = $fine_total + $fine['amount'];
 			}
 			$rows[] = array('<strong>Total:</strong>', '$' . number_format($fine_total, 2), '');
 			$submit_button = '<input type="submit" value="' . t('Pay Selected Charges') . '">';
@@ -325,8 +325,8 @@ function sopac_finespaid_page() {
 	global $user;
 	$limit = 20; // TODO Make this configurable
 	
-	if (count($_POST[payment_id])) {
-		foreach ($_POST[payment_id] as $pid) {
+	if (count($_POST['payment_id'])) {
+		foreach ($_POST['payment_id'] as $pid) {
 			db_query('DELETE FROM {sopac_fines_paid} WHERE payment_id = ' . $pid . ' AND uid = ' . $user->uid);
 		}
 	}
@@ -335,10 +335,10 @@ function sopac_finespaid_page() {
 		$header = array('','Payment Date', 'Payment Description','Amount');
 		$dbq = pager_query('SELECT payment_id, UNIX_TIMESTAMP(trans_date) as trans_date, fine_desc, amount FROM {sopac_fines_paid} WHERE uid = ' . $user->uid . ' ORDER BY trans_date DESC', $limit);
 		while ($payment_arr = db_fetch_array($dbq)) {
-			$checkbox = '<input type="checkbox" name="payment_id[]" value="' . $payment_arr[payment_id] . '">';
-			$payment_date = date('m-d-Y, H:i:s', $payment_arr[trans_date]);
-			$payment_desc = $payment_arr[fine_desc];
-			$payment_amt = '$' . number_format($payment_arr[amount], 2);
+			$checkbox = '<input type="checkbox" name="payment_id[]" value="' . $payment_arr['payment_id'] . '">';
+			$payment_date = date('m-d-Y, H:i:s', $payment_arr['trans_date']);
+			$payment_desc = $payment_arr['fine_desc'];
+			$payment_amt = '$' . number_format($payment_arr['amount'], 2);
 			$rows[] = array($checkbox, $payment_date, $payment_desc, $payment_amt);
 		}
 		$submit_button = '<input type="submit" value="Remove Selected Payment Records">';
@@ -358,10 +358,10 @@ function sopac_makepayment_page() {
 	profile_load_profile(&$user);
 
 	if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
-		if ($_POST[varname] && is_array($_POST[varname])) {
-			$varname = $_POST[varname];
+		if ($_POST['varname'] && is_array($_POST['varname'])) {
+			$varname = $_POST['varname'];
 		} else {
-			$varname = explode('|', $_POST[varname]);
+			$varname = explode('|', $_POST['varname']);
 		}
 		$locum_pass = substr($user->pass, 0, 7);
 		$cardnum = $user->profile_pref_cardnum;
@@ -372,15 +372,15 @@ function sopac_makepayment_page() {
 			$header = array('', t('Amount'),t('Description'));
 			$fine_total = (float) 0;
 			foreach ($fines as $fine) {
-				if (in_array($fine[varname], $varname)) {
+				if (in_array($fine['varname'], $varname)) {
 					$rows[] = array(
 						'',
-						'$' . number_format($fine[amount], 2),
-						$fine[desc],
+						'$' . number_format($fine['amount'], 2),
+						$fine['desc'],
 					);
-					$fine_total = $fine_total + $fine[amount];
-					$hidden_vars_arr[$fine[varname]][amount] = $_POST[fine_summary][$fine[varname]][amount];
-					$hidden_vars_arr[$fine[varname]][desc] = $_POST[fine_summary][$fine[varname]][desc];
+					$fine_total = $fine_total + $fine['amount'];
+					$hidden_vars_arr[$fine['varname']]['amount'] = $_POST['fine_summary'][$fine['varname']]['amount'];
+					$hidden_vars_arr[$fine['varname']]['desc'] = $_POST['fine_summary'][$fine['varname']]['desc'];
 				}
 			}
 			$payment_form = drupal_get_form('sopac_fine_payment_form', $varname, (string) $fine_total, $hidden_vars_arr);
@@ -502,8 +502,8 @@ function sopac_fine_payment_form() {
 	);
 	
 	foreach ($hidden_vars_arr as $hkey => $hvar) {
-		$form['sopac_payment_form']['fine_summary[' . $hkey . '][amount]'] = array('#type' => 'hidden', '#value' => $hvar[amount]);
-		$form['sopac_payment_form']['fine_summary[' . $hkey . '][desc]'] = array('#type' => 'hidden', '#value' => $hvar[desc]);
+		$form['sopac_payment_form']['fine_summary[' . $hkey . '][amount]'] = array('#type' => 'hidden', '#value' => $hvar['amount']);
+		$form['sopac_payment_form']['fine_summary[' . $hkey . '][desc]'] = array('#type' => 'hidden', '#value' => $hvar['desc']);
 	}
 	$form['sopac_payment_form']['varname'] = array('#type' => 'hidden', '#value' => implode('|', $varname));
 	$form['sopac_payment_form']['total'] = array('#type' => 'hidden', '#value' => $fine_total);
@@ -520,37 +520,37 @@ function sopac_fine_payment_form_submit($form, &$form_state) {
 
 	if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
 		$fines = $locum->get_patron_fines($cardnum, $locum_pass);
-		$payment_details[name] = $form_state[values][name];
-		$payment_details[address1] = $form_state[values][address1];
-		$payment_details[city] = $form_state[values][city];
-		$payment_details[state] = $form_state[values][state];
-		$payment_details[zip] = $form_state[values][zip];
-		$payment_details[email] = $form_state[values][email];
-		$payment_details[ccnum] = $form_state[values][ccnum];
-		$payment_details[ccexpmonth] = $form_state[values][ccexpmonth];
-		$payment_details[ccexpyear] = $form_state[values][ccexpyear];
-		$payment_details[ccseccode] = $form_state[values][ccseccode];
-		$payment_details[total] = $form_state[values][total];
-		$payment_details[varnames] = explode('|', $form_state[values][varname]);
+		$payment_details['name'] = $form_state['values']['name'];
+		$payment_details['address1'] = $form_state['values']['address1'];
+		$payment_details['city'] = $form_state['values']['city'];
+		$payment_details['state'] = $form_state['values']['state'];
+		$payment_details['zip'] = $form_state['values']['zip'];
+		$payment_details['email'] = $form_state['values']['email'];
+		$payment_details['ccnum'] = $form_state['values']['ccnum'];
+		$payment_details['ccexpmonth'] = $form_state['values']['ccexpmonth'];
+		$payment_details['ccexpyear'] = $form_state['values']['ccexpyear'];
+		$payment_details['ccseccode'] = $form_state['values']['ccseccode'];
+		$payment_details['total'] = $form_state['values']['total'];
+		$payment_details['varnames'] = explode('|', $form_state['values']['varname']);
 		$payment_result = $locum->pay_patron_fines($user->profile_pref_cardnum, $locum_pass, $payment_details);
 
-		if (!$payment_result[approved]) {
-			if ($payment_result[reason]) {
-				$error = '<strong>' . t('Your payment was not processed:') . '</strong> ' . $payment_result[reason];
+		if (!$payment_result['approved']) {
+			if ($payment_result['reason']) {
+				$error = '<strong>' . t('Your payment was not processed:') . '</strong> ' . $payment_result['reason'];
 			} else {
 				$error = t('We were unable to process your payment.');
 			}
 			drupal_set_message(t('<span class="fine-notice">' . $error . '</span>'));
-			if ($payment_result[error]) {
-				drupal_set_message(t('<span class="fine-notice">' . $payment_result[error] . '</span>'));
+			if ($payment_result['error']) {
+				drupal_set_message(t('<span class="fine-notice">' . $payment_result['error'] . '</span>'));
 			}
 		} else {
-			foreach ($_POST[fine_summary] as $fine_var => $fine_var_arr) {
-				$fine_desc = db_escape_string($fine_var_arr[desc]);
-				$sql = 'INSERT INTO {sopac_fines_paid} (payment_id, uid, amount, fine_desc) VALUES (0, ' . $user->uid . ', ' . $fine_var_arr[amount] . ', "' . $fine_desc . '")';
+			foreach ($_POST['fine_summary'] as $fine_var => $fine_var_arr) {
+				$fine_desc = db_escape_string($fine_var_arr['desc']);
+				$sql = 'INSERT INTO {sopac_fines_paid} (payment_id, uid, amount, fine_desc) VALUES (0, ' . $user->uid . ', ' . $fine_var_arr['amount'] . ', "' . $fine_desc . '")';
 				db_query($sql);
 			}
-			$amount = '$' . number_format($form_state[values][total], 2);
+			$amount = '$' . number_format($form_state['values']['total'], 2);
 			drupal_set_message('<span class="fine-notice">' . t('Your payment of ') . $amount . t(' was successful.  Thank-you!') . '</span>');
 		}
 	}
@@ -564,8 +564,8 @@ function sopac_saved_searches_page() {
 	global $user;
 	$limit = 20; // TODO Make this configurable
 	
-	if (count($_POST[search_id])) {
-		foreach ($_POST[search_id] as $sid) {
+	if (count($_POST['search_id'])) {
+		foreach ($_POST['search_id'] as $sid) {
 			db_query('DELETE FROM {sopac_saved_searches} WHERE search_id = ' . $sid . ' AND uid = ' . $user->uid);
 		}
 	}
@@ -574,8 +574,8 @@ function sopac_saved_searches_page() {
 		$header = array('','Search Description','');
 		$dbq = pager_query('SELECT * FROM {sopac_saved_searches} WHERE uid = ' . $user->uid . ' ORDER BY savedate DESC', $limit);
 		while ($search_arr = db_fetch_array($dbq)) {
-			$checkbox = '<input type="checkbox" name="search_id[]" value="' . $search_arr[search_id] . '">';
-			$search_desc = '<a href="' . $search_arr[search_url] . '">' . $search_arr[search_desc]. '</a>';
+			$checkbox = '<input type="checkbox" name="search_id[]" value="' . $search_arr['search_id'] . '">';
+			$search_desc = '<a href="' . $search_arr['search_url'] . '">' . $search_arr['search_desc']. '</a>';
 			// TODO: implement RSS feeds for saved searches.
 			$search_feed = '';
 			// $search_feed = theme_feed_icon('/feed' . $search_arr[search_url], 'RSS Feed: ' . $search_arr[search_desc]);
@@ -600,7 +600,7 @@ function sopac_saved_searches_page() {
 function sopac_savesearch_form() {
 	global $user;
 	
-	$search_args = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/search' . substr($_SERVER[REQUEST_URI], 12 + strlen(variable_get('sopac_url_prefix', 'cat/seek')));
+	$search_args = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/search' . substr($_SERVER['REQUEST_URI'], 12 + strlen(variable_get('sopac_url_prefix', 'cat/seek')));
 	$uri_arr = sopac_parse_uri();
 	$term_arr = explode('?', $uri_arr[2]);
 	
@@ -632,10 +632,10 @@ function sopac_savesearch_form() {
 function sopac_savesearch_form_submit($form, &$form_state) {
 	global $user;
 	
-	$desc = db_escape_string($form_state[values][searchname]);
-	db_query('INSERT INTO {sopac_saved_searches} VALUES (0, ' . $user->uid . ', NOW(), "' . $desc . '", "' . $form_state[values][uri] . '")');
+	$desc = db_escape_string($form_state['values']['searchname']);
+	db_query('INSERT INTO {sopac_saved_searches} VALUES (0, ' . $user->uid . ', NOW(), "' . $desc . '", "' . $form_state['values']['uri'] . '")');
 
-	$submsg = '<strong>»</strong> ' . t('You have saved this search.') . '<br /><strong>»</strong> <a href="' . $form_state[values][uri] . '">' . t('Return to your search') . '</a><br /><br />';
+	$submsg = '<strong>»</strong> ' . t('You have saved this search.') . '<br /><strong>»</strong> <a href="' . $form_state['values']['uri'] . '">' . t('Return to your search') . '</a><br /><br />';
 	drupal_set_message($submsg);
 
 }
@@ -651,10 +651,10 @@ function sopac_update_locum_acct($op, &$edit, &$account) {
 	$userinfo = $locum->get_patron_info($cardnum);
 	$bcode_verify = sopac_bcode_isverified($account);
 	if ($bcode_verify) { $account->bcode_verify = TRUE; } else { $account->bcode_verify = FALSE; }
-	if ($userinfo[pnum]) { $account->valid_card = TRUE; } else { $account->valid_card = FALSE; }
+	if ($userinfo['pnum']) { $account->valid_card = TRUE; } else { $account->valid_card = FALSE; }
 	if (!$account->valid_card || !$bcode_verify) { return 0; }
 	
-	if ($edit[mail] && $pnum) {
+	if ($edit['mail'] && $pnum) {
 		// TODO update email. etc.
 	}
 }
@@ -693,7 +693,7 @@ function sopac_bcode_verify_form() {
 			'#size' => 32,
 			'#maxlength' => 128,
 			'#required' => $req_flds,
-			'#value' => $_POST[last_name],
+			'#value' => $_POST['last_name'],
 		);
 	}
 	
@@ -704,7 +704,7 @@ function sopac_bcode_verify_form() {
 			'#size' => 24,
 			'#maxlength' => 32,
 			'#required' => $req_flds,
-			'#value' => $_POST[streetname],
+			'#value' => $_POST['streetname'],
 		);
 	}
 	
@@ -716,7 +716,7 @@ function sopac_bcode_verify_form() {
 			'#size' => 18,
 			'#maxlength' => 24,
 			'#required' => $req_flds,
-			'#value' => $_POST[telephone],
+			'#value' => $_POST['telephone'],
 		);
 	}
 	
@@ -732,8 +732,8 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 	global $account;
 	
 	$locum = new locum_client;
-	$cardnum = $form_state[values][cardnum];
-	$uid = $form_state[values][uid];
+	$cardnum = $form_state['values']['cardnum'];
+	$uid = $form_state['values']['uid'];
 	$userinfo = $locum->get_patron_info($cardnum);
 	$numreq = 0;
 	$correct = 0;
@@ -743,9 +743,9 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 	
 	// Match the name given
 	if (variable_get('sopac_require_name', 1)) {
-		if (trim($form_state[values][last_name])) {
-			$locum_name = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($userinfo[name])));
-			$sub_name = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($form_state[values][last_name])));
+		if (trim($form_state['values']['last_name'])) {
+			$locum_name = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($userinfo['name'])));
+			$sub_name = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($form_state['values']['last_name'])));
 			if (preg_match('/\b' . $sub_name . '\b/i', $locum_name)) {
 				$correct++;
 			} else {
@@ -758,9 +758,9 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 	}
 	
 	if (variable_get('sopac_require_streetname', 1)) {
-		if (trim($form_state[values][streetname])) {
-			$locum_addr = ereg_replace("[^A-Za-z ]", "", trim(strtolower($userinfo[address])));
-			$sub_addr = ereg_replace("[^A-Za-z ]", "", trim(strtolower($form_state[values][streetname])));
+		if (trim($form_state['values']['streetname'])) {
+			$locum_addr = ereg_replace("[^A-Za-z ]", "", trim(strtolower($userinfo['address'])));
+			$sub_addr = ereg_replace("[^A-Za-z ]", "", trim(strtolower($form_state['values']['streetname'])));
 			$sub_addr_arr = explode(' ', $sub_addr);
 			if (strlen($sub_addr_arr[0]) == 1 || $sub_addr_arr[0] == 'north' || $sub_addr_arr[0] == 'east' || $sub_addr_arr[0] == 'south' || $sub_addr_arr[0] == 'west') {
 				$sub_addr = $sub_addr_arr[1];
@@ -779,9 +779,9 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 	}
 	
 	if (variable_get('sopac_require_tel', 1)) {
-		if (trim($form_state[values][telephone])) {
-			$locum_tel = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($userinfo[tel1] . ' ' . $userinfo[tel2])));
-			$sub_tel = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($form_state[values][telephone])));
+		if (trim($form_state['values']['telephone'])) {
+			$locum_tel = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($userinfo['tel1'] . ' ' . $userinfo['tel2'])));
+			$sub_tel = ereg_replace("[^A-Za-z0-9 ]", "", trim(strtolower($form_state['values']['telephone'])));
 			if (preg_match('/\b' . $sub_tel . '\b/i', $locum_tel)) {
 				$correct++;
 			} else {

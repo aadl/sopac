@@ -16,14 +16,14 @@ function sopac_init() {
 
 	// Handle SSL redirection if it is enabled.
 	if (variable_get('sopac_ssl_enable', 0)) {
-		$protected_uri = preg_match('/^(\/user|\/myaccount|\/login)/', $_SERVER[REQUEST_URI], $debug_match);
-		if ($_SERVER[HTTPS] && !$protected_uri) {
-			$new_link = 'http://' . $_SERVER[HTTP_HOST] . $_SERVER[REQUEST_URI];
-		} else if (!$_SERVER[HTTPS] && $protected_uri) {
+		$protected_uri = preg_match('/^(\/user|\/myaccount|\/login)/', $_SERVER['REQUEST_URI'], $debug_match);
+		if ($_SERVER['HTTPS'] && !$protected_uri) {
+			$new_link = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		} else if (!$_SERVER['HTTPS'] && $protected_uri) {
 			if (variable_get('sopac_ssl_port', 443) != '443') {
 				$nonstd_port = ':' . variable_get('sopac_ssl_port', 443);
 			}
-			$new_link = 'https://' . $_SERVER[HTTP_HOST] . $_SERVER[REQUEST_URI];
+			$new_link = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		}
 		if ($new_link) { header("Location: $new_link"); }
 	}
@@ -135,7 +135,7 @@ function sopac_block($op='list', $delta=0) {
 		case 'view':
 			switch ($delta) {
 				case 0:
-					if ($locum_results_all[num_hits]) {
+					if ($locum_results_all['num_hits']) {
 						$block_content = theme('sopac_facet_block', $facet_menu, $locum_results_all, $locum_cfg);
 						$block['subject'] = 'Facets';
 						$block['content'] = $block_content;
@@ -219,6 +219,14 @@ function sopac_menu() {
 	);
 
 	$items[variable_get('sopac_url_prefix', 'cat/seek') . '/search'] = array(
+		'title' => 'Catalog Search',
+		'page callback' => 'sopac_catalog_search',
+		'access arguments' => array('access content'),
+		'file' => 'sopac_catalog.php',
+		'type' => MENU_CALLBACK,
+	);
+	
+	$items[variable_get('sopac_url_prefix', 'cat/seek') . '/searchrss'] = array(
 		'title' => 'Catalog Search',
 		'page callback' => 'sopac_catalog_search',
 		'access arguments' => array('access content'),
@@ -469,6 +477,10 @@ function sopac_theme() {
 			'template' => 'sopac-record',
 			'arguments' => array('item' => NULL, 'item_status' => NULL, 'locum_config' => NULL, 'no_circ' => NULL, 'locum' => NULL),
 		),
+		'sopac_record_rss' => array(
+			'template' => 'sopac-record-rss',
+			'arguments' => array('locum_result' => NULL),
+		),
 		'sopac_review' => array(
 			'template' => 'sopac-review',
 			'arguments' => array('user' =>NULL, 'title' => NULL, 'rev_arr' => NULL, 'page_type' => NULL, 'rev_form' => NULL, 'ratings' => NULL, 'no_rev_msg' => NULL, 'bib_info' => NULL),
@@ -585,11 +597,11 @@ function theme_sopac_search_handler() {
 	$locum = new locum();
 	$locum_cfg = $locum->locum_config;
 
-	$search_query = trim($_POST[search_query]);
+	$search_query = trim($_POST['search_query']);
 	if (!$search_query) { $search_query = '*'; }
 	// enforce encoding of user-entered data
 	else {$search_query = drupal_urlencode($search_query);}
-	$search_type = $_POST[search_type];
+	$search_type = $_POST['search_type'];
 	$search_type_arr = explode('_', $search_type);
 	if ($search_type_arr[0] == 'cat') {
 		
@@ -600,25 +612,25 @@ function theme_sopac_search_handler() {
 		// Material / Format types
 		if ($search_fmt) {
 			if ($search_fmt != 'all') {
-				$uris[search_format] = $locum->csv_parser($locum_cfg[format_groups][$search_fmt], '|');
+				$uris['search_format'] = $locum->csv_parser($locum_cfg['format_groups'][$search_fmt], '|');
 			}
-		} else if ($_POST[search_format]) {
-			if (is_array($_POST[search_format])) { 
-				$uris[search_format] = trim(implode('|', $_POST[search_format]));
+		} else if ($_POST['search_format']) {
+			if (is_array($_POST['search_format'])) { 
+				$uris['search_format'] = trim(implode('|', $_POST['search_format']));
 			} else {
-				$uris[search_format] = $_POST[search_format];
+				$uris['search_format'] = $_POST['search_format'];
 			}
 		}
 		
 		// Location selections overrule collection selections and act as 
-		// a filter if they are in a selection colection.
-		if ($_POST[collection]) {
+		// a filter if they are in a selection collection.
+		if ($_POST['collection']) {
 			$locations = array();
-			$uris[collection] = trim(implode('|', $_POST[collection]));
-			foreach ($_POST[collection] as $collection) {
-				$collection_arr = $locum->csv_parser($locum_cfg[collections][$collection]);
-				if ($_POST[location]) {
-					$valid_locs = array_intersect($_POST[location], $collection_arr);
+			$uris['collection'] = trim(implode('|', $_POST['collection']));
+			foreach ($_POST['collection'] as $collection) {
+				$collection_arr = $locum->csv_parser($locum_cfg['collections'][$collection]);
+				if ($_POST['location']) {
+					$valid_locs = array_intersect($_POST['location'], $collection_arr);
 					if (count($valid_locs)) {
 						$locations = array_merge($locations, $valid_locs);
 					} else {
@@ -628,16 +640,16 @@ function theme_sopac_search_handler() {
 					$locations = array_merge($locations, $collection_arr);
 				}
 			}
-			if ($_POST[location]) {
-				$locations = array_merge($locations, array_diff($_POST[location], $locations));
+			if ($_POST['location']) {
+				$locations = array_merge($locations, array_diff($_POST['location'], $locations));
 			}
-		} else if ($_POST[location]) {
-			$locations = $_POST[location];
+		} else if ($_POST['location']) {
+			$locations = $_POST['location'];
 		}
-		if (count($locations)) { $uris[location] = trim(implode('|', $locations)); }
+		if (count($locations)) { $uris['location'] = trim(implode('|', $locations)); }
 		
 		// Sort variable
-		if ($_POST[sort]) { $uris[sort] = $_POST[sort]; }
+		if ($_POST['sort']) { $uris['sort'] = $_POST['sort']; }
 		
 		// Convert all our URI variables to GETs
 		if (count($uris)) {
@@ -708,7 +720,7 @@ function sopac_parse_get_vars($override = array()) {
 
 	// TODO - Hard-coding this is not the best way to do it, but for now it is what it is... Revisit for 2.1?
 	$implode = array('search_format', 'pub_year', 'location', 'collection', 'facet_series', 'facet_lang', 'facet_year');
-	$getvars_raw = explode('?', $_SERVER[REQUEST_URI]);
+	$getvars_raw = explode('?', $_SERVER['REQUEST_URI']);
 	if (count($getvars_raw) > 1) {
 		$getvars = urldecode($getvars_raw[1]);
 	} else {
@@ -737,6 +749,32 @@ function sopac_parse_get_vars($override = array()) {
 	return $vars;
 }
 
+/*
+ * Function to prepare and return RSS feeds
+ *
+ * @param array $feed_items array of items to be syndicated, keyed as title,link,description,extra (array of additional arguments)
+ * @return string RSS feed string
+ */
+function sopac_rss_feed($feed_title, $feed_link, $feed_desc, $feed_items, $print_feed = TRUE) {
+	global $base_url;
+	
+	$namespaces = array('xmlns:dc="http://purl.org/dc/elements/1.1/"');
+	$rss_items = '';
+	foreach ($feed_items as $feed_item) {
+		$rss_items .= format_rss_item($feed_item['title'], $feed_item['link'], $feed_item['description'], $feed_item['extra']);
+	}
+
+	$output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+	$output .= "<rss version=\"2.0\" xml:base=\"". $base_url ."\" ". implode(' ', $namespaces) .">\n";
+	$output .= format_rss_channel($feed_title, $feed_link, $feed_desc, $rss_items, $GLOBALS['locale']);
+	$output .= "</rss>\n";
+	
+	if ($print_feed) {
+		drupal_set_header('Content-Type: text/xml; charset=utf-8');
+		print $output;
+	}
+}
+
 /**
  * Function to automate the handling of the pager system.
  */
@@ -757,7 +795,7 @@ function sopac_user_block_disp_query() {
 	global $user;
 	
 	$user_views = array('fines', 'library', 'holds', 'checkouts', 'tag');
-	$uri_arr = explode('/', $_GET[q]);
+	$uri_arr = explode('/', $_GET['q']);
 	if ($uri_arr[0] == 'user' && in_array($uri_arr[1], $user_views)) {
 		return TRUE;
 	}

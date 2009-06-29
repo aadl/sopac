@@ -13,39 +13,39 @@
 <table width="100%">
 	<tr>
 	<td width="50%">
-		<div class="overview-title">Top <?php print count($ratings_chunk[top][ratings]) ? count($ratings_chunk[top][ratings]) : NULL; ?> Ratings</div>
+		<div class="overview-title">Top <?php print count($ratings_chunk['top']['ratings']) ? count($ratings_chunk['top']['ratings']) : NULL; ?> Ratings</div>
 		<table class="overview-ratings">
 		<?php
-		if (count($ratings_chunk[top][ratings])) {
-			foreach ($ratings_chunk[top][ratings] as $rating) {
+		if (count($ratings_chunk['top']['ratings'])) {
+			foreach ($ratings_chunk['top']['ratings'] as $rating) {
 				print '<tr><td style="width: 100px;">';
-				print theme_sopac_get_rating_stars($rating[bnum], $rating[rating], FALSE, TRUE, 'top') . ' ';
+				print theme_sopac_get_rating_stars($rating['bnum'], $rating['rating'], FALSE, TRUE, 'top') . ' ';
 				print '</td><td>';
-				print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating[bnum] . '">' .
-					$ratings_chunk[bibs][$rating[bnum]][title] . '</a>';
+				print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'] . '">' .
+					$ratings_chunk['bibs'][$rating['bnum']]['title'] . '</a>';
 				print '</td></tr>';
 			}
 		} else {
-				print $ratings_chunk[nodata];
+				print $ratings_chunk['nodata'];
 		}
 		?>
 		</table>
 	</td>
 	<td>
-		<div class="overview-title">Latest <?php print count($ratings_chunk[latest][ratings]) ? count($ratings_chunk[latest][ratings]) : NULL; ?> Ratings</div>
+		<div class="overview-title">Latest <?php print count($ratings_chunk['latest']['ratings']) ? count($ratings_chunk['latest']['ratings']) : NULL; ?> Ratings</div>
 		<table class="overview-ratings">
 		<?php
-		if (count($ratings_chunk[latest][ratings])) {
-			foreach ($ratings_chunk[latest][ratings] as $rating) {
+		if (count($ratings_chunk['latest']['ratings'])) {
+			foreach ($ratings_chunk['latest']['ratings'] as $rating) {
 				print '<tr><td style="width: 100px;">';
-				print theme_sopac_get_rating_stars($rating[bnum], $rating[rating], FALSE, TRUE, 'latest') . ' ';
+				print theme_sopac_get_rating_stars($rating['bnum'], $rating['rating'], FALSE, TRUE, 'latest') . ' ';
 				print '</td><td>';
-				print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating[bnum] . '">' .
-					$ratings_chunk[bibs][$rating[bnum]][title] . '</a>';
+				print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'] . '">' .
+					$ratings_chunk['bibs'][$rating['bnum']]['title'] . '</a>';
 				print '</td></tr>';
 			}
 		} else {
-			print $ratings_chunk[nodata];
+			print $ratings_chunk['nodata'];
 		}
 		?>
 		</table>

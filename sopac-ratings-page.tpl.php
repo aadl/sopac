@@ -11,20 +11,20 @@
 ?>
 
 <?php
-if (count($ratings_arr[ratings])) {
+if (count($ratings_arr['ratings'])) {
 	print '
 		<table class="overview-ratings" width="100%">
 		<tr><th></th><th>' . t('Title') . '</th><th>' . t('Date Rated') . '</th></tr>
 		<tr><td colspan="3" style="padding-top:5px;"></td></tr>
 	';
-	foreach ($ratings_arr[ratings] as $rating) {
+	foreach ($ratings_arr['ratings'] as $rating) {
 		print '<tr><td style="width: 100px;">';
-		print theme_sopac_get_rating_stars($rating[bnum], $rating[rating], FALSE, TRUE) . ' ';
+		print theme_sopac_get_rating_stars($rating['bnum'], $rating['rating'], FALSE, TRUE) . ' ';
 		print '</td><td>';
-		print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating[bnum] . '">' .
-			$ratings_arr[bibs][$rating[bnum]][title] . '</a>';
+		print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'] . '">' .
+			$ratings_arr['bibs'][$rating['bnum']]['title'] . '</a>';
 		print '</td><td>';
-		print date("m-d-Y", $rating[rate_date]);
+		print date("m-d-Y", $rating['rate_date']);
 		print '</td></tr>';
 	}
 	print '</table>';
