@@ -135,6 +135,37 @@ function sopac_admin() {
 		'#description' => t("This is the port that your Apache SSL process is listening on."),
 		'#required' => TRUE,
 	);
+	
+	$form['sopac_tag_cloud'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Tag Cloud Settings'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+	
+	$form['sopac_tag_cloud']['sopac_random_tags'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Random Tags'),
+		'#default_value' => variable_get('sopac_random_tags', 1),
+		'#description' => t("Check this box if you would like to display tags in random order."),
+	);
+	
+	$form['sopac_tag_cloud']['sopac_tag_limit'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Tag Limit'),
+		'#default_value' => variable_get('sopac_tag_limit', 100),
+		'#size' => 6,
+		'#maxlength' => 3,
+		'#description' => t("This is the maximum number of tags to display in the tag cloud."),
+	);
+
+	$form['sopac_tag_cloud']['sopac_tag_sort'] = array(
+		'#type' => 'select',
+		'#title' => t('Tag Sorting'),
+		'#default_value' => variable_get('sopac_tag_sort', 'ORDER BY count DESC'),
+		'#description' => t("How to sort tags in tag cloud if Random Tags is not checked."),
+		'#options' => array('ORDER BY count DESC' => t('Decreasing Count'), 'ORDER BY tag ASC' => t('Alphabeticaly'))
+	);
 
 	$form['sopac_account'] = array(
 		'#type' => 'fieldset',

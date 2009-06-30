@@ -6,6 +6,10 @@ sopac_admin.php
 sopac.css
   --removed review-block-itemtitle fixed width to let it auto-adjust its size and better fit to differents Drupal Themes.
 
+sopac_social.php
+sopac_admin.php
+  --add 3 options to configure tag cloud
+
 jsantoni commited on 6/29/2009:
 sopac-request.tpl.php
 sopac-pat-overview.tpl.php

@@ -15,7 +15,6 @@ function sopac_personal_overview_page() {
 	
 	$num_reviews = 3;
 	$num_ratings = 5; // TODO make these all configurable.
-	$num_tags = 100;
 	
 	$insurge = new insurge_client;
 	$locum = new locum_client;
@@ -58,7 +57,7 @@ function sopac_personal_overview_page() {
 	$ratings_chunk['bibs'] = $locum->get_bib_items_arr($rate_bnums);
 	
 	// Pull together the tags
-	$tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, TRUE, $num_tags);
+	$tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, variable_get('sopac_random_tags', 1), variable_get('sopac_tag_limit', 100), 0, variable_get('sopac_tag_sort', 'ORDER BY count DESC'));
 	if (count($tag_arr)) {
 		foreach ($tag_arr as $tag_pair) {
 			$tags[$tag_pair['tag']] = $tag_pair['count'];
@@ -135,7 +134,7 @@ function theme_sopac_tag_block($block_type) {
 	
 	switch($block_type) {
 		case 'overview':
-			$tag_arr = $insurge->get_tag_totals(NULL, NULL, NULL, TRUE, 100); // TODO make this amount configurable.
+			$tag_arr = $insurge->get_tag_totals(NULL, NULL, NULL, variable_get('sopac_random_tags', 1), variable_get('sopac_tag_limit', 100), 0, variable_get('sopac_tag_sort', 'ORDER BY count DESC'));
 			break;
 		case 'record':
 			$uri_arr = sopac_parse_uri();
@@ -157,7 +156,7 @@ function theme_sopac_tag_block($block_type) {
 			static $put_personal_tag_list = 1;
 			break;
 		case 'personal':
-			$tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, TRUE, 100); // TODO make this amount configurable.
+			$tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, variable_get('sopac_random_tags', 1), variable_get('sopac_tag_limit', 100), 0, variable_get('sopac_tag_sort', 'ORDER BY count DESC'));
 			break;
 	}
 	
