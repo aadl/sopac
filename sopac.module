@@ -301,38 +301,42 @@ function sopac_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	$items['user/fines'] = array(
-		'title' => 'My Fines',
-		'page callback' => 'sopac_fines_page',
-		'access arguments' => array('access user pages'),
-		'file' => 'sopac_user.php',
-		'type' => MENU_NORMAL_ITEM,
-	);
+	if (variable_get('sopac_fines_enable', 1)) {
+		$items['user/fines'] = array(
+			'title' => 'My Fines',
+			'page callback' => 'sopac_fines_page',
+			'access arguments' => array('access user pages'),
+			'file' => 'sopac_user.php',
+			'type' => MENU_NORMAL_ITEM,
+		);
 
-	$items['user/fines/list'] = array(
-		'title' => 'List Fines',
-		'access arguments' => array('access user pages'),
-		'weight' => -10,
-		'file' => 'sopac_user.php',
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
+		$items['user/fines/list'] = array(
+			'title' => 'List Fines',
+			'access arguments' => array('access user pages'),
+			'weight' => -10,
+			'file' => 'sopac_user.php',
+			'type' => MENU_DEFAULT_LOCAL_TASK,
+		);
 
-	$items['user/fines/payments'] = array(
-		'title' => 'List Payments',
-		'page callback' => 'sopac_finespaid_page',
-		'access arguments' => array('access user pages'),
-		'file' => 'sopac_user.php',
-		'type' => MENU_LOCAL_TASK,
-	);
+		if (variable_get('sopac_payments_enable', 1)) {
+			$items['user/fines/payments'] = array(
+				'title' => 'List Payments',
+				'page callback' => 'sopac_finespaid_page',
+				'access arguments' => array('access user pages'),
+				'file' => 'sopac_user.php',
+				'type' => MENU_LOCAL_TASK,
+			);
 
-	$items['user/fines/pay'] = array(
-		'title' => 'Fines Payment',
-		'page callback' => 'sopac_makepayment_page',
-		'access arguments' => array('access user pages'),
-		'file' => 'sopac_user.php',
-		'type' => MENU_CALLBACK,
-	);
-	
+			$items['user/fines/pay'] = array(
+				'title' => 'Fines Payment',
+				'page callback' => 'sopac_makepayment_page',
+				'access arguments' => array('access user pages'),
+				'file' => 'sopac_user.php',
+				'type' => MENU_CALLBACK,
+			);
+		}
+	}
+
 	$items['user/library'] = array(
 		'title' => 'My Library',
 		'page callback' => 'sopac_personal_overview_page',

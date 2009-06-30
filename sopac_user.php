@@ -101,7 +101,7 @@ function sopac_user_info_table(&$account, &$locum) {
 			if (variable_get('sopac_numco_enable', 1)) {
 				$rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo['checkouts']);
 			}
-			if (variable_get('sopac_fines_enable', 1)) {
+			if (variable_get('sopac_fines_display', 1)) {
 				$amount_link = '<a href="/user/fines">$' . number_format($userinfo['balance'], 2, '.', '') . '</a>';
 				$rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $amount_link);
 			}
@@ -295,8 +295,9 @@ function sopac_fines_page() {
 			$header = array('',t('Amount'),t('Description'));
 			$fine_total = (float) 0;
 			foreach ($fines as $fine) {
+				$col1 = variable_get('sopac_payments_enable', 1) ? '<input type="checkbox" name="varname[]" value="' . $fine['varname'] . '">' : '';
 				$rows[] = array(
-					'<input type="checkbox" name="varname[]" value="' . $fine['varname'] . '">',
+					$col1,
 					'$' . number_format($fine['amount'], 2),
 					$fine['desc'],
 				);
@@ -306,7 +307,9 @@ function sopac_fines_page() {
 			}
 			$rows[] = array('<strong>Total:</strong>', '$' . number_format($fine_total, 2), '');
 			$submit_button = '<input type="submit" value="' . t('Pay Selected Charges') . '">';
-			$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 3)), 'class' => 'profile_button' );
+			if (variable_get('sopac_payments_enable', 1)) {
+				$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 3)), 'class' => 'profile_button' );
+			}
 			$fine_table = '<form method="post" action="/user/fines/pay">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . $hidden_vars . '</form>';
 			$notice = t('Your current fine balance is $') . number_format($fine_total, 2) . '.';
 		}

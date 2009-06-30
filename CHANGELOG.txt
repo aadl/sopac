@@ -10,6 +10,11 @@ sopac_social.php
 sopac_admin.php
   --add 3 options to configure tag cloud
 
+sopac.module
+sopac_user.php
+sopac_admin.php
+  --add configuration options to globally disable fines and payments
+
 jsantoni commited on 6/29/2009:
 sopac-request.tpl.php
 sopac-pat-overview.tpl.php

@@ -136,6 +136,27 @@ function sopac_admin() {
 		'#required' => TRUE,
 	);
 	
+	$form['sopac_fines'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Fines Settings'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+	
+	$form['sopac_fines']['sopac_fines_enable'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Enable Fines Management'),
+		'#default_value' => variable_get('sopac_fines_enable', 1),
+		'#description' => t("Check this box to allow users to access their fines through SOPAC."),
+	);
+
+	$form['sopac_fines']['sopac_payments_enable'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Enable Payments Management'),
+		'#default_value' => variable_get('sopac_payments_enable', 1),
+		'#description' => t("Check this box to allow users to pay their fines through SOPAC."),
+	);
+	
 	$form['sopac_tag_cloud'] = array(
 		'#type' => 'fieldset',
 		'#title' => t('Tag Cloud Settings'),
@@ -209,10 +230,10 @@ function sopac_admin() {
 		'#description' => t("Check this box if you would like # of checkouts appear in the Account Summary."),
 	);
 	
-	$form['sopac_account']['sopac_fines_enable'] = array(
+	$form['sopac_account']['sopac_fines_display'] = array(
 		'#type' => 'checkbox',
 		'#title' => t('Display Fine Amounts in the Account Summary'),
-		'#default_value' => variable_get('sopac_fines_enable', 1),
+		'#default_value' => variable_get('sopac_fines_display', 1),
 		'#description' => t("Check this box if you would like fine amounts to appear in the Account Summary."),
 	);
 	
