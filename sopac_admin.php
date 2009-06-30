@@ -87,15 +87,15 @@ function sopac_admin() {
 
 	$form['sopac_general']['sopac_search_form_cfg'] = array(
 		'#type' => 'select',
-		'#title' => 'Default Search Form Display',
+		'#title' => t('Default Search Form Display'),
 		'#default_value' => variable_get('sopac_search_form_cfg', 'both'),
 		'#description' => t("This option allows you to configure how you want the search form to be displayed from within the SOPAC context.  You can Display Just the basic search box, or the basic search box and the advanced search form drop-down option."),
-		'#options' => array('basic' => 'Display just the basic form', 'both' => 'Display both basic and advanced forms')
+		'#options' => array('basic' => t('Display just the basic form'), 'both' => t('Display both basic and advanced forms'))
 	);
 	
 	$form['sopac_general']['sopac_social_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Enable the Social Catalog Components',
+		'#title' => t('Enable the Social Catalog Components'),
 		'#default_value' => variable_get('sopac_social_enable', 1),
 		'#description' => t("Check this box if you would like to enable community-driven reviews, ratings, comments, and tagging in the catalog."),
 	);
@@ -107,21 +107,21 @@ function sopac_admin() {
 	$description .= t(' NOTE: the user option will be set up during the first cron job after at least 1 bib record has been harvested.');
 	$form['sopac_general']['sopac_home_branch_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Allow Users to Select a Home Branch',
+		'#title' => t('Allow Users to Select a Home Branch'),
 		'#default_value' => variable_get('sopac_home_branch_enable', 0),
 		'#description' => $description,
 	);
 	
 	$form['sopac_general']['sopac_admin_card'] = array(
 		'#type' => 'textfield',
-		'#title' => 'Library Card Number For Use in Setup',
+		'#title' => t('Library Card Number For Use in Setup'),
 		'#default_value' => variable_get('sopac_admin_card', ''),
 		'#description' => t("Enter a valid library card number for use in setting up user's and build you to select a home branch."),
 	);
 	
 	$form['sopac_general']['sopac_ssl_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Enable SSL for Account Management',
+		'#title' => t('Enable SSL for Account Management'),
 		'#default_value' => variable_get('sopac_ssl_enable', 0),
 		'#description' => t("Selecting this option will cause SOPAC to redirect browsers to an encrypted page if the user is accesing their personal information.  You will need to have SSL enabled on your web server.  This is HIGHLY RECCOMENDED.  If you enable this option, you must put the following setting in your Apache vhost configuration for this site's <VirtualHost *:443> section: SetEnv HTTPS TRUE"),
 	);
@@ -145,63 +145,63 @@ function sopac_admin() {
 	
 	$form['sopac_account']['sopac_history_hide'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Hide the Account History on the Account page',
+		'#title' => t('Hide the Account History on the Account page'),
 		'#default_value' => variable_get('sopac_history_hide', 1),
 		'#description' => t("Check this box if you would like to hide the Account History on the Account page."),
 	);
 
 	$form['sopac_account']['sopac_summary_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Enable the Account Summary on the Account page',
+		'#title' => t('Enable the Account Summary on the Account page'),
 		'#default_value' => variable_get('sopac_summary_enable', 1),
 		'#description' => t("Check this box if you would like to enable the Account Summary on the Account page.  You probably want this."),
 	);
 
 	$form['sopac_account']['sopac_pname_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display Patron Name in the Account Summary',
+		'#title' => t('Display Patron Name in the Account Summary'),
 		'#default_value' => variable_get('sopac_pname_enable', 1),
 		'#description' => t("Check this box if you would like to have patron names appear in the Account Summary."),
 	);
 	
 	$form['sopac_account']['sopac_lcard_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display Library Card Number in the Account Summary',
+		'#title' => t('Display Library Card Number in the Account Summary'),
 		'#default_value' => variable_get('sopac_lcard_enable', 1),
 		'#description' => t("Check this box if you would like to have library card numbers appear in the Account Summary."),
 	);
 	
 	$form['sopac_account']['sopac_numco_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display # of checkouts in the Account Summary',
+		'#title' => t('Display # of checkouts in the Account Summary'),
 		'#default_value' => variable_get('sopac_numco_enable', 1),
 		'#description' => t("Check this box if you would like # of checkouts appear in the Account Summary."),
 	);
 	
 	$form['sopac_account']['sopac_fines_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display Fine Amounts in the Account Summary',
+		'#title' => t('Display Fine Amounts in the Account Summary'),
 		'#default_value' => variable_get('sopac_fines_enable', 1),
 		'#description' => t("Check this box if you would like fine amounts to appear in the Account Summary."),
 	);
 	
 	$form['sopac_account']['sopac_cardexp_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display Library Card Expiration Date in the Account Summary',
+		'#title' => t('Display Library Card Expiration Date in the Account Summary'),
 		'#default_value' => variable_get('sopac_cardexp_enable', 1),
 		'#description' => t("Check this box if you would like to have library card expiration dates appear in the Account Summary."),
 	);
 	
 	$form['sopac_account']['sopac_tel_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display telephone # in the Account Summary',
+		'#title' => t('Display telephone # in the Account Summary'),
 		'#default_value' => variable_get('sopac_tel_enable', 1),
 		'#description' => t("Check this box if you would like the patron telephone # to appear in the Account Summary."),
 	);
 	
 	$form['sopac_account']['sopac_email_enable'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Display Email Address in the Account Summary',
+		'#title' => t('Display Email Address in the Account Summary'),
 		'#default_value' => variable_get('sopac_email_enable', 1),
 		'#description' => t("Check this box if you would like the patron email address to appear in the Account Summary."),
 	);
@@ -223,29 +223,29 @@ function sopac_admin() {
 	
 	$form['sopac_cardnum_verify']['sopac_require_cfg'] = array(
 		'#type' => 'select',
-		'#title' => 'Require Patrons to Meet All or One of the Requirements',
+		'#title' => t('Require Patrons to Meet All or One of the Requirements'),
 		'#default_value' => variable_get('sopac_require_cfg', 'one'),
 		'#description' => t("This option allows you to tell SOPAC if you would like to require users to fulfill all of the following enabled requirements, or just one.  For example, if this is set to just 'One', users would have to enter one correct value instead of all corect values in order to have their library card verified."),
-		'#options' => array('one' => 'Just One', 'all' => 'All Requirements')
+		'#options' => array('one' => t('Just One'), 'all' => t('All Requirements'))
 	);
 	
 	$form['sopac_cardnum_verify']['sopac_require_name'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Require Patron name for Verification',
+		'#title' => t('Require Patron name for Verification'),
 		'#default_value' => variable_get('sopac_require_name', 1),
 		'#description' => t("Check this box if you would like to require the patron to type in their name in order to verify their library card number."),
 	);
 	
 	$form['sopac_cardnum_verify']['sopac_require_tel'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Require Telephone Number for Verification',
+		'#title' => t('Require Telephone Number for Verification'),
 		'#default_value' => variable_get('sopac_require_tel', 1),
 		'#description' => t("Check this box if you would like to require the patron to type in their telephone number in order to verify their library card number."),
 	);
 	
 	$form['sopac_cardnum_verify']['sopac_require_streetname'] = array(
 		'#type' => 'checkbox',
-		'#title' => 'Use Address Street Name for Verification',
+		'#title' => t('Use Address Street Name for Verification'),
 		'#default_value' => variable_get('sopac_require_streetname', 1),
 		'#description' => t("Check this box if you would like to use the street name of the patron's address to verify their library card number."),
 	);

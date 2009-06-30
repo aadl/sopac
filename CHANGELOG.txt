@@ -1,3 +1,14 @@
+jsantoni commited on 6/30/2009:
+sopac.module
+sopac_admin.php
+  --add forgotten t() functions
+
+jsantoni commited on 6/29/2009:
+sopac-request.tpl.php
+sopac-pat-overview.tpl.php
+sopac-review.tpl.php
+  --add forgotten t() functions
+
 jsantoni commited on 6/27/2009:
 sopac-results.tpl.php
 sopac-record.tpl.php

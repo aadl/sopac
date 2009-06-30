@@ -137,50 +137,50 @@ function sopac_block($op='list', $delta=0) {
 				case 0:
 					if ($locum_results_all['num_hits']) {
 						$block_content = theme('sopac_facet_block', $facet_menu, $locum_results_all, $locum_cfg);
-						$block['subject'] = 'Facets';
+						$block['subject'] = t('Facets');
 						$block['content'] = $block_content;
 					}
 					break;
 				case 1:
 					require_once('sopac_catalog.php');
-					$block['subject'] = 'Your Search';
+					$block['subject'] = t('Your Search');
 					$block_content = sopac_search_block($locum_results_all, $locum_cfg);
 					$block['content'] = $block_content;
 					break;
 				case 2:
 					// SOPAC overview block for patron tags
 					require_once('sopac_social.php');
-					$block['subject'] = 'Popular Tags';
+					$block['subject'] = t('Popular Tags');
 					$block['content'] = theme_sopac_tag_block('overview');
 					break;
 				case 3:
 					// SOPAC overview block for patron reviews
 					require_once('sopac_social.php');
-					$block['subject'] = 'New Reviews';
+					$block['subject'] = t('New Reviews');
 					$block['content'] = theme_sopac_review_block('overview');
 					break;
 				case 4:
 					// SOPAC item record block for patron tags
 					require_once('sopac_social.php');
-					$block['subject'] = 'Record Tags';
+					$block['subject'] = t('Record Tags');
 					$block['content'] = theme_sopac_tag_block('record');
 					break;
 				case 5:
 					// SOPAC item record block for patron reviews
 					require_once('sopac_social.php');
-					$block['subject'] = 'Reviews';
+					$block['subject'] = t('Reviews');
 					$block['content'] = theme_sopac_review_block('record');
 					break;
 				case 6:
 					// SOPAC personal record block for patron's own tags
 					require_once('sopac_social.php');
-					$block['subject'] = 'My Top Tags';
+					$block['subject'] = t('My Top Tags');
 					$block['content'] = theme_sopac_tag_block('personal');
 					break;
 				case 7:
 					// SOPAC personal record block for patron's own reviews
 					require_once('sopac_social.php');
-					$block['subject'] = 'My Reviews';
+					$block['subject'] = t('My Reviews');
 					$block['content'] = theme_sopac_review_block('personal');
 					break;
 			}

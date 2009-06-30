@@ -13,7 +13,7 @@
 <table width="100%">
 	<tr>
 	<td width="50%">
-		<div class="overview-title">Top <?php print count($ratings_chunk['top']['ratings']) ? count($ratings_chunk['top']['ratings']) : NULL; ?> Ratings</div>
+		<div class="overview-title"><?php print t("Top %n Ratings", array('%n' => count($ratings_chunk['top']['ratings']) ? count($ratings_chunk['top']['ratings']) : NULL)); ?></div>
 		<table class="overview-ratings">
 		<?php
 		if (count($ratings_chunk['top']['ratings'])) {
@@ -32,7 +32,7 @@
 		</table>
 	</td>
 	<td>
-		<div class="overview-title">Latest <?php print count($ratings_chunk['latest']['ratings']) ? count($ratings_chunk['latest']['ratings']) : NULL; ?> Ratings</div>
+		<div class="overview-title"><?php print t("Latest %n Ratings", array('%n' => count($ratings_chunk['latest']['ratings']) ? count($ratings_chunk['latest']['ratings']) : NULL)); ?></div>
 		<table class="overview-ratings">
 		<?php
 		if (count($ratings_chunk['latest']['ratings'])) {
@@ -49,22 +49,22 @@
 		}
 		?>
 		</table>
-		<div class="overview-more-info">[ <a href="/user/library/ratings">See All Your Ratings</a> ]</div>
+		<div class="overview-more-info">[ <a href="/user/library/ratings"><?php print t('See All Your Ratings'); ?></a> ]</div>
 	</td>
 	</tr>
 	<tr>
 	<td colspan="2">
-		<div class="overview-title">Top Tags</div>
+		<div class="overview-title"><?php print t('Top Tags'); ?></div>
 		<?php print '<div class="overview-tag-cloud">' . $tag_cloud . '</div>'; ?>
 		<br />
-		<div class="overview-more-info">[ <a href="/user/library/tags">See All Your Tags</a> ]</div>
+		<div class="overview-more-info">[ <a href="/user/library/tags"><?php print t('See All Your Tags'); ?></a> ]</div>
 	</td>
 	</tr>
 	<tr>
 	<td colspan="2">
-		<div class="overview-title">Recent Reviews</div>
+		<div class="overview-title"><?php print t('Recent Reviews'); ?></div>
 		<?php print $review_display; ?>
-		<div class="overview-more-info">[ <a href="/user/library/reviews">See All Your Reviews</a> ]</div>
+		<div class="overview-more-info">[ <a href="/user/library/reviews"><?php print t('See All Your Reviews'); ?></a> ]</div>
 	</td>
 	</tr>
 </table>

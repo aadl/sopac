@@ -10,8 +10,8 @@ if ($request_error_msg) {
 
 if ($item_form) { print $item_form; }
 
-print '<div class="req_return_link>"<strong class="item-request">»</strong> <a href="/'. variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum . '">Return to the record display</a></div>';
+print '<div class="req_return_link>"<strong class="item-request">»</strong> <a href="/'. variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum . '">' . t('Return to the record display') . '</a></div>';
 if (sopac_prev_search_url(TRUE)){
-	print '<div class="req_return_link>"<strong class="item-request">»</strong> <a href="' . sopac_prev_search_url(TRUE) . '">Return to your search</a></div>';
+	print '<div class="req_return_link>"<strong class="item-request">»</strong> <a href="' . sopac_prev_search_url(TRUE) . '">' . t('Return to your search') . '</a></div>';
 }
 print '<br />';
