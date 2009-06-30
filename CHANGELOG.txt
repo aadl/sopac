@@ -3,6 +3,9 @@ sopac.module
 sopac_admin.php
   --add forgotten t() functions
 
+sopac.css
+  --removed review-block-itemtitle fixed width to let it auto-adjust its size and better fit to differents Drupal Themes.
+
 jsantoni commited on 6/29/2009:
 sopac-request.tpl.php
 sopac-pat-overview.tpl.php
