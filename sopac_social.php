@@ -374,7 +374,7 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
 		$size = round($min_size + (($value - $min_qty) * $step));
 		if ($spread == 1) { $size = $size + 2; }
 //		$disp_tag = htmlentities(wordwrap($tag, $wraplength, "-<br />-", 1));
-		$disp_tag = htmlentities($tag);
+		$disp_tag = htmlentities($tag, ENT_NOQUOTES, 'UTF-8');
 		$cloud .= '<a href="' . $link . '" style="font-size: ' . $size . 'px" title="' . $value . ' things tagged with ' . $tag . '">' . $disp_tag . '</a> ';
 	}
 	return '<div class="tag-cloud">' . $cloud . '</div>';
@@ -588,12 +588,12 @@ function theme_sopac_review_block($block_type) {
 	if (count($reviews['reviews'])) {
 		foreach ($reviews['reviews'] as $insurge_review) {
 			$locum_result = $locum->get_bib_item($insurge_review['bnum']);
-			$title_arr = explode(':', htmlentities($locum_result['title']));
+			$title_arr = explode(':', htmlentities($locum_result['title'], ENT_NOQUOTES, 'UTF-8'));
 			$title = trim($title_arr[0]);
 			$review_link = '/review/view/' . $insurge_review['rev_id'];
 			$item_link = '/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $insurge_review['bnum'];
 			$result_page .= '<div class="review-block-list-item">';
-			$result_page .= '<div class="review-block-revtitle"><a href="' . $review_link . '">' . htmlentities($insurge_review['rev_title']) . '</a></div>';
+			$result_page .= '<div class="review-block-revtitle"><a href="' . $review_link . '">' . htmlentities($insurge_review['rev_title'], ENT_NOQUOTES, 'UTF-8') . '</a></div>';
 			$result_page .= '<div class="review-block-itemtitle">' . t('A review of ') . '<span class="review-block-itemtitle-title"><a href="' . $item_link . '">' . $title . '</a></span></div>';
 			$result_page .= "</div>\n";
 		}

@@ -1,3 +1,7 @@
+jsantoni commited on 7/1/2009:
+sopac_social.php
+  --fix utf-8 compliance in blocks
+
 jsantoni commited on 6/30/2009:
 sopac.module
 sopac_admin.php
