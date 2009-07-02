@@ -1,3 +1,7 @@
+jsantoni commited on 7/2/2009:
+sopac_admin.php
+  --add a call to menu_rebuild() when submitting system_settings_form
+
 jsantoni commited on 7/1/2009:
 sopac_social.php
   --fix utf-8 compliance in blocks

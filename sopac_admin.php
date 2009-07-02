@@ -310,9 +310,12 @@ function sopac_admin() {
 		'#required' => TRUE,
 	);
 	
+	// This will call sopac_admin_submit() to clear menu cache
+	$form = system_settings_form($form);
+	$form['#submit'][] = 'sopac_admin_submit';
 	
 	// Return the SOPAC configuration form
-	return system_settings_form($form);
+	return $form;
 	
 }
 
@@ -343,5 +346,10 @@ function sopac_setup_user_home_selector() {
 		}
 	}
 	return false;
+}
+
+// Rebuild menu cache
+function sopac_admin_submit($form, &$form_state) {
+    menu_rebuild();
 }
 
