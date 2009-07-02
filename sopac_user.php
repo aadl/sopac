@@ -101,7 +101,7 @@ function sopac_user_info_table(&$account, &$locum) {
 			if (variable_get('sopac_numco_enable', 1)) {
 				$rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo['checkouts']);
 			}
-			if (variable_get('sopac_fines_display', 1)) {
+			if (variable_get('sopac_fines_display', 1) && variable_get('sopac_fines_enable', 1)) {
 				$amount_link = '<a href="/user/fines">$' . number_format($userinfo['balance'], 2, '.', '') . '</a>';
 				$rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $amount_link);
 			}

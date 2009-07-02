@@ -21,6 +21,7 @@ function sopac_admin() {
 		'#type' => 'fieldset',
 		'#title' => t('General Settings'),
 		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
 	);
 	
 	$form['sopac_general']['sopac_lib_name'] = array(
@@ -57,11 +58,11 @@ function sopac_admin() {
 	}
 	$form['sopac_general']['sopac_insurge_path'] = array(
 		'#type' => 'textfield',
-		'#title' => t('Path to the InSuRge Client Library'),
+		'#title' => t('Path to the Insurge Client Library'),
 		'#default_value' => variable_get('sopac_insurge_path', '/usr/local/include/insurge'),
 		'#size' => 32,
 		'#maxlength' => 128,
-		'#description' => t("The path to where you have installed InSuRge." . $insurge_error),
+		'#description' => t("The path to where you have installed Insurge." . $insurge_error),
 		'#required' => TRUE,
 	);
 	
@@ -91,13 +92,6 @@ function sopac_admin() {
 		'#default_value' => variable_get('sopac_search_form_cfg', 'both'),
 		'#description' => t("This option allows you to configure how you want the search form to be displayed from within the SOPAC context.  You can Display Just the basic search box, or the basic search box and the advanced search form drop-down option."),
 		'#options' => array('basic' => t('Display just the basic form'), 'both' => t('Display both basic and advanced forms'))
-	);
-	
-	$form['sopac_general']['sopac_social_enable'] = array(
-		'#type' => 'checkbox',
-		'#title' => t('Enable the Social Catalog Components'),
-		'#default_value' => variable_get('sopac_social_enable', 1),
-		'#description' => t("Check this box if you would like to enable community-driven reviews, ratings, comments, and tagging in the catalog."),
 	);
 	
 	// the next two settings to support giving users ability to select a home branch
@@ -157,35 +151,48 @@ function sopac_admin() {
 		'#description' => t("Check this box to allow users to pay their fines through SOPAC."),
 	);
 	
-	$form['sopac_tag_cloud'] = array(
+	$form['sopac_social_features'] = array(
 		'#type' => 'fieldset',
-		'#title' => t('Tag Cloud Settings'),
+		'#title' => t('Social Feature Settings'),
 		'#collapsible' => TRUE,
 		'#collapsed' => TRUE,
 	);
 	
-	$form['sopac_tag_cloud']['sopac_random_tags'] = array(
+	// This really isn't implemented yet and is here are a reminder
+	$form['sopac_social_features']['sopac_social_enable'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Enable the Social Catalog Components'),
+		'#default_value' => variable_get('sopac_social_enable', 1),
+		'#description' => t("Check this box if you would like to enable community-driven reviews, ratings, comments, and tagging in the catalog."),
+	);
+	
+	$form['sopac_social_features']['sopac_random_tags'] = array(
 		'#type' => 'checkbox',
 		'#title' => t('Random Tags'),
 		'#default_value' => variable_get('sopac_random_tags', 1),
 		'#description' => t("Check this box if you would like to display tags in random order."),
 	);
 	
-	$form['sopac_tag_cloud']['sopac_tag_limit'] = array(
+	$form['sopac_social_features']['sopac_tag_limit'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Tag Limit'),
 		'#default_value' => variable_get('sopac_tag_limit', 100),
 		'#size' => 6,
-		'#maxlength' => 3,
+		'#maxlength' => 5,
 		'#description' => t("This is the maximum number of tags to display in the tag cloud."),
 	);
 
-	$form['sopac_tag_cloud']['sopac_tag_sort'] = array(
+	$form['sopac_social_features']['sopac_tag_sort'] = array(
 		'#type' => 'select',
-		'#title' => t('Tag Sorting'),
+		'#title' => t('Tag Cloud Sorting'),
 		'#default_value' => variable_get('sopac_tag_sort', 'ORDER BY count DESC'),
 		'#description' => t("How to sort tags in tag cloud if Random Tags is not checked."),
-		'#options' => array('ORDER BY count DESC' => t('Decreasing Count'), 'ORDER BY tag ASC' => t('Alphabeticaly'))
+		'#options' => array(
+			'ORDER BY count ASC' => t('By count, ascending'),
+			'ORDER BY count DESC' => t('By count, descending'),
+			'ORDER BY tag ASC' => t('Alphabeticaly, ascending'),
+			'ORDER BY tag DESC' => t('Alphabeticaly, descending'),
+		),
 	);
 
 	$form['sopac_account'] = array(
@@ -230,12 +237,14 @@ function sopac_admin() {
 		'#description' => t("Check this box if you would like # of checkouts appear in the Account Summary."),
 	);
 	
-	$form['sopac_account']['sopac_fines_display'] = array(
-		'#type' => 'checkbox',
-		'#title' => t('Display Fine Amounts in the Account Summary'),
-		'#default_value' => variable_get('sopac_fines_display', 1),
-		'#description' => t("Check this box if you would like fine amounts to appear in the Account Summary."),
-	);
+	if (variable_get('sopac_fines_enable', 1)) {
+		$form['sopac_account']['sopac_fines_display'] = array(
+			'#type' => 'checkbox',
+			'#title' => t('Display Fine Amounts in the Account Summary'),
+			'#default_value' => variable_get('sopac_fines_display', 1),
+			'#description' => t("Check this box if you would like fine amounts to appear in the Account Summary."),
+		);
+	}
 	
 	$form['sopac_account']['sopac_cardexp_enable'] = array(
 		'#type' => 'checkbox',
