@@ -38,9 +38,12 @@ if (!$cover_img_url) {
 				?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
 			} ?>
 			<br />
-			<li> <?php 
+			<li>
+			<?php 
 			print $locum_result['copies'] . t(' of ') . $locum_result['totalcopies'] . ' ';
-			print ($locum_result['totalcopies'] == 1) ? t('copy available') : t('copies available'); ?></li>
+			print ($locum_result['totalcopies'] == 1) ? t('copy available') : t('copies available');
+			?>
+			</li>
 			<?php 
 			if (!in_array($locum_result['loc_code'], $no_circ)) {
 				print '<li class="item-request"><strong>» ' . sopac_put_request_link($locum_result['bnum']) . '</strong></li>';
