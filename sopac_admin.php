@@ -237,6 +237,18 @@ function sopac_admin() {
 		'#description' => t("Check this box if you would like # of checkouts appear in the Account Summary."),
 	);
 	
+	$form['sopac_account']['sopac_checkout_history_enable'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Display checkout history in the user area'),
+		'#default_value' => variable_get('sopac_checkout_history_enable', 1),
+		'#description' => t("Check this box if you would like checkout history to appear in the user area."),
+	);
+	$form['sopac_account']['sopac_hold_freezes_enable'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Enable freezing holds'),
+		'#default_value' => variable_get('sopac_hold_freezes_enable', 1),
+		'#description' => t("Check this box if you would like users to be able to freeze holds."),
+	);
 	if (variable_get('sopac_fines_enable', 1)) {
 		$form['sopac_account']['sopac_fines_display'] = array(
 			'#type' => 'checkbox',

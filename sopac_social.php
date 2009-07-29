@@ -62,7 +62,7 @@ function sopac_personal_overview_page() {
 		foreach ($tag_arr as $tag_pair) {
 			$tags[$tag_pair['tag']] = $tag_pair['count'];
 		}
-		$tag_cloud = theme_sopac_tag_cloud($tags, 'personal');
+		$tag_cloud = theme('sopac_tag_cloud', $tags, 'personal');
 	} else {
 		$tag_cloud = '<div class="overview-nodata">'.t('You have not tagged any items yet.').'</div>';
 	}
@@ -103,7 +103,7 @@ function sopac_tags_page_cloud() {
 		$tags[$tag_pair['tag']] = $tag_pair['count'];
 	}
 	if (count($tags)) {
-		$cloud = theme_sopac_tag_cloud($tags);
+		$cloud = theme('sopac_tag_cloud', $tags);
 	} else {
 		$cloud = '<div class="overview-nodata">'.t('You have not tagged any items yet.').'</div>';
 	}
@@ -183,7 +183,7 @@ function theme_sopac_tag_block($block_type) {
 		foreach ($tag_arr as $tag_pair) {
 			$tags[$tag_pair['tag']] = $tag_pair['count'];
 		}
-		$cloud = theme_sopac_tag_cloud($tags, $block_type);
+		$cloud = theme('sopac_tag_cloud', $tags, $block_type);
 	} else {
 		$cloud = t('No tags, currently.');
 	}
@@ -395,7 +395,7 @@ function sopac_review_page($page_type) {
 			$bnum = $actions[1];
 			$bnum_arr[] = $bnum;
 			$item = $locum->get_bib_item($bnum);
-			$ratings = theme_sopac_get_rating_stars($bnum);
+			$ratings = theme('sopac_get_rating_stars', $bnum);
 			$reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL, $page_limit, $offset);
 			sopac_pager_init($reviews['total'], 0, $page_limit);
 			$title = t('Reviews for ') . ucwords($item['title']);

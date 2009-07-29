@@ -211,21 +211,42 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 function sopac_user_holds_table(&$account, &$locum) {
 	
 	// Process any holds deletions that have been submitted
-	if ($_POST['sub_type'] == 'Cancel Selected Holds') {
+	$freezes_enabled = variable_get('sopac_hold_freezes_enable', 1);
+	$submit_value = $freezes_enabled ? 'Update Holds' : 'Cancel Selected Holds';
+	if ($_POST['sub_type'] == $submit_value) {
+  	$freezes = array_key_exists('freeze', $_POST) ? $_POST['freeze'] : array();
+  	$freeze_starts = array_key_exists('freeze_start', $_POST) ? $_POST['freeze_start'] : array();
 		if (count($_POST['bnum'])) {
 			foreach ($_POST['bnum'] as $bnum => $varname) {
 				$items[$bnum] = $varname;
+				unset($freezes[$bnum]);
+				unset($freeze_starts[$bnum]);
 			}
 			$locum->cancel_holds($account->profile_pref_cardnum, $account->locum_pass, $items);
 		}
+	  $holdfreezes_to_update = array();
+	  foreach ($freeze_starts as $bnum => $was_frozen) {
+	  	if (($was_frozen == 'true' && !array_key_exists($bnum, $freezes)) || 
+	  	  ($was_frozen == 'false' && array_key_exists($bnum, $freezes))) {
+	  	    $holdfreezes_to_update[$bnum] = array_key_exists($bnum, $freezes);
+	  	}
+	  }
+	  if (count($holdfreezes_to_update)) {
+	  	$locum->update_holdfreezes($account->profile_pref_cardnum, $account->locum_pass, $holdfreezes_to_update);
+	  }
 	}
 	
 	$rows = array();
 	if ($account->profile_pref_cardnum) {
 		$cardnum = $account->profile_pref_cardnum;
-		$holds = $locum->get_patron_holds($cardnum, $locum_pass);
+		$holds = $locum->get_patron_holds($cardnum);
 		if (!count($holds)) { return t('No items on hold.'); }
-		$header = array('', t('Title'), t('Status'), t('Pickup Location'));
+		if ($freezes_enabled) {
+			$header = array('Delete', 'Title', 'Status', 'Pickup Location', 'Freeze');
+		}
+		else {
+			$header = array('', 'Title', 'Status', 'Pickup Location');
+		}
 		foreach ($holds as $hold) {
 			// Show only the name of the pickup location, not a select list of all branches
 			$options = preg_split('/\<\/option\>/i', $hold['pickuploc']);
@@ -235,15 +256,27 @@ function sopac_user_holds_table(&$account, &$locum) {
 					break;
 				}
 			}
-			$rows[] = array(
+			if ($hold['can_freeze']) {
+				$freezer = 
+				'<input type="checkbox" name="freeze[' . $hold[bnum] . ']" value="freeze"' . (($hold['is_frozen']) ? 'checked=checked' : '') . '>' .
+				'<input type="hidden" name="freeze_start[' . $hold[bnum] . ']" value="' . (($hold['is_frozen']) ? 'true' : 'false') . '">';
+			}
+			else {
+				$freezer = '&nbsp;';
+			}
+			$row = array(
 				'<input type="checkbox" name="bnum[' . $hold['bnum'] . ']" value="' . $hold['varname'] . '">',
 				'<a href="/catalog/record/' . $hold['bnum'] . '">' . $hold['title'] . '</a>',
 				$hold['status'],
 				$hold['pickuploc'],
 			);
+			if ($freezes_enabled) {
+				$row[] = $freezer;
+			}
+			$rows[] = $row;
 		}
-		$submit_button = '<input type="submit" name="sub_type" value="' . t('Cancel Selected Holds') . '">';
-		$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 4)), 'class' => 'profile_button' );
+		$submit_button = '<input type="submit" name="sub_type" value="' . $submit_value . '">';
+		$rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => $freezes_enabled ? 5 : 4)), 'class' => 'profile_button' );
 	} else {
 		return FALSE;
 	}
@@ -260,6 +293,80 @@ function sopac_checkouts_page() {
 	$locum = new locum_client;
 	profile_load_profile(&$user);
 	$content = sopac_user_chkout_table(&$user, &$locum);
+	return $content;
+}
+
+/**
+ * A dedicated checkout history page.
+ */
+function sopac_checkout_history_page() {
+	global $user;
+	profile_load_profile(&$user);
+	if ($user->profile_pref_cardnum) {
+		$locum = new locum_client();
+		$locum_pass = substr($user->pass, 0, 7);
+		$cardnum = $user->profile_pref_cardnum;
+		$checkouts = $locum->get_patron_checkout_history($cardnum, $locum_pass);
+		if (!is_array($checkouts)) {
+			if ($checkouts == 'out') {
+				$content = '<div>This feature is currently turned off.</div>';
+				$toggle = l('Opt In', 'user/checkouts/history/opt/in');
+			}
+			if ($checkouts == 'in') {
+				$content = '<div>There are no items in your checkout history.</div>';
+				$toggle = l('Opt Out', 'user/checkouts/history/opt/out');
+			}
+		}
+		else {
+			$toggle = l('Opt Out', 'user/checkouts/history/opt/out');
+			// Create the checkout history table
+			$header = array('Title', 'Author', 'Checked Out', 'Details');
+			$rows = array();
+			foreach ($checkouts as $item) {
+				$rows[] = array(
+					'<a href="/catalog/record/' . $item['bnum'] . '">' . $item['title'] . '</a>',
+					$item['author'],
+					$item['date'],
+					$item['details'],
+				);
+			}
+			$content = theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0'));
+		}
+		$content .= '<div>' . $toggle . '</div>';
+	}
+	else {$content = '<div>Please register your library card to take advantage of this feature.</div>';}
+	return $content;
+}
+/**
+ * Handle toggling checkout history on or off.
+ */
+function sopac_checkout_history_toggle($action) {
+	global $user;
+	if ($action != 'in' && $action != 'out') {drupal_goto('user/checkouts/history');}
+	$adjective = $action == 'in' ? 'on' : 'off';
+	profile_load_profile(&$user);
+	if ($user->profile_pref_cardnum) {
+		if (!$_GET['confirm']) {
+			$confirm_link = l('confirm', $_GET['q'], array('query' => 'confirm=true'));
+			$content = "<div>Please $confirm_link that you wish to turn $adjective your checkout history.";
+			if ($action == 'out') {
+				$content .= ' Please note: this will delete your entire checkout history.';
+			}
+		}
+		else {
+			$locum = new locum_client();
+			$locum_pass = substr($user->pass, 0, 7);
+			$cardnum = $user->profile_pref_cardnum;
+			$success = $locum->set_patron_checkout_history($cardnum, $locum_pass, $action);
+			if ($success === true) {
+				$content = "<div>Your checkout history has been turned $adjective.</div>";
+			}
+			else {
+				$content = "<div>An error occurred. Your checkout history has not been turned $adjective. Please try again.</div>";
+			}
+		}
+	}
+	else {$content = '<div>Please register your library card to take advantage of this feature.</div>';}
 	return $content;
 }
 

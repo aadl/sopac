@@ -293,6 +293,23 @@ function sopac_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 	
+	if (variable_get('sopac_checkout_history_enable', 1)) {
+		$items['user/checkouts/history'] = array(
+			'title' => 'My Checkout History',
+			'page callback' => 'sopac_checkout_history_page',
+			'access arguments' => array('access user pages'),
+			'file' => 'sopac_user.php',
+			'type' => MENU_NORMAL_ITEM,
+		);
+		$items['user/checkouts/history/opt/%'] = array(
+			'title' => 'Change Checkout History Status',
+			'page callback' => 'sopac_checkout_history_toggle',
+			'page arguments' => array(4),
+			'access arguments' => array('access user pages'),
+			'file' => 'sopac_user.php',
+			'type' => MENU_CALLBACK,
+		);
+	}
 	$items['user/holds'] = array(
 		'title' => 'My Holds',
 		'page callback' => 'sopac_holds_page',
@@ -590,7 +607,7 @@ function sopac_search_form($form_type = 'both') {
 	return $search_form;
 }
 
-/*
+/**
  * Handles the search queries & sets the the RESTful URIs.
  * It very well may be that this function needs to be overridden due to themeing
  * considerations, so it takes advantage of Drupal's hook_theme and may be defined

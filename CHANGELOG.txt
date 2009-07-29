@@ -1,3 +1,17 @@
+sid_m committed on 7/29/2009:
+sopac.module:
+  --add user/checkouts/history and user/checkouts/history/opt/% menu items
+sopac_admin.php
+  --add settings for enable checkout history, and enable freezing holds.
+sopac_catalog.php
+  --modify sopac_catalog_search() to capture # of holds so can be displayed in search results if desired
+sopac_social.php
+  --modify sopac_personal_overview_page(), sopac_tags_page_cloud(), theme_sopac_tag_block(), and sopac_review_page() so they correctly calls theming functions
+sopac_user.php
+  --modify sopac_user_holds_table() to support freezing holds
+  --add sopac_checkout_history_page()
+  --add sopac_checkout_history_toggle()
+
 jsantoni commited on 7/2/2009:
 sopac_admin.php
   --add a call to menu_rebuild() when submitting system_settings_form
