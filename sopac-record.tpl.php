@@ -6,6 +6,7 @@ $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 $dl_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['download']));
 $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['skip_avail']));
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
+$google_url = "http://books.google.com/books?bibkeys=ISBN:" . trim(preg_replace('/[^\d\s]/', '', $item['stdnum'])) . "&jscmd=viewapi";
 ?>
 
 <!-- begin item record -->
@@ -120,7 +121,14 @@ $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_co
 		if (!$no_avail_mat_codes) { print t('No copies found.  Please contact a librarian for more assistance.'); }
 	}
 ?>
-
-
+<?php //if (preg_match('%embeddable":true%is', @file_get_contents($google_url))) { ?>
+<!-- <br /><span style="padding-left: 10px;"><strong><?php print t('Preview'); ?></strong></span> --!>
+<div class="item-google-prev">
+	<script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
+	<script type="text/javascript">
+	GBS_insertEmbeddedViewer('ISBN:<?php print trim(preg_replace('/[^\d\s]/', '', $item['stdnum'])); ?>',500,400);
+	</script>
+</div>
+<?php //} ?>
 <br />
 <!-- end item record -->

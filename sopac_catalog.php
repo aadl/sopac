@@ -275,7 +275,7 @@ function sopac_put_request_link($bnum) {
 			$link_text = t('Register your card to request this item');
 		}
 	} else {
-		$link = '/user/login';
+		$link = '/user/login?' . drupal_get_destination();
 		$link_text = t('Please log in to request this item');
 	}
 

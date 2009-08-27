@@ -147,6 +147,11 @@
 	border-bottom-width:0;
 }
 
+.item-google-prev {
+	margin-top: 20px;
+	margin-left: 30px;
+}
+
 /* Request Template Styles */
 
 .non_circ_msg {

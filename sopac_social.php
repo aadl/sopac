@@ -166,7 +166,7 @@ function theme_sopac_tag_block($block_type) {
 		}
 	} else {
 		if ($put_tag_form) {
-			$block_suffix = '<br /><br /><a href="/user/login">' . t('Login') . '</a>' . t(' to add tags.') . '</a>';
+			$block_suffix = '<br /><br /><a href="/user/login?' . drupal_get_destination() . '">' . t('Login') . '</a>' . t(' to add tags.') . '</a>';
 		}
 	}
 	
@@ -416,7 +416,7 @@ function sopac_review_page($page_type) {
 				if (!$insurge->check_reviewed($user->uid, $item['bnum']) && $user->uid) {
 					$rev_form = drupal_get_form('sopac_review_form', $item['bnum']);
 				} else if (!$user->uid) {
-					$rev_form = '<div class="review-login"><a href="/user/login">' . t('Login') . '</a>' . t(' to write a review') . '</div>';
+					$rev_form = '<div class="review-login"><a href="/user/login?' . drupal_get_destination() . '">' . t('Login') . '</a>' . t(' to write a review') . '</div>';
 				}
 				$result_page = theme('sopac_review', $user, $title, $rev_arr, $page_type, $rev_form, $ratings, $no_rev_msg);
 				$result_page .= theme('pager', NULL, $page_limit, 0, NULL, 6);
@@ -669,7 +669,7 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
 	
 	if (!$user->uid) {
 		$disable_flag = ' disabled="disabled" ';
-		$login_string = ' - <a href="/user/login">' . t('Login') . '</a>' . t(' to add yours');
+		$login_string = ' - <a href="/user/login?' . drupal_get_destination() . '">' . t('Login') . '</a>' . t(' to add yours');
 	}
 	
 	$ratings_info_arr = $insurge->get_rating($bnum);
