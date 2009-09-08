@@ -1,3 +1,7 @@
+jsantoni commited on 9/8/2009:
+sopac_catalog.php
+  --this prevent the search form to display url content when we aren't on the search result page
+
 sid_m committed on 7/29/2009:
 sopac.module:
   --add user/checkouts/history and user/checkouts/history/opt/% menu items

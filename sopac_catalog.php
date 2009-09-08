@@ -503,7 +503,7 @@ function sopac_search_form_basic() {
 		'#default_value' => $search_args,
 		'#size' => 25,
 		'#maxlength' => 255,
-		'#value' => $search_args,
+		'#value' => $actions[0] == 'search' ? $search_args : '',
 	);
 	$form['basic']['inline']['search_type'] = array(
 		'#type' => 'select',
