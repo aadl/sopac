@@ -87,11 +87,16 @@ $google_url = "http://books.google.com/books?bibkeys=ISBN:" . trim(preg_replace(
 		</ul>
 	</td>
 	<td width="20%">
-		<?php $cover_img_url = $item['cover_img'] ? $item['cover_img'] : '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png'; ?>
-		<ul class="item-cover-block">
-		<li><img width="100" class="item-cover" src="<?php print $cover_img_url; ?>"></li>
-		<?php if ($item['title_medium']) { print '<li>' . $item['title_medium'] . '</li>'; } ?>
-		</ul>
+		<?php 
+			if (module_exists('covercache')) {
+				print $cover_img;
+			} else {
+				$cover_img_url = $item['cover_img'] ? $item['cover_img'] : '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png'; ?>
+				<ul class="item-cover-block">
+				<li><img width="100" class="item-cover" src="<?php print $cover_img_url; ?>"></li>
+				<?php if ($item['title_medium']) { print '<li>' . $item['title_medium'] . '</li>'; } ?>
+				</ul>
+			<?php } ?>
 	</td>
 
 	</tr>

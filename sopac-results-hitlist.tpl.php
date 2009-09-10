@@ -19,7 +19,16 @@ if (!$cover_img_url) {
 <table>
 	<tr>
 	<td class="hitlist-number" width="7%"><?php print $result_num; ?></td>
-	<td width="13%"><a href="/<?php print $url_prefix . '/record/' . $locum_result['bnum'] ?>"><img class="hitlist-cover" width="72" src="<?php print $cover_img_url; ?>"></a></td>
+	<td width="13%">
+		<a href="/<?php print $url_prefix . '/record/' . $locum_result['bnum'] ?>">
+		<?php
+		if (module_exists('covercache')) {
+			print $cover_img;
+		} else { ?>
+			<img class="hitlist-cover" width="72" src="<?php print $cover_img_url; ?>">
+		<?php } ?>
+		</a>
+		</td>
 	<td width="100%">
 		<ul class="hitlist-info">
 			<li class="hitlist-title">
