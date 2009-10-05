@@ -290,9 +290,27 @@ function sopac_user_holds_table(&$account, &$locum) {
 function sopac_checkouts_page() {
   global $user;
   
+  $account = user_load($user->uid);
+  $cardnum = $account->profile_pref_cardnum;
   $locum = new locum_client;
+  $userinfo = $locum->get_patron_info($cardnum);
+  $bcode_verify = sopac_bcode_isverified($account);
+  if ($bcode_verify) { $account->bcode_verify = TRUE; } else { $account->bcode_verify = FALSE; }
+  if ($userinfo['pnum']) { $account->valid_card = TRUE; } else { $account->valid_card = FALSE; }
   profile_load_profile(&$user);
-  $content = sopac_user_chkout_table(&$user, &$locum);
+  
+  if ($account->valid_card && $bcode_verify) {
+    $content = sopac_user_chkout_table(&$user, &$locum);
+  } else if ($account->valid_card && !$bcode_verify) {
+    $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
+  } else if ($cardnum && !$account->valid_card) {
+    $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that your card number is invalid.  If you feel that this is in error, please contact us.')) . '</div>';
+  } else if (!$user->uid) {
+    $content = '<div class="error">' . t('You must be <a href="/user">logged in</a> to view this page.') . '</div>';
+  } else if (!$cardnum) {
+    $content = '<div class="error">' . t('You must register a valid <a href="/user/' . $user->uid . '/edit/Preferences">library card number</a> to view this page.') . '</div>';
+  }
+  
   return $content;
 }
 
@@ -360,8 +378,7 @@ function sopac_checkout_history_toggle($action) {
       $success = $locum->set_patron_checkout_history($cardnum, $locum_pass, $action);
       if ($success === true) {
         $content = "<div>Your checkout history has been turned $adjective.</div>";
-      }
-      else {
+      } else {
         $content = "<div>An error occurred. Your checkout history has not been turned $adjective. Please try again.</div>";
       }
     }
@@ -376,9 +393,27 @@ function sopac_checkout_history_toggle($action) {
 function sopac_holds_page() {
   global $user;
   
+  $account = user_load($user->uid);
+  $cardnum = $account->profile_pref_cardnum;
   $locum = new locum_client;
+  $userinfo = $locum->get_patron_info($cardnum);
+  $bcode_verify = sopac_bcode_isverified($account);
+  if ($bcode_verify) { $account->bcode_verify = TRUE; } else { $account->bcode_verify = FALSE; }
+  if ($userinfo['pnum']) { $account->valid_card = TRUE; } else { $account->valid_card = FALSE; }
   profile_load_profile(&$user);
-  $content = sopac_user_holds_table(&$user, &$locum);
+  
+  if ($account->valid_card && $bcode_verify) {
+    $content = sopac_user_holds_table(&$user, &$locum);
+  } else if ($account->valid_card && !$bcode_verify) {
+    $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
+  } else if ($cardnum && !$account->valid_card) {
+    $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that your card number is invalid.  If you feel that this is in error, please contact us.')) . '</div>';
+  } else if (!$user->uid) {
+    $content = '<div class="error">' . t('You must be <a href="/user">logged in</a> to view this page.') . '</div>';
+  } else if (!$cardnum) {
+    $content = '<div class="error">' . t('You must register a valid <a href="/user/' . $user->uid . '/edit/Preferences">library card number</a> to view this page.') . '</div>';
+  }
+  
   return $content;
 }
 
