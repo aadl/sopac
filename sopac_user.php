@@ -226,9 +226,10 @@ function sopac_user_holds_table(&$account, &$locum) {
     }
     $holdfreezes_to_update = array();
     foreach ($freeze_starts as $bnum => $was_frozen) {
-      if (($was_frozen == 'true' && !array_key_exists($bnum, $freezes)) || 
-        ($was_frozen == 'false' && array_key_exists($bnum, $freezes))) {
-          $holdfreezes_to_update[$bnum] = array_key_exists($bnum, $freezes);
+      if ($was_frozen == 'true' && !array_key_exists($bnum, $freezes)) {
+        $holdfreezes_to_update[$bnum] = 0;
+      } else if ($was_frozen == 'false' && array_key_exists($bnum, $freezes)) {
+        $holdfreezes_to_update[$bnum] = 1;
       }
     }
     if (count($holdfreezes_to_update)) {
@@ -258,8 +259,8 @@ function sopac_user_holds_table(&$account, &$locum) {
       }
       if ($hold['can_freeze']) {
         $freezer = 
-        '<input type="checkbox" name="freeze[' . $hold[bnum] . ']" value="freeze"' . (($hold['is_frozen']) ? 'checked=checked' : '') . '>' .
-        '<input type="hidden" name="freeze_start[' . $hold[bnum] . ']" value="' . (($hold['is_frozen']) ? 'true' : 'false') . '">';
+        '<input type="checkbox" name="freeze[' . $hold['bnum'] . ']" value="freeze"' . (($hold['is_frozen']) ? 'checked=checked' : '') . '>' .
+        '<input type="hidden" name="freeze_start[' . $hold['bnum'] . ']" value="' . (($hold['is_frozen']) ? 'true' : 'false') . '">';
       }
       else {
         $freezer = '&nbsp;';
