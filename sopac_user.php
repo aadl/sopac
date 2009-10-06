@@ -5,7 +5,7 @@
  * This file is called via hook_user
  *
  * @package SOPAC
- * @version 2.0
+ * @version 2.1
  * @author John Blyberg
  */
 
@@ -72,10 +72,10 @@ function sopac_user_info_table(&$account, &$locum) {
   if ($account->profile_pref_home_branch) {
     $home_branch_link = l($account->profile_pref_home_branch, 'user/' . $account->uid . '/edit/Preferences');
   }
-  elseif (variable_get('sopac_home_selector_options', false)) {
+  elseif (variable_get('sopac_home_selector_options', FALSE)) {
     $home_branch_link = l(t('Click to select your home branch'), 'user/' . $account->uid . '/edit/Preferences');
   }
-  else {$home_branch_link = null;}
+  else {$home_branch_link = NULL;}
   
   if ($account->profile_pref_cardnum) {
     $cardnum = $account->profile_pref_cardnum;
@@ -353,7 +353,7 @@ function sopac_checkout_history_page() {
     }
     $content .= '<div>' . $toggle . '</div>';
   }
-  else {$content = '<div>Please register your library card to take advantage of this feature.</div>';}
+  else {$content = '<div>' . t('Please register your library card to take advantage of this feature.') . '</div>';}
   return $content;
 }
 /**
@@ -362,14 +362,14 @@ function sopac_checkout_history_page() {
 function sopac_checkout_history_toggle($action) {
   global $user;
   if ($action != 'in' && $action != 'out') {drupal_goto('user/checkouts/history');}
-  $adjective = $action == 'in' ? 'on' : 'off';
+  $adjective = $action == 'in' ? t('on') : t('off');
   profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
     if (!$_GET['confirm']) {
       $confirm_link = l('confirm', $_GET['q'], array('query' => 'confirm=true'));
       $content = "<div>Please $confirm_link that you wish to turn $adjective your checkout history.";
       if ($action == 'out') {
-        $content .= ' Please note: this will delete your entire checkout history.';
+        $content .= ' ' . t('Please note: this will delete your entire checkout history.');
       }
     }
     else {
@@ -377,14 +377,14 @@ function sopac_checkout_history_toggle($action) {
       $locum_pass = substr($user->pass, 0, 7);
       $cardnum = $user->profile_pref_cardnum;
       $success = $locum->set_patron_checkout_history($cardnum, $locum_pass, $action);
-      if ($success === true) {
+      if ($success === TRUE) {
         $content = "<div>Your checkout history has been turned $adjective.</div>";
       } else {
         $content = "<div>An error occurred. Your checkout history has not been turned $adjective. Please try again.</div>";
       }
     }
   }
-  else {$content = '<div>Please register your library card to take advantage of this feature.</div>';}
+  else {$content = '<div>' . t('Please register your library card to take advantage of this feature.') . '</div>';}
   return $content;
 }
 
@@ -487,7 +487,7 @@ function sopac_finespaid_page() {
       $payment_amt = '$' . number_format($payment_arr['amount'], 2);
       $rows[] = array($checkbox, $payment_date, $payment_desc, $payment_amt);
     }
-    $submit_button = '<input type="submit" value="Remove Selected Payment Records">';
+    $submit_button = '<input type="submit" value="' . t('Remove Selected Payment Records') . '">';
     $rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 4)), 'class' => 'profile_button' );
     $page_disp = '<form method="post">' . theme('pager', NULL, $limit, 0, NULL, 6) . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . '</form>';
   } else {

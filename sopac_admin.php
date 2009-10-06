@@ -5,7 +5,7 @@
  * This file is called via hook_menu
  *
  * @package SOPAC
- * @version 2.0
+ * @version 2.1
  * @author John Blyberg
  */
 
@@ -344,12 +344,12 @@ function sopac_admin() {
 function sopac_setup_user_home_selector() {
   $admin_card = variable_get('sopac_admin_card', '');
   if (!variable_get('sopac_home_branch_enable', 0) || !$admin_card || variable_get('sopac_home_selector_options', false)) {
-    return false;
+    return FALSE;
   }
   $locum = new locum_client;
   $bib_numbers = $locum->get_bib_numbers();
   if (!count($bib_numbers)) {
-    return false;
+    return FALSE;
   }
   foreach ($bib_numbers as $bnum) {
     $hold_result = $locum->place_hold($admin_card, $bnum);
