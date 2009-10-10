@@ -213,69 +213,72 @@ function sopac_user_holds_table(&$account, &$locum) {
   // Process any holds deletions that have been submitted
   $freezes_enabled = variable_get('sopac_hold_freezes_enable', 1);
   $submit_value = $freezes_enabled ? 'Update Holds' : 'Cancel Selected Holds';
-  if ($_POST['sub_type'] == $submit_value) {
-    $freezes = array_key_exists('freeze', $_POST) ? $_POST['freeze'] : array();
-    $freeze_starts = array_key_exists('freeze_start', $_POST) ? $_POST['freeze_start'] : array();
-    if (count($_POST['bnum'])) {
-      foreach ($_POST['bnum'] as $bnum => $varname) {
-        $items[$bnum] = $varname;
-        unset($freezes[$bnum]);
-        unset($freeze_starts[$bnum]);
-      }
-      $locum->cancel_holds($account->profile_pref_cardnum, $account->locum_pass, $items);
-    }
-    $holdfreezes_to_update = array();
-    foreach ($freeze_starts as $bnum => $was_frozen) {
-      if ($was_frozen == 'true' && !array_key_exists($bnum, $freezes)) {
-        $holdfreezes_to_update[$bnum] = 0;
-      } else if ($was_frozen == 'false' && array_key_exists($bnum, $freezes)) {
-        $holdfreezes_to_update[$bnum] = 1;
-      }
-    }
-    if (count($holdfreezes_to_update)) {
-      $locum->update_holdfreezes($account->profile_pref_cardnum, $account->locum_pass, $holdfreezes_to_update);
-    }
-  }
-  
-  $rows = array();
+  $update_holds = FALSE;
+
   if ($account->profile_pref_cardnum) {
     $cardnum = $account->profile_pref_cardnum;
-    $holds = $locum->get_patron_holds($cardnum);
+    $holds = $locum->get_patron_holds($cardnum, $account->locum_pass);
+    
+    if ($_POST['sub_type'] == $submit_value) {
+      
+      // Queue up cancellations
+      $cancel_arr = array();
+      if (count($_POST['cancel'])) {
+        $cancel_arr = $_POST['cancel'];
+        $update_holds = TRUE;
+      }
+      
+      // Queue up freezes
+      $freeze_arr = array();
+      foreach ($holds as $hold) {
+        if (isset($_POST['freeze'][$hold['bnum']])) {
+          $freeze_arr[$hold['bnum']] = 1;
+          $update_holds = TRUE;
+        } else if ($hold['is_frozen'] == 1) {
+          $freeze_arr[$hold['bnum']] = 0;
+          $update_holds = TRUE;
+        }
+      }
+      
+      if ($update_holds) {
+        $locum->update_holds($cardnum, $account->locum_pass, $cancel_arr, $freeze_arr, NULL);
+        $holds = $locum->get_patron_holds($cardnum, $account->locum_pass);
+      }
+    }
+    
     if (!count($holds)) { return t('No items on hold.'); }
+    
     if ($freezes_enabled) {
       $header = array('Delete', 'Title', 'Status', 'Pickup Location', 'Freeze');
     }
     else {
       $header = array('', 'Title', 'Status', 'Pickup Location');
     }
+    
+    $rows = array();
     foreach ($holds as $hold) {
-      // Show only the name of the pickup location, not a select list of all branches
-      $options = preg_split('/\<\/option\>/i', $hold['pickuploc']);
-      foreach($options as $option) {
-        if (preg_match('/selected=["\']?selected/', $option) && preg_match('/.*\>(.+)$/', $option, $matches)) {
-          $hold['pickuploc'] = $matches[1];
-          break;
-        }
-      }
+      $hold_pickup_loc = $hold['pickuploc']['options'][$hold['pickuploc']['selected']];
+
       if ($hold['can_freeze']) {
         $freezer = 
-        '<input type="checkbox" name="freeze[' . $hold['bnum'] . ']" value="freeze"' . (($hold['is_frozen']) ? 'checked=checked' : '') . '>' .
-        '<input type="hidden" name="freeze_start[' . $hold['bnum'] . ']" value="' . (($hold['is_frozen']) ? 'true' : 'false') . '">';
-      }
-      else {
+        '<input type="checkbox" name="freeze[' . $hold['bnum'] . ']" value="1"' . (($hold['is_frozen']) ? 'checked=checked' : '') . '>';
+      } else {
         $freezer = '&nbsp;';
       }
+      
       $row = array(
-        '<input type="checkbox" name="bnum[' . $hold['bnum'] . ']" value="' . $hold['varname'] . '">',
+        '<input type="checkbox" name="cancel[' . $hold['bnum'] . ']" value="1">',
         '<a href="/catalog/record/' . $hold['bnum'] . '">' . $hold['title'] . '</a>',
         $hold['status'],
-        $hold['pickuploc'],
+        $hold_pickup_loc,
       );
+      
       if ($freezes_enabled) {
         $row[] = $freezer;
       }
       $rows[] = $row;
     }
+    
     $submit_button = '<input type="submit" name="sub_type" value="' . $submit_value . '">';
     $rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => $freezes_enabled ? 5 : 4)), 'class' => 'profile_button' );
   } else {
