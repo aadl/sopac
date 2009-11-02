@@ -1,4 +1,9 @@
 <?php
+// $Id$
+/**
+ * @file
+ * Install, update and uninstall functions for the SOPAC module.
+ */
 
 /**
  * Implementation of hook_install().
@@ -157,7 +162,8 @@ function sopac_install_custom_table_mods($install = TRUE) {
   if ($install) {
     db_query('ALTER TABLE {sopac_fines_paid} CHANGE trans_date trans_date TIMESTAMP NOT NULL');
     db_query('ALTER TABLE {sopac_fines_paid} CHANGE trans_date trans_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
-  } else {
+  }
+  else {
     db_query('ALTER TABLE {sopac_fines_paid} CHANGE trans_date trans_date DATETIME NOT NULL');
   }
 }
