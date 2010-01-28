@@ -75,11 +75,11 @@ $google_url = "http://books.google.com/books?bibkeys=ISBN:" . trim(preg_replace(
         }
         if (!$no_avail_mat_codes) {
           print '<tr><th style="padding-top:5px;">' . t('Copies Available') . '</th><td style="padding-top:5px;">';
-          print $item_status['copies'] . t(' of ') . $item_status['total'];
+          print $item_status['avail'] . t(' of ') . $item_status['total'];
           print '</td></tr>';
         }
         if ($item_status['holds']) { print '<tr><th>' . t('# of Holds') . '</th><td>' . $item_status['holds'] . '</td></tr>'; }
-        if ($item_status['order']) { print '<tr><th>' . t('On Order') . '</th><td>' . $item_status['order'] . '</td></tr>'; }
+        if ($item_status['on_order']) { print '<tr><th>' . t('On Order') . '</th><td>' . $item_status['on_order'] . '</td></tr>'; }
         ?>
       </table>
       </div>
@@ -102,28 +102,32 @@ $google_url = "http://books.google.com/books?bibkeys=ISBN:" . trim(preg_replace(
   </tr>
 </table>
 
-<?php if (count($item_status['details']) && !$no_avail_mat_codes) { ?>
+<?php if (count($item_status['items']) && !$no_avail_mat_codes) { ?>
 <div class="item-avail-disp">
+<fieldset class=" collapsible collapsed"><legend><?php print t('Click to view all copies'); ?></legend>
 <table cellspacing="0">
   <?php print '<tr class="item-avail-label"><th>' . t('Location') . '</th><th>' . t('Call Number') . '</th><th>' . t('Item Status') . '</th>'; ?>
+
   <?php
-  // TODO :: see bib 1228068
-  foreach ($item_status['details'] as $cnum => $loc_info_arr) {
-    foreach ($loc_info_arr as $loc => $loc_info) {
-      if ($loc_info['avail'] > 0) {
-        print '<tr><td>' . $loc . '</td><td>' . $cnum . '</td><td>' . $loc_info['avail'] . t(' copies available') . '</td></tr>';
-      }
-      if (count($loc_info['due'])) {
-        print '<tr><td>' . $loc . '</td><td>' . $cnum . '</td><td>Next copy due ' . date('n-j-Y', $loc_info['due'][0]) . '</td></tr>';
-      }
+  foreach ($item_status['items'] as $copy_status) {
+    if ($copy_status['avail'] > 0) {
+      $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
+      $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
+    } else if ($copy_status['due']) {
+      $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
+    } else {
+      $status_msg = $copy_status['statusmsg'];
     }
+    print '<tr><td>' . $copy_status['location'] . '</td><td>' . $copy_status['callnum'] . '</td><td>' . $status_msg . '</td></tr>';
   }
   ?>
+
 </table>
+</fieldset>
 </div>
 <?php 
   } else {
-    if (!$no_avail_mat_codes) { print t('No copies found.  Please contact a librarian for more assistance.'); }
+    if (!$no_avail_mat_codes) { print t('No copies found.  Please contact a librarian for assistance.'); }
   }
 ?>
 <?php //if (preg_match('%embeddable":true%is', @file_get_contents($google_url))) { ?>

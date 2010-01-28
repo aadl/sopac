@@ -49,8 +49,8 @@ if (!$cover_img_url) {
       <br />
       <li>
       <?php 
-      print $locum_result['copies'] . t(' of ') . $locum_result['totalcopies'] . ' ';
-      print ($locum_result['totalcopies'] == 1) ? t('copy available') : t('copies available');
+      print $locum_result['status']['avail'] . t(' of ') . $locum_result['status']['total'] . ' ';
+      print ($locum_result['status']['total'] == 1) ? t('copy available') : t('copies available');
       ?>
       </li>
       <?php 
