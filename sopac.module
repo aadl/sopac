@@ -225,14 +225,6 @@ function sopac_menu() {
     'file' => 'sopac_catalog.php',
     'type' => MENU_CALLBACK,
   );
-  
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/searchrss'] = array(
-    'title' => 'Catalog Search',
-    'page callback' => 'sopac_catalog_search',
-    'access arguments' => array('access content'),
-    'file' => 'sopac_catalog.php',
-    'type' => MENU_CALLBACK,
-  );
 
   $items[variable_get('sopac_url_prefix', 'cat/seek') . '/savesearch'] = array(
     'title' => 'Save Search',
@@ -485,8 +477,16 @@ function sopac_theme() {
       'template' => 'sopac-results',
       'arguments' => array('result_info' => NULL, 'hitlist_pager' => NULL, 'hitlist_content' => NULL, 'locum_result' => NULL, 'locum_config' => NULL),
     ),
+    'sopac_results_rss' => array(
+      'template' => 'sopac-results-rss',
+      'arguments' => array('result_info' => NULL, 'search_term' => NULL, 'search_type' => NULL, 'hitlist_content' => NULL, 'locum_result' => NULL, 'locum_config' => NULL),
+    ),
     'sopac_results_hitlist' => array(
       'template' => 'sopac-results-hitlist',
+      'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL),
+    ),
+    'sopac_results_hitlist_rss' => array(
+      'template' => 'sopac-results-hitlist-rss',
       'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL),
     ),
     'sopac_results_nohits' => array(
@@ -496,10 +496,6 @@ function sopac_theme() {
     'sopac_record' => array(
       'template' => 'sopac-record',
       'arguments' => array('item' => NULL, 'item_status' => NULL, 'locum_config' => NULL, 'no_circ' => NULL, 'locum' => NULL),
-    ),
-    'sopac_record_rss' => array(
-      'template' => 'sopac-record-rss',
-      'arguments' => array('locum_result' => NULL),
     ),
     'sopac_review' => array(
       'template' => 'sopac-review',
@@ -767,32 +763,6 @@ function sopac_parse_get_vars($override = array()) {
     }
   }
   return $vars;
-}
-
-/*
- * Function to prepare and return RSS feeds
- *
- * @param array $feed_items array of items to be syndicated, keyed as title,link,description,extra (array of additional arguments)
- * @return string RSS feed string
- */
-function sopac_rss_feed($feed_title, $feed_link, $feed_desc, $feed_items, $print_feed = TRUE) {
-  global $base_url;
-  
-  $namespaces = array('xmlns:dc="http://purl.org/dc/elements/1.1/"');
-  $rss_items = '';
-  foreach ($feed_items as $feed_item) {
-    $rss_items .= format_rss_item($feed_item['title'], $feed_item['link'], $feed_item['description'], $feed_item['extra']);
-  }
-
-  $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-  $output .= "<rss version=\"2.0\" xml:base=\"". $base_url ."\" ". implode(' ', $namespaces) .">\n";
-  $output .= format_rss_channel($feed_title, $feed_link, $feed_desc, $rss_items, $GLOBALS['locale']);
-  $output .= "</rss>\n";
-  
-  if ($print_feed) {
-    drupal_set_header('Content-Type: text/xml; charset=utf-8');
-    print $output;
-  }
 }
 
 /**

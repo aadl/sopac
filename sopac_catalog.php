@@ -36,6 +36,11 @@ function sopac_catalog_search() {
   $format = $getvars['search_format'];
   $location = $getvars['location'];
   $pager_page_array = explode(',', $getvars['page']);
+  $search_type = $actions[1];
+  $search_term = utf8_urldecode($actions[2]);
+  
+  // Begin thinking about RSS
+  $hitlist_template = ($getvars['output'] == 'rss') ? 'sopac_results_hitlist_rss' : 'sopac_results_hitlist';
 
   // If there is a proper search query, we get that data here.
   if (in_array($actions[1], $valid_search_types)) {
@@ -58,7 +63,7 @@ function sopac_catalog_search() {
     if (count($getvars['facet_year'])) { $facet_args['facet_year'] = $getvars['facet_year']; }
 
     // Get the search results from Locum
-    $locum_results_all = $locum->search($actions[1], utf8_urldecode($actions[2]), $limit, $page_offset, $sort, $format, $location, $facet_args);
+    $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args);
     $num_results = $locum_results_all['num_hits'];
     $result_info['num_results'] = $num_results;
     $result_info['hit_lowest'] = $page_offset + 1;
@@ -69,11 +74,6 @@ function sopac_catalog_search() {
     }
   }
   
-  if ($actions[0] == 'searchrss') {
-    sopac_catalog_rss_feed($locum_results_all);
-    return;
-  }
-
   // Construct the search form
   $search_form_cfg = variable_get('sopac_search_form_cfg', 'both');
   $search_form = sopac_search_form($search_form_cfg);
@@ -101,7 +101,7 @@ function sopac_catalog_search() {
       
       $cover_img_url = $locum_result['cover_img'];
     
-      $result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
+      $result_body .= theme($hitlist_template, $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
       $hitnum++;
     }
 
@@ -111,24 +111,20 @@ function sopac_catalog_search() {
   }
 
   // Pull it all together into the search page template
-  $result_page = $search_form . theme('sopac_results', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
+  $result_page = $search_form . theme($output_template, $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
 
+  // Check to see if we're doing RSS
+  if ($getvars['output'] == 'rss') {
+    print theme('sopac_results_rss', $result_info, $search_term, $search_type, $result_body, $locum_results_all, $locum->locum_config);
+    exit(0);
+  } else {
+    $result_page = $search_form . theme('sopac_results', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
+  }
+  
   return '<p>'. t($result_page) .'</p>';
 
 }
 
-function sopac_catalog_rss_feed($locum_results_all) {
-  
-  $items = array();
-  $i = 0;
-  foreach ($locum_results_all['results'] as $locum_result) {
-    $item[$i]['title'] = ''; // Item title
-    $item[$i]['link'] = ''; // link to the catalog record
-    $item[$i]['description'] = theme('sopac_record_rss', $locaum_result);
-    $i++;
-  }
-  
-}
 
 /**
  * Prepares and returns the HTML for an item record.
