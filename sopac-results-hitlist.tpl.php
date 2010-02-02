@@ -29,7 +29,7 @@ if (!$cover_img_url) {
     <?php } ?>
     </a>
     </td>
-  <td width="100%">
+  <td width="50%" valign="top">
     <ul class="hitlist-info">
       <li class="hitlist-title">
         <strong><a href="/<?php print $url_prefix . '/record/' . $locum_result['bnum'] ?>"><?php print $locum_result['title'];?></a></strong>
@@ -60,7 +60,17 @@ if (!$cover_img_url) {
       ?>
     </ul>
   </td>
-
+  <?php
+  if ($locum_result['review_links']) {
+    print '<td width="50%" valign="top">';
+    print "Reviews and Summaries <br /> \n";
+    print '<ul>';
+    foreach ($locum_result['review_links'] as $rev_title => $rev_link) {
+      print '<li><a href="' . $rev_link . '" target="_new">' . $rev_title . '</a>';
+    }
+    print '</ul></td>';
+  }
+  ?>
   <td width="15%">
   <ul class="hitlist-format-icon">
     <li><img src="<?php print '/' . drupal_get_path('module', 'sopac') . '/images/' . $locum_result['mat_code'] . '.png' ?>"></li>

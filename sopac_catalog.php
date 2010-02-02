@@ -99,8 +99,14 @@ function sopac_catalog_search() {
       // Grab item status from Locum
       $locum_result['status'] = $locum->get_item_status($locum_result['bnum']);
       
+      // Get the cover image
       $cover_img_url = $locum_result['cover_img'];
-    
+      
+      // Grab Syndetics reviews, etc..
+      $review_links = $locum->get_syndetics($locum_result['stdnum']);
+      if (count($review_links)) { $locum_result['review_links'] = $review_links; }
+
+      // Send it all off to the template
       $result_body .= theme($hitlist_template, $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
       $hitnum++;
     }
@@ -120,6 +126,9 @@ function sopac_catalog_search() {
   } else {
     $result_page = $search_form . theme('sopac_results', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
   }
+  
+  $search_feed_url = sopac_update_url($_SERVER['REQUEST_URI'], 'output', 'rss');
+  drupal_add_feed($search_feed_url, 'Search for "' . $search_term . '"');
   
   return '<p>'. t($result_page) .'</p>';
 
@@ -221,26 +230,6 @@ function suggestion_link($locum_result) {
   $url_prefix = variable_get('sopac_url_prefix', 'cat/seek'); 
   $sugg_link = '/' . $url_prefix . '/search/' . $locum_result['type'] . '/' . $locum_result['suggestion'] . '?' . $pagevars;
   return $sugg_link;
-}
-
-/**
- * Takes an array and creates page variable.  It's basically the reverse of sopac_parse_get_vars()
- *
- * @param array Array of variables to formulate
- * @return string GET variable string
- */
-function sopac_make_pagevars($getvars) {
-  $pagevars = '';
-  
-  if (is_array($getvars) && count($getvars)) {
-    foreach ($getvars as $key => $var) {
-      if (is_array($var)) { $var = implode('|', $var); }
-      $pagevars .= $key . '=' . $var . '&';
-    }
-    $pagevars = substr($pagevars, 0, -1);
-  }
-  return $pagevars;
-
 }
 
 /**

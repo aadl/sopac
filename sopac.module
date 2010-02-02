@@ -766,6 +766,54 @@ function sopac_parse_get_vars($override = array()) {
 }
 
 /**
+ * Takes an array and creates page variable.  It's basically the reverse of sopac_parse_get_vars()
+ *
+ * @param array Array of variables to formulate
+ * @return string GET variable string
+ */
+function sopac_make_pagevars($getvars) {
+  $pagevars = '';
+  
+  if (is_array($getvars) && count($getvars)) {
+    foreach ($getvars as $key => $var) {
+      if (is_array($var)) { $var = implode('|', $var); }
+      $pagevars .= $key . '=' . $var . '&';
+    }
+    $pagevars = substr($pagevars, 0, -1);
+  }
+  return $pagevars;
+
+}
+
+/**
+ * Takes a url, and a new varname/value pair and updates a url
+ *
+ * @param string $url URL
+ * @param string $uKey Variable name
+ * @param string $uVal Variable value
+ * @return string New URL with variable
+ */
+function sopac_update_url($url, $uKey, $uVal) {
+  $Qurl = explode("?",$url);
+  $arr = explode("&",$Qurl[1]);
+  $r = ''; $set = 0;
+  for($i=0;$i<sizeof($arr);$i++) {
+    $arr2 = explode("=",$arr[$i]);
+    if($arr2[0] == $uKey) {
+      $arr2[1] = $uVal;
+      $set = 1;
+    }
+    $r.=$arr2[0]."=".$arr2[1]."&";
+  }
+  if($set == 0) {
+    $r.= $uKey."=".$uVal;
+  } else {
+    $r = rtrim($r, "&");
+  }
+  return $Qurl[0].'?'.$r;
+}
+
+/**
  * Function to automate the handling of the pager system.
  */
 function sopac_pager_init($total, $element = 0, $limit = 10) {

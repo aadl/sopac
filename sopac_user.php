@@ -136,7 +136,7 @@ function sopac_user_info_table(&$account, &$locum) {
     
   } else if ($cardnum && !$account->valid_card) {
     
-    $user_info_disp .= '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that your card number is invalid.  If you feel that this is in error, please contact us.')) . '</div>';
+    $user_info_disp .= '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that the library card number stored on our website is invalid. If you have received a new card, or feel that this is an error, please click on the card number above to change it to your most recent library card. If you need further help, please contact us.')) . '</div>';
     
   }
 
@@ -308,7 +308,7 @@ function sopac_checkouts_page() {
   } else if ($account->valid_card && !$bcode_verify) {
     $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
   } else if ($cardnum && !$account->valid_card) {
-    $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that your card number is invalid.  If you feel that this is in error, please contact us.')) . '</div>';
+    $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that the library card number stored on our website is invalid. If you have received a new card, or feel that this is an error, please click on the card number above to change it to your most recent library card. If you need further help, please contact us.')) . '</div>';
   } else if (!$user->uid) {
     $content = '<div class="error">' . t('You must be <a href="/user">logged in</a> to view this page.') . '</div>';
   } else if (!$cardnum) {
@@ -411,7 +411,7 @@ function sopac_holds_page() {
   } else if ($account->valid_card && !$bcode_verify) {
     $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
   } else if ($cardnum && !$account->valid_card) {
-    $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that your card number is invalid.  If you feel that this is in error, please contact us.')) . '</div>';
+    $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that the library card number stored on our website is invalid. If you have received a new card, or feel that this is an error, please click on the card number above to change it to your most recent library card. If you need further help, please contact us.')) . '</div>';
   } else if (!$user->uid) {
     $content = '<div class="error">' . t('You must be <a href="/user">logged in</a> to view this page.') . '</div>';
   } else if (!$cardnum) {
@@ -726,8 +726,8 @@ function sopac_saved_searches_page() {
       $checkbox = '<input type="checkbox" name="search_id[]" value="' . $search_arr['search_id'] . '">';
       $search_desc = '<a href="' . $search_arr['search_url'] . '">' . $search_arr['search_desc']. '</a>';
       // TODO: implement RSS feeds for saved searches.
-      $search_feed = '';
-      // $search_feed = theme_feed_icon('/feed' . $search_arr[search_url], 'RSS Feed: ' . $search_arr[search_desc]);
+      $search_feed_url = sopac_update_url($search_arr['search_url'], 'output', 'rss');
+      $search_feed = theme_feed_icon($search_feed_url, 'RSS Feed: ' . $search_arr['search_desc']);
       $rows[] = array($checkbox, $search_desc, $search_feed);
     }
     $submit_button = '<input type="submit" value="' . t('Remove Selected Searches') . '">';

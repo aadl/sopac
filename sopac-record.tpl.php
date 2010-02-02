@@ -55,6 +55,7 @@ $google_url = "http://books.google.com/books?bibkeys=ISBN:" . trim(preg_replace(
         if ($item['lccn']) { print '<tr><th>' . t('LC #') . '</th><td>' . $item['lccn'] . '</td></tr>';  }
         if ($item['lang']) { print '<tr><th>' . t('Language') . '</th><td>' . $item['lang'] . '</td></tr>';  }
         if ($item['mat_code']) { print '<tr><th>' . t('Material Format') . '</th><td>' . $locum_config['formats'][$item['mat_code']] . '</td></tr>';  }
+        if ($item['download_link']) { print '<tr><th>' . t('Download') . '</th><td><a href="' . $item['download_link'] . '">Click here to download this work</a></td></tr>';  }
         if ($location_label) { print '<tr><th>' . t('Location') . '</th><td>' . $location_label . '</td></tr>';  }
         if ($item['notes']) {
           $notes_arr = unserialize($item['notes']);
