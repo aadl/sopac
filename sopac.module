@@ -242,23 +242,6 @@ function sopac_menu() {
     'file' => 'sopac_catalog.php',
     'type' => MENU_CALLBACK,
   );
-  
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/record/%/view'] = array(
-    'title' => 'Item Record',
-    'access arguments' => array('access content'),
-    'weight' => -10,
-    'file' => 'sopac_catalog.php',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/record/%/reviews'] = array(
-    'title' => 'Item Reviews',
-    'page callback' => 'sopac_review_page',
-    'access arguments' => array('access content'),
-    'page arguments' => array('catalog'),
-    'file' => 'sopac_social.php',
-    'type' => MENU_LOCAL_TASK,
-  );
 
   $items[variable_get('sopac_url_prefix', 'cat/seek') . '/request'] = array(
     'title' => 'Request an Item',
@@ -495,7 +478,7 @@ function sopac_theme() {
     ),
     'sopac_record' => array(
       'template' => 'sopac-record',
-      'arguments' => array('item' => NULL, 'item_status' => NULL, 'locum_config' => NULL, 'no_circ' => NULL, 'locum' => NULL),
+      'arguments' => array('item' => NULL, 'item_status' => NULL, 'locum_config' => NULL, 'no_circ' => NULL, 'locum' => NULL, 'rev_arr' => NULL, 'rev_form' => NULL),
     ),
     'sopac_review' => array(
       'template' => 'sopac-review',

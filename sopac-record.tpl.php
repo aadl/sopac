@@ -2,143 +2,260 @@
 /*
  * Item record display template
  */
+
+// Set the page title
+drupal_set_title(ucwords($item['title']));
+
+// Set up some variables. 
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
+$new_author_str = sopac_author_format($item['author'], $item['addl_author']);
 $dl_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['download']));
 $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['skip_avail']));
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
-$google_url = "http://books.google.com/books?bibkeys=ISBN:" . trim(preg_replace('/[^\d\s]/', '', $item['stdnum'])) . "&jscmd=viewapi";
+$note_arr = unserialize($item['notes']);
+
+$series = trim($item['series']);
+if ($split_pos = max(strpos($series, ";"), strpos($series, ":"), strpos($series, "."), 0)) {
+  $series = trim(substr($series, 0, $split_pos));
+}
+
+// Construct the availabilty summary.
+if ($item_status['avail'] == 0 && $item_status['holds'] > 0) {
+  $class = "holds";
+  $reqtext = "There are no copies available. " . $item_status['holds'] . " request" .
+  ($item_status['holds'] == 1 ? '' : 's') . " on " . count($item_status['items']) . " copies";
+} else if ($item_status['avail'] == 0) {
+  $class = "first";
+  $reqtext = "There are no copies available.";
+} else if($item_status['holds'] > 0) {
+  $class = "holds";
+  $reqtext = "There " . ($item_status['avail'] == 1 ? 'is' : 'are') . " currently $item_status[avail] available and " . $item_status['holds'] . " request" . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
+} else {
+  $class = "avail";
+  $reqtext = "There " . ($item_status['avail'] == 1 ? 'is' : 'are') . " currently $item_status[avail] available.";
+}
+
+// Build the item availability array
+
+foreach ($item_status['items'] as $copy_status) {
+  if ($copy_status['avail'] > 0) {
+    $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
+    $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
+  } else if ($copy_status['due']) {
+    $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
+  } else {
+    $status_msg = $copy_status['statusmsg'];
+  }
+  $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
+}
+
+if (sopac_prev_search_url(TRUE)) {
+  print '<p><a href="' . sopac_prev_search_url() . '">&#171; Return to your search</a></p>';
+}
+
 ?>
 
 <!-- begin item record -->
-<table>
-  <tr>
-  <td width="80%" class="item-info-block">
-    <div class="item-title"><strong><?php print ucwords($item['title']); ?></strong></div>
-    <?php if (variable_get('sopac_social_enable', 1)) { print '<br />' . theme_sopac_get_rating_stars($item['bnum']); } ?>
-    
-    <ul class="item-info-list">
-    <?php 
-    if (!in_array($item['loc_code'], $no_circ)) {
-      print '<li class="item-request"><strong>» ' . sopac_put_request_link($item['bnum']) . '</strong></li>';
-    }
-    ?>
-    
-    <?php
-    if (sopac_prev_search_url(TRUE)){
-      print '<li class="item-request"><strong>»</strong> <a href="' . sopac_prev_search_url() . '">' . t('Return to your search') . '</a></li>'; 
-    }
-    ?>
-    <li class="item-details-list">
-      <div class="item-detail-block">
-      <table>
-        <?php 
-        if ($item['author']) { print '<tr><th>' . t('Author') . '</th><td><a href="/' . 
-          $url_prefix . '/search/author/' . urlencode($item['author']) .
-          '">' . $item['author'] . '</a></td></tr>'; } 
-        if ($item['addl_author']) {
-          $addl_author_arr = unserialize($item['addl_author']);
-          print '<tr><th>Additional Authors</th><td>';
-          foreach ($addl_author_arr as $addl_author) {
-            $addl_author_links[] = '<a href="/' . $url_prefix . '/search/author/' . urlencode($addl_author) . '">' . $addl_author . '</a>';
-          }
-          print implode('<br />', $addl_author_links);
-          print '</td></tr>';
-        }
-        if ($item['pub_info']) { print '<tr><th>' . t('Publication Info') . '</th><td>' . $item['pub_info'] . '</td></tr>';  }
-        if ($item['pub_year']) { print '<tr><th>' . t('Year Published') . '</th><td>' . $item['pub_year'] . '</td></tr>';  }
-        if ($item['series']) { print '<tr><th>' . t('Series') . '</th><td><a href="/' . 
-          $url_prefix . '/search/series/' . urlencode($item['series']) . '">' . $item['series'] . '</a></td></tr>';  }
-        if ($item['edition']) { print '<tr><th>' . t('Edition') . '</th><td>' . $item['edition'] . '</td></tr>';  }
-        if ($item['descr']) { print '<tr><th>' . t('Description') . '</th><td>' . nl2br($item['descr']) . '</td></tr>';  }
-        if ($item['callnum']) { print '<tr><th>' . t('Call #') . '</th><td>' . $item['callnum'] . '</td></tr>';  }
-        if ($item['stdnum']) { print '<tr><th>' . t('ISBN/Standard #') . '</th><td>' . $item['stdnum'] . '</td></tr>';  }
-        if ($item['lccn']) { print '<tr><th>' . t('LC #') . '</th><td>' . $item['lccn'] . '</td></tr>';  }
-        if ($item['lang']) { print '<tr><th>' . t('Language') . '</th><td>' . $item['lang'] . '</td></tr>';  }
-        if ($item['mat_code']) { print '<tr><th>' . t('Material Format') . '</th><td>' . $locum_config['formats'][$item['mat_code']] . '</td></tr>';  }
-        if ($item['download_link']) { print '<tr><th>' . t('Download') . '</th><td><a href="' . $item['download_link'] . '">Click here to download this work</a></td></tr>';  }
-        if ($location_label) { print '<tr><th>' . t('Location') . '</th><td>' . $location_label . '</td></tr>';  }
-        if ($item['notes']) {
-          $notes_arr = unserialize($item['notes']);
-          print '<tr><th style="padding-top:5px;">' . t('Notes') . '</th><td style="padding-top:5px;">';
-          print implode('<br /><br />', $notes_arr);
-          print '</td></tr>';
-        }
-        if ($item['subjects']) {
-          $subj_arr = unserialize($item['subjects']);
-          if (is_array($subj_arr)) {
-            print '<tr><th style="padding-top:5px;">' . t('Subject Headings') . '</th><td style="padding-top:5px;">';
-            foreach ($subj_arr as $subj) {
-              $subj_links[] = '<a href="/' . $url_prefix . '/search/subject/' . urlencode($subj) . '">' . $subj . '</a>';
-            }
-            print implode(' | ', $subj_links);
-            print '</td></tr>';
-          }
-        }
-        if (!$no_avail_mat_codes) {
-          print '<tr><th style="padding-top:5px;">' . t('Copies Available') . '</th><td style="padding-top:5px;">';
-          print $item_status['avail'] . t(' of ') . $item_status['total'];
-          print '</td></tr>';
-        }
-        if ($item_status['holds']) { print '<tr><th>' . t('# of Holds') . '</th><td>' . $item_status['holds'] . '</td></tr>'; }
-        if ($item_status['on_order']) { print '<tr><th>' . t('On Order') . '</th><td>' . $item_status['on_order'] . '</td></tr>'; }
-        ?>
-      </table>
-      </div>
-    </li>
-    </ul>
-  </td>
-  <td width="20%">
-    <?php 
-      if (module_exists('covercache')) {
-        print $cover_img;
-      } else {
-        $cover_img_url = $item['cover_img'] ? $item['cover_img'] : '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png'; ?>
-        <ul class="item-cover-block">
-        <li><img width="100" class="item-cover" src="<?php print $cover_img_url; ?>"></li>
-        <?php if ($item['title_medium']) { print '<li>' . $item['title_medium'] . '</li>'; } ?>
-        </ul>
-      <?php } ?>
-  </td>
+<div class="itemrecord">
 
-  </tr>
-</table>
+<!-- begin left-hand column -->
+<div class="item-left">
 
-<?php if (count($item_status['items']) && !$no_avail_mat_codes) { ?>
-<div class="item-avail-disp">
-<fieldset class=" collapsible collapsed"><legend><?php print t('Click to view all copies'); ?></legend>
-<table cellspacing="0">
-  <?php print '<tr class="item-avail-label"><th>' . t('Location') . '</th><th>' . t('Call Number') . '</th><th>' . t('Item Status') . '</th>'; ?>
+<!-- Cover Image -->
+<?php echo $cover_img; ?>
 
-  <?php
-  foreach ($item_status['items'] as $copy_status) {
-    if ($copy_status['avail'] > 0) {
-      $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
-      $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
-    } else if ($copy_status['due']) {
-      $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
-    } else {
-      $status_msg = $copy_status['statusmsg'];
-    }
-    print '<tr><td>' . $copy_status['location'] . '</td><td>' . $copy_status['callnum'] . '</td><td>' . $status_msg . '</td></tr>';
-  }
-  ?>
-
-</table>
-</fieldset>
-</div>
+<!-- Ratings -->
 <?php 
-  } else {
-    if (!$no_avail_mat_codes) { print t('No copies found.  Please contact a librarian for assistance.'); }
-  }
+if (variable_get('sopac_social_enable', 1)) {
+  print '<div class="item-rating">';
+  print theme_sopac_get_rating_stars($item['bnum']);
+  print '</div>';
+}
 ?>
-<?php //if (preg_match('%embeddable":true%is', @file_get_contents($google_url))) { ?>
-<!-- <br /><span style="padding-left: 10px;"><strong><?php print t('Preview'); ?></strong></span> --!>
-<div class="item-google-prev">
-  <script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
-  <script type="text/javascript">
-  GBS_insertEmbeddedViewer('ISBN:<?php print trim(preg_replace('/[^\d\s]/', '', $item['stdnum'])); ?>',500,400);
-  </script>
+
+<!-- Item Details -->
+<ul>
+<?php
+if ($item['pub_info']) { print '<li><b>Published:</b> ' . $item['pub_info'] . '</li>';  }
+if ($item['pub_year']) { print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';  }
+if ($item['series']) { print '<li><b>Series:</b> <a href="/' . 
+                     $url_prefix . '/search/series/' . urlencode($series) . '">' . $item['series'] . '</a></li>';  }
+if ($item['edition']) { print '<li><b>Edition:</b> ' . $item['edition'] . '</li>';  }
+if ($item['descr']) { print '<li><b>Description:</b> ' . nl2br($item['descr']) . '</li>';  }
+if ($item['stdnum']) { print '<li><b>ISBN/Standard #:</b>' . $item['stdnum'] . '</li>';  }
+if ($item['lang']) { print '<li><b>Language:</b> ' . $locum_config['languages'][$item['lang']] . '</li>';  }
+if ($item['mat_code']) { print '<li><b>Format:</b> ' . $locum_config['formats'][$item['mat_code']] . '</li>';  }
+?>
+</ul>
+
+<!-- Additional Credits -->
+<?php
+if ($item['addl_author']) {
+  print '<h3>Additional Credits</h3><ul>';
+  $addl_author_arr = unserialize($item['addl_author']);
+  foreach ($addl_author_arr as $addl_author) {
+    $addl_author_link = '/' . $url_prefix . '/search/author/%22' . urlencode($addl_author) .'%22';
+    print '<li><a href="' . $addl_author_link . '">' . $addl_author . '</a></li>';
+  }
+  print '</ul>';
+}
+?>
+
+<!-- Subject Headings -->
+<?php
+if ($item['subjects']) {
+  print '<h3>Subjects</h3><ul>';
+  $subj_arr = unserialize($item['subjects']);
+  if (is_array($subj_arr)) {
+    foreach ($subj_arr as $subj) {
+      $subjurl = '/' . $url_prefix . '/search/subject/%22' . urlencode($subj) . '%22';
+      print '<li><a href="' . $subjurl . '">' . $subj . '</a></li>';
+    }
+  }
+  print '</ul>';
+}
+?>
+
+<!-- Tags -->
+<?php
+if (variable_get('sopac_social_enable', 1)) {
+  print '<h3>Tags</h3>';
+  $block = module_invoke('sopac','block','view', 4);
+  print $block['content'];
+}
+?>
+
+<!-- end left-hand column -->
 </div>
-<?php //} ?>
-<br />
+
+
+<!-- begin right-hand column -->
+<div class="item-right">
+
+<!-- Supressed record notification -->
+<?php
+if ($item['active'] == '0') {
+  print '<div class="suppressed">This Record is Suppressed</div>';
+}
+?>
+
+<!-- Item Format Icon -->
+<ul class="item-format-icon">
+    <li><img src="<?php print '/' . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png' ?>"></li>
+    <li style="margin-top: -2px;"><?php print wordwrap($locum_config['formats'][$item['mat_code']], 8, '<br />'); ?></li>
+</ul>
+  
+<!-- Item Title -->
+<h1>
+<?php
+print ucwords($item['title']);
+if ($item['title_medium']) {
+  print " $item[title_medium]";
+}
+?>
+</h1>
+
+<!-- Item Author -->
+<?php 
+if ($item['author']) { 
+  $authorurl = '/' . $url_prefix . '/search/author/' . $new_author_str;
+  print '<h3>by <a href="' . $authorurl . '">' . $new_author_str . '</a></h3>';
+}
+?>
+
+<!-- Request Link -->
+<?php
+if (!in_array($item['loc_code'], $no_circ)) {
+  print '<div class="item-request">';
+  print '<p>' . sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]) . '</p>';
+  print '<h3>' . $reqtext . '</h3>';
+  print '</div>';
+} 
+?>
+
+<!-- Where to find it -->
+<div class="item-avail-disp">
+<h2>Where To Find It</h2>
+<?php
+if ($item_status['callnums']) { 
+  print '<p>Call number: <strong>' . implode(", ", $item_status['callnums']) . '</strong></p>';
+}
+if (count($item_status['items']) && !$no_avail_mat_codes) {
+  print '<fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend>';
+  drupal_add_js('misc/collapse.js');
+  print theme('table', array("Location", "Call Number", "Item Status"), $copy_status_array);
+  print '</fieldset>';
+} else {
+  if (!$no_avail_mat_codes) { print '<p>No copies found.</p>'; }
+}
+if (count($item_status['orders'])) {
+  print '<p>' . implode("</p><p>", $item_status['orders']) . '</p>';
+}
+?>
+</div>
+
+<!-- Notes / Additional Details -->
+<?php
+if (is_array($note_arr)) {
+  print '<div id="item-notes">';
+  print '<h2>Additional Details</h2>';
+  foreach($note_arr as $note) {
+    print '<p>' . $note . '</p>';
+  }
+  print '</div>';
+}
+?>
+
+<!-- Syndetics / Review Links -->
+<?php
+if ($item['review_links']) {
+  print '<div id="item-syndetics">';
+  print '<h2>Reviews &amp; Summaries</h2>';
+  print '<ul>';
+  foreach ($item['review_links'] as $rev_title => $rev_link) {
+    print '<li><a href="' . $rev_link . '" target="_new">' . $rev_title . '</a>';
+  }
+  print '</ul></div>';
+}
+?>
+
+<!-- Community / SOPAC Reviews -->
+<div id="item-reviews">
+<h2>Community Reviews</h2>
+<?php
+if (count($rev_arr)) {
+  foreach ($rev_arr as $rev_item) {
+    print '<div class="hreview">';
+    print '<h3 class="summary"><a href="/review/view/' . $rev_item['rev_id'] . '" class="fn url">' . $rev_item['rev_title'] . '</a></h3>';
+    if ($rev_item['uid']) {
+      $rev_user = user_load(array('uid' => $rev_item['uid']));
+      print '<p class="review-byline">submitted by <span class="review-author"><a href="/review/user/' . $rev_item['uid'] . '">' . $rev_user->name . '</a> on <abbr class="dtreviewed" title="' . date("c", $rev_item['timestamp']) . '">' . date("F j, Y, g:i a", $rev_item['timestamp']) . '</abbr></span>';
+      if ($user->uid == $rev_item['uid']) {
+        print ' &nbsp; [ <a title="Delete this review" href="/review/delete/' . $rev_item['rev_id'] . '?ref=' . urlencode($_SERVER['REQUEST_URI']) . '">delete</a> ] [ <a title="Edit this review" href="/review/edit/' . $rev_item['rev_id'] . '?ref=' . urlencode($_SERVER['REQUEST_URI']) . '">edit</a> ]';
+      }
+      print '</p>';
+    }
+    print '<div class="review-body description">' . nl2br($rev_item['rev_body']) . '</div></div>';
+  }
+} else {
+  print '<p>No reviews have been written yet.  You could be the first!</p>';
+}
+print $rev_form ? $rev_form : '<p><a href="/user/login?destination=' . $_SERVER['REQUEST_URI'] . '">Login</a> to write a review of your own.';
+?>
+</div>
+
+<!-- Google Books Preview -->
+<div id="item-google-books">
+  <div class="item-google-prev">
+    <script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
+    <script type="text/javascript">
+    GBS_insertEmbeddedViewer('ISBN:<?php print $item['stdnum']; ?>',500,400);
+    </script>
+  </div>
+</div>
+
+<!-- end right-hand column -->
+</div>
+
 <!-- end item record -->
+</div>

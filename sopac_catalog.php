@@ -87,14 +87,8 @@ function sopac_catalog_search() {
 
     foreach ($locum_results_all['results'] as $locum_result) {
 
-      // Format stdnum as best we can
-      if (preg_match('/ /', $locum_result['stdnum'])) {
-        $stdnum_arr = explode(' ', $locum_result['stdnum']);
-        $stdnum = $stdnum_arr[0];
-        $locum_result['stdnum'] = $stdnum;
-      } else {
-        $stdnum = $locum_result['stdnum'];
-      }
+      // Grab Stdnum
+      $stdnum = $locum_result['stdnum'];
 
       // Grab item status from Locum
       $locum_result['status'] = $locum->get_item_status($locum_result['bnum']);
@@ -145,17 +139,44 @@ function sopac_bib_record() {
   global $user;
   
   $locum = new locum_client;
+  $insurge = new insurge_client;
   $actions = sopac_parse_uri();
   $bnum = $actions[1];
   
   // Load social function
   require_once('sopac_social.php');
   
+  $bnum_arr[] = $bnum;
+	$reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL);
+	$i = 0;
+	foreach ($reviews['reviews'] as $insurge_review) {
+				$rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
+				$rev_arr[$i]['bnum'] = $insurge_review['bnum'];
+				if ($insurge_review['uid']) { $rev_arr[$i]['uid'] = $insurge_review['uid']; }
+				$rev_arr[$i]['timestamp'] = $insurge_review['rev_create_date'];
+				$rev_arr[$i]['rev_title'] = $insurge_review['rev_title'];
+				$rev_arr[$i]['rev_body'] = $insurge_review['rev_body'];
+				$i++;
+	}
+  
   $no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
-  $item = $locum->get_bib_item($bnum);
+  $item = $locum->get_bib_item($bnum, TRUE);
   $item_status = $locum->get_item_status($bnum);
   if ($item['bnum']) {
-    $result_page = theme('sopac_record', $item, $item_status, $locum->locum_config, $no_circ, &$locum);
+    
+    // Grab Syndetics reviews, etc..
+    $review_links = $locum->get_syndetics($item['stdnum']);
+    if (count($review_links)) { $item['review_links'] = $review_links; }
+    
+    // Get and patron reviews
+    if (!$insurge->check_reviewed($user->uid, $item['bnum']) && $user->uid) {
+			$rev_form = drupal_get_form('sopac_review_form', $item['bnum']);
+		} else {
+		  $rev_form = NULL;
+		}
+
+		// Build the page
+		$result_page = theme('sopac_record', $item, $item_status, $locum->locum_config, $no_circ, &$locum, $rev_arr, $rev_form);
   } else {
     $result_page = t('This record does not exist.');
   }

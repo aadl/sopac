@@ -29,7 +29,7 @@ if (!$cover_img_url) {
     <?php } ?>
     </a>
     </td>
-  <td width="50%" valign="top">
+  <td width="<?php print $locum_result['review_links'] ? '50' : '100'; ?>%" valign="top">
     <ul class="hitlist-info">
       <li class="hitlist-title">
         <strong><a href="/<?php print $url_prefix . '/record/' . $locum_result['bnum'] ?>"><?php print $locum_result['title'];?></a></strong>
@@ -63,8 +63,8 @@ if (!$cover_img_url) {
   <?php
   if ($locum_result['review_links']) {
     print '<td width="50%" valign="top">';
-    print "Reviews and Summaries <br /> \n";
-    print '<ul>';
+    print '<ul class="hitlist-info">';
+    print '<li class="hitlist-subtitle">Reviews &amp; Summaries</li>';
     foreach ($locum_result['review_links'] as $rev_title => $rev_link) {
       print '<li><a href="' . $rev_link . '" target="_new">' . $rev_title . '</a>';
     }
