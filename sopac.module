@@ -650,6 +650,25 @@ function theme_sopac_search_handler() {
     // Sort variable
     if ($_POST['sort']) { $uris['sort'] = $_POST['sort']; }
     
+    // Age Group variable
+		if ($_POST['age']) { $uris['age'] = $_POST['age']; }
+		
+		// Limit to Available
+		if ($_POST['limit_avail']) {
+			$uris['limit_avail'] = $_POST['limit_avail'];
+		}
+		
+		// Publisher Search
+		if ($_POST['publisher']) {
+			$uris['pub'] = trim($_POST['publisher']);
+		}
+		
+		// Publication date ranges
+		if ($_POST['pub_year_start'] || $_POST['pub_year_end']) {
+			$uris['pub_year'] = trim($_POST['pub_year_start']) . '|' .
+													trim($_POST['pub_year_end']);
+		}
+		
     // Convert all our URI variables to GETs
     if (count($uris)) {
     $delimiter = '?';
@@ -718,7 +737,7 @@ function sopac_parse_uri($strip_prefix = TRUE) {
 function sopac_parse_get_vars($override = array()) {
 
   // TODO - Hard-coding this is not the best way to do it, but for now it is what it is... Revisit for 2.1?
-  $implode = array('search_format', 'pub_year', 'location', 'collection', 'facet_series', 'facet_lang', 'facet_year');
+  $implode = array('search_format', 'pub_year', 'location', 'collection', 'facet_series', 'facet_lang', 'facet_year', 'facet_decade', 'age');
   $getvars_raw = explode('?', $_SERVER['REQUEST_URI']);
   if (count($getvars_raw) > 1) {
     $getvars = urldecode($getvars_raw[1]);

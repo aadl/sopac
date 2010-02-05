@@ -36,17 +36,18 @@ if ($item_status['avail'] == 0 && $item_status['holds'] > 0) {
 }
 
 // Build the item availability array
-
-foreach ($item_status['items'] as $copy_status) {
-  if ($copy_status['avail'] > 0) {
-    $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
-    $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
-  } else if ($copy_status['due']) {
-    $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
-  } else {
-    $status_msg = $copy_status['statusmsg'];
+if (count($item_status['items'])) {
+  foreach ($item_status['items'] as $copy_status) {
+    if ($copy_status['avail'] > 0) {
+      $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
+      $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
+    } else if ($copy_status['due']) {
+      $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
+    } else {
+      $status_msg = $copy_status['statusmsg'];
+    }
+    $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
   }
-  $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
 }
 
 if (sopac_prev_search_url(TRUE)) {
@@ -165,7 +166,7 @@ if ($item['author']) {
 
 <!-- Request Link -->
 <?php
-if (!in_array($item['loc_code'], $no_circ)) {
+if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
   print '<div class="item-request">';
   print '<p>' . sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]) . '</p>';
   print '<h3>' . $reqtext . '</h3>';
@@ -180,11 +181,16 @@ if (!in_array($item['loc_code'], $no_circ)) {
 if ($item_status['callnums']) { 
   print '<p>Call number: <strong>' . implode(", ", $item_status['callnums']) . '</strong></p>';
 }
+
 if (count($item_status['items']) && !$no_avail_mat_codes) {
   print '<fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend>';
   drupal_add_js('misc/collapse.js');
   print theme('table', array("Location", "Call Number", "Item Status"), $copy_status_array);
   print '</fieldset>';
+} else if ($item['download_link']) {
+  print '<div class="item-request">';
+  print '<p><a href="' . $item['download_link'] . '" target="_new">Download this Title</a></p>';
+  print '</div>';
 } else {
   if (!$no_avail_mat_codes) { print '<p>No copies found.</p>'; }
 }

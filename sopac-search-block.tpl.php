@@ -48,6 +48,24 @@ By Format:
   }
 ?></div>
 
+<?php
+if (is_array($getvars['age']) && count($getvars['age'])) {
+  print '<br />In Age Group:';
+  print '<div class="search-block-attr">';
+  $age_flipped = array_flip($getvars['age']);
+  foreach ($getvars['age'] as $age) {
+    $getvars_tmp = $getvars;
+    unset($getvars_tmp['age'][$age_flipped[$age]]);
+    $getvars_tmp['page'] = '';
+    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
+    $gvar_indicator = $pvars_tmp ? '?' : '';
+    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
+    $age_arr[$age] = $locum_config['ages'][$age] . ' [<a href="' . $rem_link . '">x</a>]';
+  }
+  print implode('<br />', $age_arr);
+  print '</div>';
+}
+?>
 
 <?php
 if (is_array($getvars['collection']) && count($getvars['collection'])) {
@@ -121,7 +139,7 @@ if (is_array($getvars['facet_lang']) && count($getvars['facet_lang'])) {
     $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
     $gvar_indicator = $pvars_tmp ? '?' : '';
     $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $lang_arr[trim($lang)] = ucfirst($lang) . ' [<a href="' . $rem_link . '">x</a>]';
+    $lang_arr[trim($lang)] = ucfirst($locum_config['languages'][$lang]) . ' [<a href="' . $rem_link . '">x</a>]';
   }
   print implode('<br />', $lang_arr);
   print '</div>';
@@ -147,7 +165,25 @@ if (is_array($getvars['facet_year']) && count($getvars['facet_year'])) {
 }
 ?>
 
+<?php
 
+if (is_array($getvars['facet_decade']) && count($getvars['facet_decade'])) {
+  print '<br />Refined by Decade:';
+  print '<div class="search-block-attr">';
+  $decade_flipped = array_flip($getvars['facet_decade']);
+  foreach ($search['decade'] as $decade) {
+    $getvars_tmp = $getvars;
+    unset($getvars_tmp['facet_decade'][$decade_flipped[$decade]]);
+    $getvars_tmp['page'] = '';
+    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
+    $gvar_indicator = $pvars_tmp ? '?' : '';
+    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
+    $decade_arr[trim($decade)] = $decade . ' [<a href="' . $rem_link . '">x</a>]';
+  }
+  print implode('<br />', $decade_arr);
+  print '</div>';
+}
+?>
 
 <br />
 <div style="float: right;">» <a href="/research_help">Need help?</a></div>

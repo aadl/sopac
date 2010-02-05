@@ -59,6 +59,27 @@ if ($loc_count) {
 
 }
 
+$facet_age = is_array($getvars['age']) ? $getvars['age'] : array();
+$age_count = count($locum_result['facets']['ages']);
+if ($age_count) {
+  if (!is_array($getvars['age'])) { $li_prop = ' class="closed"'; } else { $li_prop = NULL; }
+  print "<li$li_prop><span class=\"folder\">by Age Group</span> <small>($age_count)</small><ul>\n";
+  foreach ($locum_result['facets']['ages'] as $age => $age_count_indv) {
+    $age_name = $locum_config['ages'][$age] ? $locum_config['ages'][$age] : $age;
+    if (in_array($age, $facet_age)) {
+      print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $age_name . "</strong></li>\n";
+    } else {
+      $getvars_tmp = $getvars;
+      $getvars_tmp['age'][] = urlencode($age);
+      if (isset($getvars_tmp['page'])) { $getvars_tmp['page'] = ''; }
+      $link_addr = $uri . '?' . sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp));
+      print '<li id="tree-kid">» <a href="' . $link_addr . '">' . $age_name . '</a> <small>(' . $age_count_indv . ")</small></li>\n";
+      unset($getvars_tmp);
+    }
+  }
+  print "</ul></li>\n";
+
+}
 
 $facet_series = is_array($getvars['facet_series']) ? $getvars['facet_series'] : array();
 if (count($locum_result['facets']['series'])) {
@@ -97,13 +118,13 @@ if ($lang_count) {
   print "<li$li_prop><span class=\"folder\">by Language</span> <small>($lang_count)</small><ul>\n";
   foreach ($locum_result['facets']['lang'] as $lang => $lang_code_count) {
     if (in_array($lang, $facet_lang)) {
-      print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . ucfirst($lang) . "</strong></li>\n";
+      print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . ucfirst($locum_config['languages'][$lang]) . "</strong></li>\n";
     } else {
       $getvars_tmp = $getvars;
       $getvars_tmp['facet_lang'][] = urlencode($lang);
       if (isset($getvars_tmp['page'])) { $getvars_tmp['page'] = ''; }
       $link_addr = $uri . '?' . sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp));
-      print '<li id="tree-kid">» <a href="' . $link_addr . '">' . ucfirst($lang) . '</a> <small>(' . $lang_code_count . ")</small></li>\n";
+      print '<li id="tree-kid">» <a href="' . $link_addr . '">' . ucfirst($locum_config['languages'][$lang]) . '</a> <small>(' . $lang_code_count . ")</small></li>\n";
       unset($getvars_tmp);
     }
   }
@@ -130,6 +151,26 @@ if ($year_count) {
   }
   print "</ul></li>\n";
 
+}
+
+$facet_decade = is_array($getvars[facet_decade]) ? $getvars[facet_decade] : array();
+$decade_count = count($locum_result[facets][pub_decade]);
+if ($decade_count) {
+	if (!is_array($getvars[facet_decade])) { $li_prop = ' class="closed"'; } else { $li_prop = NULL; }
+	print "<li$li_prop><span class=\"folder\">by Decade</span> <small>($decade_count)</small><ul>\n";
+	foreach ($locum_result[facets][pub_decade] as $decade => $pub_decade_count) {
+		if (in_array($decade, $facet_decade)) {
+			print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $decade . "-" . ($decade + 9) . "</strong></li>\n";
+		} else if ($decade <= date('Y')) { // 'cuz catalogers are so infallable.. *cough*
+    $getvars_tmp = $getvars;
+    $getvars_tmp['facet_decade'][] = urlencode($decade);
+    if (isset($getvars_tmp['page'])) { $getvars_tmp['page'] = ''; }
+    $link_addr = $uri . '?' . sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp));
+    print '<li id="tree-kid">» <a href="' . $link_addr . '">' . $decade . '-' . ($decade + 9) . '</a> <small>(' . $pub_decade_count . ")</small></li>\n";
+			unset($getvars_tmp);
+		}
+	}
+	print "</ul></li>\n";
 }
 
 ?>        

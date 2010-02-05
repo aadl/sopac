@@ -61,6 +61,8 @@ function sopac_catalog_search() {
     if (count($getvars['facet_series'])) { $facet_args['facet_series'] = $getvars['facet_series']; }
     if (count($getvars['facet_lang'])) { $facet_args['facet_lang'] = $getvars['facet_lang']; }
     if (count($getvars['facet_year'])) { $facet_args['facet_year'] = $getvars['facet_year']; }
+    if (count($getvars['facet_decade'])) { $facet_args['facet_decade'] = $getvars['facet_decade']; }
+    if (count($getvars['age'])) { $facet_args['age'] = $getvars['age']; }
 
     // Get the search results from Locum
     $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args);
@@ -205,6 +207,8 @@ function sopac_search_block($locum_results_all, $locum_cfg) {
   $search['series'] = count($getvars['facet_series']) ? $getvars['facet_series'] : array();
   $search['lang'] = count($getvars['facet_lang']) ? $getvars['facet_lang'] : array();
   $search['year'] = count($getvars['facet_year']) ? $getvars['facet_year'] : array();
+  $search['decade'] = count($getvars['facet_decade']) ? $getvars['facet_decade'] : array();
+  $search['age'] = count($getvars['age']) ? $getvars['age'] : array();
 
   return theme('sopac_search_block', $search, $locum_results_all, $locum_cfg, $user);
 
@@ -614,7 +618,28 @@ function sopac_search_form_adv() {
     '#value' => $getvars['sort'],
     '#options' => $sortopts,
   );
-
+  
+  $age_options = array_merge(array('' => 'Any Age Group'), $locum_cfg['ages']);
+  unset($age_options['all']);
+	$form['advanced']['keywords']['age'] = array(
+		'#type' => 'select',
+		'#title' => 'in age group',
+		'#options' => $age_options,
+	);
+	
+	$form['advanced']['keywords']['limit'] = array(
+		'#prefix' => '<div class="container-inline">',
+		'#type' => 'checkbox',
+		'#default_value' => $getvars['limit'],
+	);
+	$form['advanced']['keywords']['limit_avail'] = array(
+		'#type' => 'select',
+		'#title' => 'limit to items available at',
+		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['locations']),
+		'#default_value' => $getvars['limit_avail'],
+		'#suffix' => "</div>",
+	);
+	
   $form['advanced']['narrow1'] = array(
     '#prefix' => '<div class="adv_search_crit">',
     '#suffix' => '</div>',
