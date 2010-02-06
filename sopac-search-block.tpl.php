@@ -178,7 +178,7 @@ if (is_array($getvars['facet_decade']) && count($getvars['facet_decade'])) {
     $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
     $gvar_indicator = $pvars_tmp ? '?' : '';
     $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $decade_arr[trim($decade)] = $decade . ' [<a href="' . $rem_link . '">x</a>]';
+    $decade_arr[trim($decade)] = $decade . '-' . ($decade + 9) . ' [<a href="' . $rem_link . '">x</a>]';
   }
   print implode('<br />', $decade_arr);
   print '</div>';

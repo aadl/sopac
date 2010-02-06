@@ -140,7 +140,7 @@ if ($year_count) {
   foreach ($locum_result['facets']['pub_year'] as $year => $pub_year_count) {
     if (in_array($year, $facet_year)) {
       print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $year . "</strong></li>\n";
-    } else if ($year <= date('Y')) { // 'cuz catalogers are so infallable.. *cough*
+    } else if ($year <= date('Y')) {
       $getvars_tmp = $getvars;
       $getvars_tmp['facet_year'][] = urlencode($year);
       if (isset($getvars_tmp['page'])) { $getvars_tmp['page'] = ''; }
@@ -153,15 +153,15 @@ if ($year_count) {
 
 }
 
-$facet_decade = is_array($getvars[facet_decade]) ? $getvars[facet_decade] : array();
-$decade_count = count($locum_result[facets][pub_decade]);
+$facet_decade = is_array($getvars['facet_decade']) ? $getvars['facet_decade'] : array();
+$decade_count = count($locum_result['facets']['pub_decade']);
 if ($decade_count) {
-	if (!is_array($getvars[facet_decade])) { $li_prop = ' class="closed"'; } else { $li_prop = NULL; }
+	if (!is_array($getvars['facet_decade'])) { $li_prop = ' class="closed"'; } else { $li_prop = NULL; }
 	print "<li$li_prop><span class=\"folder\">by Decade</span> <small>($decade_count)</small><ul>\n";
-	foreach ($locum_result[facets][pub_decade] as $decade => $pub_decade_count) {
+	foreach ($locum_result['facets']['pub_decade'] as $decade => $pub_decade_count) {
 		if (in_array($decade, $facet_decade)) {
 			print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $decade . "-" . ($decade + 9) . "</strong></li>\n";
-		} else if ($decade <= date('Y')) { // 'cuz catalogers are so infallable.. *cough*
+		} else if ($decade <= date('Y')) {
     $getvars_tmp = $getvars;
     $getvars_tmp['facet_decade'][] = urlencode($decade);
     if (isset($getvars_tmp['page'])) { $getvars_tmp['page'] = ''; }
