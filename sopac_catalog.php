@@ -35,6 +35,7 @@ function sopac_catalog_search() {
   $sort = $getvars['sort'];
   $format = $getvars['search_format'];
   $location = $getvars['location'];
+  $limit_avail = $getvars['limit_avail'];
   $pager_page_array = explode(',', $getvars['page']);
   $search_type = $actions[1];
   $search_term = utf8_urldecode($actions[2]);
@@ -65,7 +66,7 @@ function sopac_catalog_search() {
     if (count($getvars['age'])) { $facet_args['age'] = $getvars['age']; }
 
     // Get the search results from Locum
-    $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args);
+    $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args, FALSE, $limit_avail);
     $num_results = $locum_results_all['num_hits'];
     $result_info['num_results'] = $num_results;
     $result_info['hit_lowest'] = $page_offset + 1;
