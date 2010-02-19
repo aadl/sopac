@@ -23,7 +23,7 @@ if ($split_pos = max(strpos($series, ";"), strpos($series, ":"), strpos($series,
 if ($item_status['avail'] == 0 && $item_status['holds'] > 0) {
   $class = "holds";
   $reqtext = "There are no copies available. " . $item_status['holds'] . " request" .
-  ($item_status['holds'] == 1 ? '' : 's') . " on " . count($item_status['items']) . " copies";
+  ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ($item_status['total'] == 1 ? ' copy' : ' copies') . '.';
 } else if ($item_status['avail'] == 0) {
   $class = "first";
   $reqtext = "There are no copies available.";
