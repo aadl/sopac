@@ -19,7 +19,7 @@
  */
 function sopac_catalog_search() {
   global $pager_page_array, $pager_total, $locum_results_all, $locum_cfg;
-  
+    
   // Load Required JS libraries
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.treeview.js');
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.rating.js');
@@ -528,6 +528,19 @@ function sopac_search_form_basic() {
   );
 
   $form['basic']['inline']['submit'] = array('#type' => 'submit', '#value' => t('Search'));
+  
+  $form['basic']['limit']['limit'] = array(
+		'#prefix' => '<div class="basic-search-inline"><div class="container-inline">',
+		'#type' => 'checkbox',
+		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
+	);
+	$form['basic']['limit']['limit_avail'] = array(
+		'#type' => 'select',
+		'#title' => 'limit to items available at',
+		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
+		'#default_value' => $getvars['limit_avail'],
+		'#suffix' => "</div></div>",
+	);
 
   return $form;
 
@@ -628,24 +641,12 @@ function sopac_search_form_adv() {
 		'#options' => $age_options,
 	);
 	
-	$form['advanced']['keywords']['limit'] = array(
-		'#prefix' => '<div class="container-inline">',
-		'#type' => 'checkbox',
-		'#default_value' => $getvars['limit'],
-	);
-	$form['advanced']['keywords']['limit_avail'] = array(
-		'#type' => 'select',
-		'#title' => 'limit to items available at',
-		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['locations']),
-		'#default_value' => $getvars['limit_avail'],
-		'#suffix' => "</div>",
-	);
-	
   $form['advanced']['narrow1'] = array(
     '#prefix' => '<div class="adv_search_crit">',
     '#suffix' => '</div>',
   );
 
+  /* Have not yet implemented collections, and in a number of ways, multi-branch has replaced it
   if (count($locum_cfg['collections'])) {
     
     foreach ($locum_cfg['collections'] as $loc_collect_key => $loc_collect_var) {
@@ -661,6 +662,7 @@ function sopac_search_form_adv() {
       '#multiple' => TRUE,
     );
   }
+  */
   
   $form['advanced']['narrow1']['location'] = array(
     '#type' => 'select',
@@ -680,10 +682,23 @@ function sopac_search_form_adv() {
     '#multiple' => TRUE,
   );
   
+  $form['advanced']['limit'] = array(
+		'#prefix' => '<div class="action"><div class="adv-search-inline"><div class="container-inline">',
+		'#type' => 'checkbox',
+		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
+	);
+	$form['advanced']['limit_avail'] = array(
+		'#type' => 'select',
+		'#title' => 'limit to items available at',
+		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
+		'#default_value' => $getvars['limit_avail'],
+		'#suffix' => "</div></div>",
+	);
+	
   $form['advanced']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Advanced search'),
-    '#prefix' => '<div class="action">',
+//    '#prefix' => '<div class="action">',
 //    '#suffix' => '</div>',
   );
   

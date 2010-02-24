@@ -654,7 +654,7 @@ function theme_sopac_search_handler() {
 		if ($_POST['age']) { $uris['age'] = $_POST['age']; }
 		
 		// Limit to Available
-		if ($_POST['limit_avail']) {
+		if ($_POST['limit_avail'] && $_POST['limit']) {
 			$uris['limit_avail'] = $_POST['limit_avail'];
 		}
 		

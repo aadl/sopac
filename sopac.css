@@ -292,6 +292,18 @@ padding-left:10px;
   font-size: 12pt;
 }
 
+/* Search form stuff */
+
+.basic-search-inline {
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+.adv-search-inline {
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
 /* Search Tracker Block styles */
 
 .search-block-attr {

@@ -37,6 +37,7 @@ if ($mat_count) {
   print "</ul></li>\n";
 }
 
+/* We're in the process of phasing out the location facet in favor of multi-branch
 $facet_loc = is_array($getvars['location']) ? $getvars['location'] : array();
 $loc_count = count($locum_result['facets']['loc']);
 if ($loc_count) {
@@ -58,6 +59,7 @@ if ($loc_count) {
   print "</ul></li>\n";
 
 }
+*/
 
 $facet_age = is_array($getvars['age']) ? $getvars['age'] : array();
 $age_count = count($locum_result['facets']['ages']);
