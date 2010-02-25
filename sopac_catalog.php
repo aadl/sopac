@@ -529,18 +529,29 @@ function sopac_search_form_basic() {
 
   $form['basic']['inline']['submit'] = array('#type' => 'submit', '#value' => t('Search'));
   
-  $form['basic']['limit']['limit'] = array(
-		'#prefix' => '<div class="basic-search-inline"><div class="container-inline">',
-		'#type' => 'checkbox',
-		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
-	);
-	$form['basic']['limit']['limit_avail'] = array(
-		'#type' => 'select',
-		'#title' => 'limit to items available at',
-		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
-		'#default_value' => $getvars['limit_avail'],
-		'#suffix' => "</div></div>",
-	);
+  if (variable_get('sopac_multi_branch_enable', 0)) {
+    $form['basic']['limit']['limit'] = array(
+  		'#prefix' => '<div class="basic-search-inline"><div class="container-inline">',
+  		'#type' => 'checkbox',
+  		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
+  	);
+	
+  	$form['basic']['limit']['limit_avail'] = array(
+  		'#type' => 'select',
+  		'#title' => t('limit to items available at'),
+  		'#options' => array_merge(array('any' => t('Any Location')), $locum_cfg['branches']),
+  		'#default_value' => $getvars['limit_avail'],
+  		'#suffix' => "</div></div>",
+  	);
+  } else {
+    $form['basic']['limit']['limit'] = array(
+  		'#prefix' => '<div class="basic-search-inline"><div class="container-inline">',
+  		'#type' => 'checkbox',
+  		'#title' => '<strong>' . t('limit to available items') . '</strong>',
+  		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
+  		'#suffix' => "</div></div>",
+  	);
+  }
 
   return $form;
 
@@ -682,18 +693,28 @@ function sopac_search_form_adv() {
     '#multiple' => TRUE,
   );
   
-  $form['advanced']['limit'] = array(
-		'#prefix' => '<div class="action"><div class="adv-search-inline"><div class="container-inline">',
-		'#type' => 'checkbox',
-		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
-	);
-	$form['advanced']['limit_avail'] = array(
-		'#type' => 'select',
-		'#title' => 'limit to items available at',
-		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
-		'#default_value' => $getvars['limit_avail'],
-		'#suffix' => "</div></div>",
-	);
+  if (variable_get('sopac_multi_branch_enable', 0)) {
+    $form['advanced']['limit'] = array(
+  		'#prefix' => '<div class="action"><div class="adv-search-inline"><div class="container-inline">',
+  		'#type' => 'checkbox',
+  		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
+  	);
+  	$form['advanced']['limit_avail'] = array(
+  		'#type' => 'select',
+  		'#title' => 'limit to items available at',
+  		'#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
+  		'#default_value' => $getvars['limit_avail'],
+  		'#suffix' => "</div></div>",
+  	);
+  } else {
+    $form['advanced']['limit'] = array(
+  		'#prefix' => '<div class="action"><div class="adv-search-inline"><div class="container-inline">',
+  		'#type' => 'checkbox',
+  		'#title' => '<strong>' . t('limit to available items') . '</strong>',
+  		'#default_value' => $getvars['limit_avail'] ? 1 : 0,
+  		'#suffix' => "</div></div>",
+  	);
+  }
 	
   $form['advanced']['submit'] = array(
     '#type' => 'submit',

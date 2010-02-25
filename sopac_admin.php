@@ -94,11 +94,18 @@ function sopac_admin() {
     '#options' => array('basic' => t('Display just the basic form'), 'both' => t('Display both basic and advanced forms'))
   );
   
+  $form['sopac_general']['sopac_multi_branch_enable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Multi-Branch Support'),
+    '#default_value' => variable_get('sopac_multi_branch_enable', 0),
+    '#description' => t('Select this option if you plan to operate SOPAC in a multi-branch environment.'),
+  );
+  
   // the next two settings to support giving users ability to select a home branch
   
   $description =   t('Check this box if your library has multiple branches, and you would like each user to be able to select a home branch.');
-  $description .= t(' NOTE: If you check this box, you must also enter a valid library card number in the next field.');
-  $description .= t(' NOTE: the user option will be set up during the first cron job after at least 1 bib record has been harvested.');
+  $description .= t('<br />NOTE: If you check this box, you must also enter a valid library card number in the next field.');
+  $description .= t('<br />NOTE: the user option will be set up during the first cron job after at least 1 bib record has been harvested.');
   $form['sopac_general']['sopac_home_branch_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow Users to Select a Home Branch'),
