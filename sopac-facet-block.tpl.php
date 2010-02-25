@@ -37,6 +37,31 @@ if ($mat_count) {
   print "</ul></li>\n";
 }
 
+if (variable_get('sopac_multi_branch_enable', 0)) {
+  $facet_avail = $getvars['limit_avail'] ? $getvars['limit_avail'] : NULL;
+  $avail_count = count($locum_result['facets']['avail']);
+  if ($avail_count) {
+    if (!$getvars['limit_avail'] && $getvars['limit_avail'] != 'any' ) { $li_prop = ' class="closed"'; } else { $li_prop = NULL; }
+    print "<li$li_prop><span class=\"folder\">by Availability</span> <small>($avail_count)</small><ul>\n";
+    foreach ($locum_result['facets']['avail'] as $avail => $avail_count_indv) {
+      $avail_name = $locum_config['branches'][$avail] ? $locum_config['branches'][$avail] : $avail;
+      if ($avail_name == 'any') { $avail_name = t('All Locations'); }
+      if ($avail == $facet_avail) {
+        print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $avail_name . "</strong></li>\n";
+      } else {
+        $getvars_tmp = $getvars;
+        $getvars_tmp['limit_avail'] = urlencode($avail);
+        if (isset($getvars_tmp['page'])) { $getvars_tmp['page'] = ''; }
+        $link_addr = $uri . '?' . sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp));
+        print '<li id="tree-kid">» <a href="' . $link_addr . '">' . $avail_name . '</a> <small>(' . $avail_count_indv . ")</small></li>\n";
+        unset($getvars_tmp);
+      }
+    }
+    print "</ul></li>\n";
+
+  }
+}
+
 /* We're in the process of phasing out the location facet in favor of multi-branch
 $facet_loc = is_array($getvars['location']) ? $getvars['location'] : array();
 $loc_count = count($locum_result['facets']['loc']);
