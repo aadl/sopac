@@ -250,6 +250,14 @@ function sopac_admin() {
     '#default_value' => variable_get('sopac_checkout_history_enable', 1),
     '#description' => t("Check this box if you would like checkout history to appear in the user area."),
   );
+  
+  $form['sopac_account']['sopac_checkout_history_wipe'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Delete checkout history from ILS after harvest'),
+    '#default_value' => variable_get('sopac_checkout_history_wipe', 1),
+    '#description' => t("Check this box if you would like to purge checkout history from the ILS after it's imported into SOPAC."),
+  );
+  
   $form['sopac_account']['sopac_hold_freezes_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable freezing holds'),

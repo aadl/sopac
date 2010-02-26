@@ -46,7 +46,11 @@ if (count($item_status['items'])) {
     } else {
       $status_msg = $copy_status['statusmsg'];
     }
-    $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
+    if (variable_get('sopac_multi_branch_enable', 0)) {
+      $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $locum_config['branches'][$copy_status['branch']], $status_msg);
+    } else {
+      $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
+    }
   }
 }
 
@@ -185,7 +189,11 @@ if ($item_status['callnums']) {
 if (count($item_status['items']) && !$no_avail_mat_codes) {
   print '<fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend>';
   drupal_add_js('misc/collapse.js');
-  print theme('table', array("Location", "Call Number", "Item Status"), $copy_status_array);
+  if (variable_get('sopac_multi_branch_enable', 0)) {
+    print theme('table', array("Location", "Call Number", "Location", "Item Status"), $copy_status_array);
+  } else {
+    print theme('table', array("Location", "Call Number", "Item Status"), $copy_status_array);
+  }
   print '</fieldset>';
 } else if ($item['download_link']) {
   print '<div class="item-request">';

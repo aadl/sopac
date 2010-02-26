@@ -88,6 +88,26 @@ function sopac_catalog_search() {
     $hitlist = '';
     $hitnum = $page_offset + 1;
 
+    // When limiting to available, sometimes the "Last" link takes the user beyond the number of
+    // available items and errors out.  This will step them back until they have at least 1 hit.
+    if (!count($locum_results_all['results']) && $getvars['limit_avail']) {
+      $uri_arr = explode('?', $_SERVER['REQUEST_URI']);
+      $uri = $uri_arr[0];
+      $getvars_tmp = $getvars;
+      if ($getvars_tmp['page']) {
+        if ($getvars_tmp['page'] == 1) {
+          $getvars_tmp['page'] = '';
+        } else {
+          $getvars_tmp['page']--;
+        }
+        $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
+        $gvar_indicator = $pvars_tmp ? '?' : '';
+        $step_link = $uri . $gvar_indicator . $pvars_tmp;
+        header('Location: ' . $step_link);
+      }
+    }
+
+    // Loop through results.
     foreach ($locum_results_all['results'] as $locum_result) {
 
       // Grab Stdnum
@@ -236,7 +256,7 @@ function sopac_author_format($author, $addl_author_ser) {
     }
   }
   if ($new_author_str) { 
-    $new_author_str = ereg_replace("[^A-Za-z '.-]", '', $new_author_str ); 
+    //$new_author_str = ereg_replace("[^A-Za-z\x20-\x7F '.-]", '', $new_author_str ); 
     $new_author_str = preg_replace('/ - /', ' ', $new_author_str);  
   } else {
     $new_author_str = '';
