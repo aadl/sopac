@@ -45,7 +45,7 @@ if (variable_get('sopac_multi_branch_enable', 0)) {
     print "<li$li_prop><span class=\"folder\">by Availability</span> <small>($avail_count)</small><ul>\n";
     foreach ($locum_result['facets']['avail'] as $avail => $avail_count_indv) {
       $avail_name = $locum_config['branches'][$avail] ? $locum_config['branches'][$avail] : $avail;
-      if ($avail_name == 'any') { $avail_name = t('All Locations'); }
+      if ($avail_name == 'any') { $avail_name = t('Any Location'); }
       if ($avail == $facet_avail) {
         print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $avail_name . "</strong></li>\n";
       } else {

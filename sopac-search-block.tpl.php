@@ -28,6 +28,27 @@ You Searched For:
 <br />
 By Search Type:
 <div class="search-block-attr"><?php print ucfirst($search['type']); ?></div>
+
+<?php
+if ($getvars['limit_avail'] && ($locum_config['branches'][$getvars['limit_avail']] || $getvars['limit_avail'] == 'any')) {
+  print '<br />Available at:';
+  print '<div class="search-block-attr">';
+
+    $getvars_tmp = $getvars;
+    $getvars_tmp['limit_avail'] = '';
+    $getvars_tmp['page'] = '';
+    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
+    $gvar_indicator = $pvars_tmp ? '?' : '';
+    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
+    if ($getvars['limit_avail'] == 'any') {
+      $limit_info = t('Any Location') . ' [<a href="' . $rem_link . '">x</a>]';
+    } else {
+      $limit_info = $locum_config['branches'][$getvars['limit_avail']] . ' [<a href="' . $rem_link . '">x</a>]';
+    }
+  print $limit_info . '</div>';
+}
+?>
+
 <br />
 By Format:
 <div class="search-block-attr"><?php 
@@ -166,7 +187,6 @@ if (is_array($getvars['facet_year']) && count($getvars['facet_year'])) {
 ?>
 
 <?php
-
 if (is_array($getvars['facet_decade']) && count($getvars['facet_decade'])) {
   print '<br />Refined by Decade:';
   print '<div class="search-block-attr">';

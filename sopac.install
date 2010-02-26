@@ -39,6 +39,7 @@ function sopac_uninstall() {
  * Implementation of hook_schema().
  */   
 function sopac_schema() {
+  
   $schema['sopac_card_verify'] = array(
     'description' => t('Stores profile field information.'),
     'fields' => array(
@@ -149,6 +150,40 @@ function sopac_schema() {
     'indexes' => array(
       'uid' => array('uid'),
       'savedate' => array('savedate'),
+    ),
+  );
+
+  $schema['sopac_checkout_hist'] = array(
+    'description' => t('Stores checkout history information.'),
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'size' => 'medium',
+        'description' => t('Drupal user ID.'),
+      ),
+      'bnum' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'size' => 'medium',
+        'description' => t('Bibliographic number.'),
+      ),
+      'date' => array(
+        'type' => 'datetime',
+        'not null' => TRUE,
+        'description' => t('Item checkout date.'),
+      ),
+      'count' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'size' => 'medium',
+        'description' => t('Drupal user ID.'),
+      ),
+    ),
+    'indexes' => array(
+      'uid' => array('uid'),
+      'bnum' => array('bnum'),
+      'date' => array('date'),
     ),
   );
   

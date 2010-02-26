@@ -329,6 +329,7 @@ function sopac_checkout_history_page() {
     $locum_pass = substr($user->pass, 0, 7);
     $cardnum = $user->profile_pref_cardnum;
     $checkouts = $locum->get_patron_checkout_history($cardnum, $locum_pass);
+
     if (!is_array($checkouts)) {
       if ($checkouts == 'out') {
         $content = '<div>This feature is currently turned off.</div>';
@@ -359,12 +360,13 @@ function sopac_checkout_history_page() {
   else {$content = '<div>' . t('Please register your library card to take advantage of this feature.') . '</div>';}
   return $content;
 }
+
 /**
  * Handle toggling checkout history on or off.
  */
 function sopac_checkout_history_toggle($action) {
   global $user;
-  if ($action != 'in' && $action != 'out') {drupal_goto('user/checkouts/history');}
+  if ($action != 'in' && $action != 'out') { drupal_goto('user/checkouts/history'); }
   $adjective = $action == 'in' ? t('on') : t('off');
   profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
