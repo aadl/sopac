@@ -23,15 +23,33 @@
 }
 
 .hitlist-range {
+  border: 1px solid #E0D9CA;
+  background-color: #FFF7E5;
+  margin: 5px 10px 0px 10px;
+  padding: 4px;
+  text-align: left;
+  height: 15px;
+}
+
+.range {
   float: left;
-  margin-left: 15px;
+  width: 30%;
+  display: block;
+}
+
+.pagination {
+  float: left;
+  display: block;
+  width: 30%;
+  text-align: center;
 }
 
 .hitlist-sorter {
-  float: right;
   text-align: right;
-  margin-right: 15px;
+  float:right;
+  margin-top: -3px;
 }
+
 
 .hitlist-info {
   list-style-image:none;
@@ -93,8 +111,8 @@
  */
  
 .itemrecord {
-  padding:0 0 0 10px;
-  width:100%;
+  padding: 0px 0px 0px 10px;
+  width: 100%;
 }
  
 .itemrecord h1, .itemrecord h2 {
@@ -111,33 +129,29 @@
 }
 
 .item-right, .item-left {
-  float:left;
+  float: left;
 }
 
 .item-left {
-  margin-right:15px;
-  width:25%;
+  width: 28%;
+  margin-right: 15px;
 }
-
 .item-left ul {
-  list-style-type:none;
-  margin-left:-20px;
+  list-style-type: none;
+  margin-left: -20px;
 }
-
-.item-left {
-  margin-top:0;
+.item-left .item-cover {
+  margin-top: 0px;
 }
-
 .item-right {
-  margin-left:10px;
-  width:68%;
+  width: 66%;
+  margin-left: 10px;
 }
-
 .item-right h2 {
-  background-color:#777765;
-  color:#FFFFFF;
-  margin:0;
-  padding:5px;
+background-color:#777765;
+color:#FFFFFF;
+margin: 0px;
+padding: 5px;
 }
 
 .item-cover-block {
@@ -183,14 +197,13 @@
 }
 
 .item-format-icon {
-  color:#8D8A81;
-  float:right;
-  font-size:8pt;
-  list-style-image:none;
-  list-style-position:outside;
-  list-style-type:none;
-  margin-top:-15px;
-  text-align:center;
+  float: right;
+  list-style: none;
+  font-size: 8pt;
+  text-align: center;
+  color: #8D8A81;
+  margin-top: -35px;
+  width: 45px;
 }
 
 .item-request p a {

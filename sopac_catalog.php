@@ -46,12 +46,30 @@ function sopac_catalog_search() {
   // If there is a proper search query, we get that data here.
   if (in_array($actions[1], $valid_search_types)) {
     $valid_search = TRUE;
+    
+    // Save the search URL in a cookie
     $_SESSION['search_url'] = $_SERVER['REQUEST_URI'];
-    if ($addl_search_args['limit']) { 
-      $limit = $addl_search_args['limit']; 
-    } else { 
-      $limit = variable_get('sopac_results_per_page', 20);
+    
+    if ($getvars['perpage']) {
+      $limit = $getvars['perpage'];
+    } else if ($user->profile_perpage) {
+      $limit = $user->profile_perpage;
+    } else {
+      $limit = variable_get('sopac_results_per_page', 10);
     }
+    
+    /* Not implemented yet
+    if ($user->uid && $limit != $user->profile_perpage) {
+      $field = db_fetch_object(db_query("SELECT * FROM profile_fields WHERE name = 'profile_perpage'"));
+      db_query("INSERT INTO profile_values (fid, uid, value) VALUES (%d, %d, '%s') ON DUPLICATE KEY UPDATE value = '%s'", $field->fid, $user->uid, $limit, $limit);
+    }
+    */
+    
+    //if ($addl_search_args['limit']) { 
+    //  $limit = $addl_search_args['limit']; 
+    //} else { 
+    //  $limit = variable_get('sopac_results_per_page', 20);
+    //}
 
     // Initialize the pager if need be
     if ($pager_page_array[0]) { $page = $pager_page_array[0] + 1; } else { $page = 1; }
@@ -68,6 +86,7 @@ function sopac_catalog_search() {
     // Get the search results from Locum
     $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args, FALSE, $limit_avail);
     $num_results = $locum_results_all['num_hits'];
+    $result_info['limit'] = $limit;
     $result_info['num_results'] = $num_results;
     $result_info['hit_lowest'] = $page_offset + 1;
     if (($page_offset + $limit) < $num_results) { 
@@ -329,7 +348,7 @@ function sopac_prev_search_url($override = FALSE) {
 function sopac_request_item() {
   global $user;
   // avoid php errors when debugging
-  $varname = $request_result_msg = $request_error_msg = $item_form = $bnum = null;
+  $varname = $request_result_msg = $request_error_msg = $item_form = $bnum = NULL;
   
   $button_txt = t('Request Selected Item');
   profile_load_profile(&$user);
@@ -345,13 +364,13 @@ function sopac_request_item() {
     // support multi-branch & user home branch
     $actions = sopac_parse_uri();
     $bnum = $actions[1];
-    $pickup_arg = $actions[2] ? $actions[2] : null;
+    $pickup_arg = $actions[2] ? $actions[2] : NULL;
     $stored_pickup_options = variable_get('sopac_home_selector_options', array());
     if (!$pickup_arg && count($stored_pickup_options)) {
       $hold_result['choose_location']['options'] = $stored_pickup_options;
     }
     else {
-      $pickup_name = $actions[3] ? $actions[3] : null;
+      $pickup_name = $actions[3] ? $actions[3] : NULL;
       $locum = new locum_client;
       $bib_item = $locum->get_bib_item($bnum);
       $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
@@ -383,7 +402,7 @@ function sopac_request_item() {
     
     if ($hold_result['selection']  && !$hold_result['success']) {
       $requestable = 0;
-      $header = array('',t('Location'),t('Call Number'),t('Status'));
+      $header = array('', t('Location'), t('Call Number'), t('Status'));
       foreach ($hold_result['selection'] as $selection) {
         $status = $selection['status'];
         if ($selection['varname']) {
@@ -610,11 +629,11 @@ function sopac_search_form_adv() {
 
   $sortopts = array(
     '' => t('Relevance'),
-    'catalog_newest' => t('Newest in Collection'),
-    'catalog_oldest' => t('Oldest in Collection'),
+    'atoz' => t('Alphabetical A to Z'),
+    'ztoa' => t('Alphabetical Z to A'),
+    'catalog_newest' => t('Just Added'),
     'newest' => t('Pub date: Newest'),
     'oldest' => t('Pub date: Oldest'),
-    'title' => t('Alphabetically by Title'),
     'author' => t('Alphabetically by Author'),
     'top_rated' => t('Top Rated Items'),
     'popular_week' => t('Most Popular this Week'),

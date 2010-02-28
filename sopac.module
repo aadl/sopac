@@ -703,8 +703,8 @@ function theme_sopac_search_handler() {
  * @return string cleaned-up URI.
  */
 function utf8_urldecode($str) {
-  $str = preg_replace("/%u([0-9a-f]{3,4})/i","&#x\\1;",urldecode($str));
-  return html_entity_decode($str,null,'UTF-8');;
+  $str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str));
+  return html_entity_decode($str, NULL, 'UTF-8');;
 }
 
 /**
@@ -718,9 +718,9 @@ function sopac_parse_uri($strip_prefix = TRUE) {
 
   // Strip out everything in the URI up through SOPAC's prefix
   if ($strip_prefix) {
-    $args_raw = substr($_GET[q], strlen(variable_get('sopac_url_prefix', 'cat/seek')));
+    $args_raw = substr($_GET['q'], strlen(variable_get('sopac_url_prefix', 'cat/seek')));
   } else {
-    $args_raw = $_GET[q];
+    $args_raw = $_GET['q'];
   }
 
   $uri_array = explode('/', $args_raw);
@@ -742,7 +742,7 @@ function sopac_parse_uri($strip_prefix = TRUE) {
  */
 function sopac_parse_get_vars($override = array()) {
 
-  // TODO - Hard-coding this is not the best way to do it, but for now it is what it is... Revisit for 2.1?
+  // TODO - Hard-coding this is not the best way to do it, but for now it is what it is... Revisit for 2.2?
   $implode = array('search_format', 'pub_year', 'location', 'collection', 'facet_series', 'facet_lang', 'facet_year', 'facet_decade', 'age');
   $getvars_raw = explode('?', $_SERVER['REQUEST_URI']);
   if (count($getvars_raw) > 1) {
@@ -802,23 +802,24 @@ function sopac_make_pagevars($getvars) {
  * @return string New URL with variable
  */
 function sopac_update_url($url, $uKey, $uVal) {
-  $Qurl = explode("?",$url);
-  $arr = explode("&",$Qurl[1]);
-  $r = ''; $set = 0;
-  for($i=0;$i<sizeof($arr);$i++) {
-    $arr2 = explode("=",$arr[$i]);
-    if($arr2[0] == $uKey) {
+  $Qurl = explode("?", $url);
+  $arr = explode("&", $Qurl[1]);
+  $r = '';
+  $set = 0;
+  for ($i = 0; $i < sizeof($arr); $i++) {
+    $arr2 = explode("=", $arr[$i]);
+    if ($arr2[0] == $uKey) {
       $arr2[1] = $uVal;
       $set = 1;
     }
-    $r.=$arr2[0]."=".$arr2[1]."&";
+    $r .= $arr2[0] . "=" . $arr2[1] . "&";
   }
-  if($set == 0) {
-    $r.= $uKey."=".$uVal;
+  if ($set == 0) {
+    $r .= $uKey . "=" . $uVal;
   } else {
     $r = rtrim($r, "&");
   }
-  return $Qurl[0].'?'.$r;
+  return $Qurl[0] . '?' . $r;
 }
 
 /**
@@ -851,7 +852,7 @@ function sopac_user_block_disp_query() {
 
 function sopac_cron() {
   // Part of supporting user home branch in multibranch situation
-  if (variable_get('sopac_home_branch_enable', false) && !variable_get('sopac_home_selector_options', false)) {
+  if (variable_get('sopac_home_branch_enable', FALSE) && !variable_get('sopac_home_selector_options', FALSE)) {
     require_once('sopac_admin.php');
     sopac_setup_user_home_selector();
   }

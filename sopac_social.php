@@ -303,10 +303,17 @@ function sopac_user_tag_hitlist() {
   $hitnum = $page_offset + 1;
   foreach ($bnum_arr['bnums'] as $bnum) {
     $locum_result = $locum->get_bib_item($bnum);
-    $item_status = $locum->get_item_status($bnum);
-    $locum_result['copies'] = $item_status['copies'];
-    $locum_result['avail_details'] = $item_status['details'];
+    
+    // Grab Stdnum
+    $stdnum = $locum_result['stdnum'];
+    // Grab item status from Locum
+    $locum_result['status'] = $locum->get_item_status($bnum);
+    // Get the cover image
     $cover_img_url = $locum_result['cover_img'];
+    // Grab Syndetics reviews, etc..
+    $review_links = $locum->get_syndetics($locum_result['stdnum']);
+    if (count($review_links)) { $locum_result['review_links'] = $review_links; }
+    
     $result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum->locum_config, $no_circ);
     $hitnum++;
   }

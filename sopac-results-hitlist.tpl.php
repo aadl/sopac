@@ -8,7 +8,10 @@
 
 $new_author_str = sopac_author_format($locum_result['author'], $locum_result['addl_author']);
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
-if (!$cover_img_url) {
+
+if ($locum_result['cover_img'] && $locum_result['cover_img'] != 'CACHE') {
+  $cover_img_url = $locum_result['cover_img'];
+} else {
   $cover_img_url = '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png';
 }
 ?>
@@ -25,7 +28,7 @@ if (!$cover_img_url) {
     if (module_exists('covercache')) {
       print $cover_img;
     } else { ?>
-      <img class="hitlist-cover" width="72" src="<?php print $cover_img_url; ?>">
+      <img class="hitlist-cover" width="100" src="<?php print $cover_img_url; ?>">
     <?php } ?>
     </a>
     </td>

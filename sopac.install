@@ -152,40 +152,6 @@ function sopac_schema() {
       'savedate' => array('savedate'),
     ),
   );
-
-  $schema['sopac_checkout_hist'] = array(
-    'description' => t('Stores checkout history information.'),
-    'fields' => array(
-      'uid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'size' => 'medium',
-        'description' => t('Drupal user ID.'),
-      ),
-      'bnum' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'size' => 'medium',
-        'description' => t('Bibliographic number.'),
-      ),
-      'date' => array(
-        'type' => 'datetime',
-        'not null' => TRUE,
-        'description' => t('Item checkout date.'),
-      ),
-      'count' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'size' => 'medium',
-        'description' => t('Drupal user ID.'),
-      ),
-    ),
-    'indexes' => array(
-      'uid' => array('uid'),
-      'bnum' => array('bnum'),
-      'date' => array('date'),
-    ),
-  );
   
   return $schema;
 }
