@@ -1,105 +1,542 @@
-jsantoni commited on 9/8/2009:
-sopac_catalog.php
-  --this prevent the search form to display url content when we aren't on the search result page
+------------------------------------------------------------------------
+r119 | jblyberg | 2010-02-28 20:54:50 -0500 (Sun, 28 Feb 2010) | 2 lines
+Changed paths:
+   M /trunk/sopac-results-hitlist-rss.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
 
-sid_m committed on 7/29/2009:
-sopac.module:
-  --add user/checkouts/history and user/checkouts/history/opt/% menu items
-sopac_admin.php
-  --add settings for enable checkout history, and enable freezing holds.
-sopac_catalog.php
-  --modify sopac_catalog_search() to capture # of holds so can be displayed in search results if desired
-sopac_social.php
-  --modify sopac_personal_overview_page(), sopac_tags_page_cloud(), theme_sopac_tag_block(), and sopac_review_page() so they correctly calls theming functions
-sopac_user.php
-  --modify sopac_user_holds_table() to support freezing holds
-  --add sopac_checkout_history_page()
-  --add sopac_checkout_history_toggle()
+Small template changes.
 
-jsantoni commited on 7/2/2009:
-sopac_admin.php
-  --add a call to menu_rebuild() when submitting system_settings_form
+------------------------------------------------------------------------
+r118 | jblyberg | 2010-02-28 16:04:17 -0500 (Sun, 28 Feb 2010) | 3 lines
+Changed paths:
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac-results.tpl.php
+   M /trunk/sopac-search-block.tpl.php
+   M /trunk/sopac.css
+   M /trunk/sopac.install
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
 
-jsantoni commited on 7/1/2009:
-sopac_social.php
-  --fix utf-8 compliance in blocks
+Numerous bugfixes.
+IE compliance in templates.
 
-jsantoni commited on 6/30/2009:
-sopac.module
-sopac_admin.php
-  --add forgotten t() functions
+------------------------------------------------------------------------
+r117 | jblyberg | 2010-02-26 16:57:20 -0500 (Fri, 26 Feb 2010) | 3 lines
+Changed paths:
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_catalog.php
 
-sopac.css
-  --removed review-block-itemtitle fixed width to let it auto-adjust its size and better fit to differents Drupal Themes.
+Fixed a bug that caused a result set to "overreach" when limiting by available.
+Added location information to item record view when multi-branch is enabled.
 
-sopac_social.php
-sopac_admin.php
-  --add 3 options to configure tag cloud
+------------------------------------------------------------------------
+r116 | jblyberg | 2010-02-26 11:04:55 -0500 (Fri, 26 Feb 2010) | 4 lines
+Changed paths:
+   M /trunk/sopac-facet-block.tpl.php
+   M /trunk/sopac-search-block.tpl.php
+   M /trunk/sopac.install
+   M /trunk/sopac_user.php
 
-sopac.module
-sopac_user.php
-sopac_admin.php
-  --add configuration options to globally disable fines and payments
+Added availability limits to search block.
+Changed "All Locations" to "Any Location"
+Began work on checkout history.
 
-jsantoni commited on 6/29/2009:
-sopac-request.tpl.php
-sopac-pat-overview.tpl.php
-sopac-review.tpl.php
-  --add forgotten t() functions
+------------------------------------------------------------------------
+r115 | jblyberg | 2010-02-25 11:27:18 -0500 (Thu, 25 Feb 2010) | 2 lines
+Changed paths:
+   M /trunk/sopac-facet-block.tpl.php
 
-jsantoni commited on 6/27/2009:
-sopac-results.tpl.php
-sopac-record.tpl.php
-sopac-results-hitlist.tpl.php
-sopac-ratings-page.tpl.php
-  --add forgotten t() functions
+Added multi-branch availability facet.
 
-jsantoni commited on 6/26/2009:
-sopac_user.php:
-sopac_social.php:
-sopac_catalog.php:
-  --add forgotten t() functions
+------------------------------------------------------------------------
+r114 | jblyberg | 2010-02-25 10:26:36 -0500 (Thu, 25 Feb 2010) | 2 lines
+Changed paths:
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_catalog.php
 
-sid_m committed on 6/23/2009:
-sopac_user.php:
-  --comment out line creating broken RSS feed link for saved search list display. Added TODO and placeholder variable.
+Added admin option to enable multi-branch.
 
-sid_m committed on 5/18/2009:
-sopac.module:
-  --add url-encoding of user-entered search text in theme_sopac_search_handler()
+------------------------------------------------------------------------
+r113 | jblyberg | 2010-02-24 17:20:57 -0500 (Wed, 24 Feb 2010) | 3 lines
+Changed paths:
+   M /trunk/sopac-facet-block.tpl.php
+   M /trunk/sopac.css
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
 
-sid_m committed on 3/26/2009: 
-sopac.module:
+Finished (I think) limit-to-available functionality.
+Removed location facet.
 
-  --add 'hold/location' url to help handle selecting from multiple pickup locations
-  --declare the following themes in hook_theme:
-      sopac_tag_block
-      sopac_review_block
-      sopac_tag_cloud
-      sopac_get_rating_stars
-  --add cron job to support user home branch in multibranch situation
+------------------------------------------------------------------------
+r112 | jblyberg | 2010-02-19 17:42:36 -0500 (Fri, 19 Feb 2010) | 2 lines
+Changed paths:
+   M /trunk/sopac-record.tpl.php
 
-sopac_admin.php:
+Fixed a small plurality check.
 
-  --add settings sopac_home_branch_enable and sopac_admin_card to  support giving users ability to select a home branch
-  --add sopac_setup_user_home_selector() which adds home branch selection to user profile, and creates a drupal variable containing the branch options.
+------------------------------------------------------------------------
+r111 | jblyberg | 2010-02-08 09:27:17 -0500 (Mon, 08 Feb 2010) | 2 lines
+Changed paths:
+   M /trunk/sopac_catalog.php
 
-sopac_catalog.php:
+Began work on "limiting to available"
 
-  --modify sopac_request_item() to support user selecting pickup location in multi-branch situations
-  --added sopac_hold_location_page(), sopac_hold_location_form(), and sopac_hold_location_form_submit() functions for form where user selects branch to pickup item
-  --remove hard coding of path to nocover.png so tpl can override with a theme- or site-specific version
+------------------------------------------------------------------------
+r110 | jblyberg | 2010-02-06 09:15:09 -0500 (Sat, 06 Feb 2010) | 2 lines
+Changed paths:
+   M /trunk/sopac-facet-block.tpl.php
+   M /trunk/sopac-search-block.tpl.php
 
-sopac-results-hitlist.tpl.php:
+Small bugfix related to decade facet.
 
-  --add setting of path to nocover.png so can override with a theme- or site-specific version
+------------------------------------------------------------------------
+r109 | jblyberg | 2010-02-05 17:36:14 -0500 (Fri, 05 Feb 2010) | 4 lines
+Changed paths:
+   M /trunk/sopac-facet-block.tpl.php
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-search-block.tpl.php
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
 
-sopac_social.php:
+Added download links to record template.
+Updated facets to include age and decade.
+Added age and decade support to the search forms.
 
-  --clean up sopac_user_tag_hitlist() so uses same pager at top and bottom
-  --remove hard coding of path to nocover.png so tpl can override with a theme- or site-specific version
+------------------------------------------------------------------------
+r108 | jblyberg | 2010-02-04 18:16:13 -0500 (Thu, 04 Feb 2010) | 3 lines
+Changed paths:
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac.css
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
 
-sopac_user.php:
+Implemented new record display.
+Incorporated syndetics/review links.
 
-  --add support for link displaying user's home branch in sopac_user_info_table()
-  --modify sopac_user_holds_table() so in the list of holds, each hold displays the pickup branch as text, not a select control of all branches
+------------------------------------------------------------------------
+r107 | jblyberg | 2010-02-02 17:41:02 -0500 (Tue, 02 Feb 2010) | 5 lines
+Changed paths:
+   M /contrib/covercache/covercache.module
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist-rss.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac-results-rss.tpl.php
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_user.php
+
+Added function to cover cache module to return just image url.
+Completed catalog search RSS implementation.
+Updated availability code to reflect changes in Locum.
+Began implementation of Syndetics reviews and summaries.
+
+------------------------------------------------------------------------
+r106 | jblyberg | 2010-01-29 15:44:31 -0500 (Fri, 29 Jan 2010) | 2 lines
+Changed paths:
+   M /contrib/covercache/covercache.module
+   D /trunk/sopac-record-rss.php
+   A /trunk/sopac-results-hitlist-rss.tpl.php
+   A /trunk/sopac-results-rss.tpl.php (from /trunk/sopac-record-rss.php:105)
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
+
+Initial implementation of native RSS templates
+
+------------------------------------------------------------------------
+r105 | jblyberg | 2010-01-28 18:27:05 -0500 (Thu, 28 Jan 2010) | 3 lines
+Changed paths:
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac_catalog.php
+
+Updated availability to use new convention in catalog display.
+Added collapsible item list in record display.
+
+------------------------------------------------------------------------
+r104 | reby | 2009-11-02 15:59:44 -0500 (Mon, 02 Nov 2009) | 1 line
+Changed paths:
+   M /trunk/sopac.install
+
+brought sopac.install up to drupal standards other than a db_query_range
+------------------------------------------------------------------------
+r103 | jblyberg | 2009-10-09 22:51:00 -0400 (Fri, 09 Oct 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac_user.php
+
+Converted holds functionality to use new update_holds().
+
+------------------------------------------------------------------------
+r102 | jblyberg | 2009-10-05 23:02:59 -0400 (Mon, 05 Oct 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac-pat-overview.tpl.php
+   M /trunk/sopac-ratings-page.tpl.php
+   M /trunk/sopac-review.tpl.php
+   M /trunk/sopac-tags-page.tpl.php
+   M /trunk/sopac.info
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
+   M /trunk/sopac_user.php
+
+Version number change and minor code clean-up.
+
+------------------------------------------------------------------------
+r101 | jblyberg | 2009-10-05 22:35:32 -0400 (Mon, 05 Oct 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac_user.php
+
+The holds form now passes (int) 0 or 1 instead of (string) true or false, as expected by locum.
+
+------------------------------------------------------------------------
+r100 | jblyberg | 2009-10-05 16:35:54 -0400 (Mon, 05 Oct 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac_user.php
+
+Fixed security flaw that allowed users to see non-verified account info.
+
+------------------------------------------------------------------------
+r99 | jblyberg | 2009-10-02 16:53:17 -0400 (Fri, 02 Oct 2009) | 2 lines
+Changed paths:
+   M /contrib/covercache/covercache.module
+   M /trunk/sopac-facet-block.tpl.php
+   M /trunk/sopac-fines.tpl.php
+   M /trunk/sopac-pat-overview.tpl.php
+   M /trunk/sopac-ratings-page.tpl.php
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-request.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac-results-nohits.tpl.php
+   M /trunk/sopac-results.tpl.php
+   M /trunk/sopac-review.tpl.php
+   M /trunk/sopac-search-block.tpl.php
+   M /trunk/sopac-tags-page.tpl.php
+   M /trunk/sopac-user-links-block.tpl.php
+   M /trunk/sopac.css
+   M /trunk/sopac.install
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
+   M /trunk/sopac_user.php
+
+Changed whitespace standard to match Drupal coding standards.
+
+------------------------------------------------------------------------
+r96 | jblyberg | 2009-09-10 18:13:03 -0400 (Thu, 10 Sep 2009) | 3 lines
+Changed paths:
+   A /contrib/covercache
+   A /contrib/covercache/covercache.css
+   A /contrib/covercache/covercache.info
+   A /contrib/covercache/covercache.module
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+
+Added covercache module to contrib directory.
+Modified the templates to support covercache if it's enabled.
+
+------------------------------------------------------------------------
+r95 | jsantoni | 2009-09-08 05:26:04 -0400 (Tue, 08 Sep 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_catalog.php
+
+This prevents the search form to display url arguments when we aren't on the right page
+
+
+------------------------------------------------------------------------
+r94 | jblyberg | 2009-08-27 17:21:40 -0400 (Thu, 27 Aug 2009) | 3 lines
+Changed paths:
+   A /contrib
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac.css
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
+
+Added Google Book support in the record template.
+Added "destination" variables to login links to send users back to originating pages.
+
+------------------------------------------------------------------------
+r93 | smaskit | 2009-07-29 16:49:54 -0400 (Wed, 29 Jul 2009) | 1 line
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
+   M /trunk/sopac_user.php
+
+add support for checkout history, and for freezing holds
+------------------------------------------------------------------------
+r92 | jblyberg | 2009-07-21 22:23:12 -0400 (Tue, 21 Jul 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac.module
+
+Fixed a commit discrepency from a prior commit conflict.
+
+------------------------------------------------------------------------
+r91 | jblyberg | 2009-07-03 09:24:28 -0400 (Fri, 03 Jul 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac-results-hitlist.tpl.php
+
+Slight change in code syntax.
+
+------------------------------------------------------------------------
+r90 | jblyberg | 2009-07-02 22:07:07 -0400 (Thu, 02 Jul 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac-results-hitlist.tpl.php
+
+Fixed x of y display tht was somehow lost in translation ;)
+
+------------------------------------------------------------------------
+r89 | jblyberg | 2009-07-02 17:11:56 -0400 (Thu, 02 Jul 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_user.php
+
+Added some fixes to fines toggle to make it more comprehensive.
+
+------------------------------------------------------------------------
+r88 | jsantoni | 2009-07-02 03:46:14 -0400 (Thu, 02 Jul 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_admin.php
+
+Add a call to menu_rebuild() when submitting system_settings_form
+
+
+------------------------------------------------------------------------
+r87 | jsantoni | 2009-07-01 08:04:51 -0400 (Wed, 01 Jul 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_social.php
+
+This fixes UTF-8 compliance in blocks
+
+
+------------------------------------------------------------------------
+r86 | jsantoni | 2009-06-30 10:30:05 -0400 (Tue, 30 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_user.php
+
+Add configuration options to globally disable fines and payments
+
+
+------------------------------------------------------------------------
+r85 | jsantoni | 2009-06-30 10:11:59 -0400 (Tue, 30 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_social.php
+
+Add 3 options to configure tag cloud
+
+
+------------------------------------------------------------------------
+r84 | jsantoni | 2009-06-30 06:20:10 -0400 (Tue, 30 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac.css
+
+Removed review-block-itemtitle fixed width to let it auto-adjust its size and better fit to differents Drupal Themes.
+
+
+------------------------------------------------------------------------
+r83 | jsantoni | 2009-06-30 05:04:20 -0400 (Tue, 30 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac-pat-overview.tpl.php
+   M /trunk/sopac-request.tpl.php
+   M /trunk/sopac-review.tpl.php
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+
+Added forgotten t() functions
+
+
+------------------------------------------------------------------------
+r82 | jblyberg | 2009-06-28 23:43:10 -0400 (Sun, 28 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/sopac-facet-block.tpl.php
+   M /trunk/sopac-pat-overview.tpl.php
+   M /trunk/sopac-ratings-page.tpl.php
+   A /trunk/sopac-record-rss.php
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac-results-nohits.tpl.php
+   M /trunk/sopac-results.tpl.php
+   M /trunk/sopac-review.tpl.php
+   M /trunk/sopac-search-block.tpl.php
+   M /trunk/sopac-tags-page.tpl.php
+   M /trunk/sopac.module
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
+   M /trunk/sopac_user.php
+
+Code clean-up.
+Resolved conflicts w/ Jean's translation changes.
+
+------------------------------------------------------------------------
+r81 | jsantoni | 2009-06-27 12:34:26 -0400 (Sat, 27 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac-ratings-page.tpl.php
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac-results.tpl.php
+
+Added forgotten t() functions to templates
+
+
+------------------------------------------------------------------------
+r80 | jsantoni | 2009-06-26 09:35:44 -0400 (Fri, 26 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_catalog.php
+
+Added forgotten t() functions.
+
+
+------------------------------------------------------------------------
+r79 | jsantoni | 2009-06-26 08:04:56 -0400 (Fri, 26 Jun 2009) | 3 lines
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_social.php
+   M /trunk/sopac_user.php
+
+Added forgotten t() functions.
+
+
+------------------------------------------------------------------------
+r78 | smaskit | 2009-06-24 00:31:12 -0400 (Wed, 24 Jun 2009) | 1 line
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac_user.php
+
+comment out line creating broken RSS link in list of saved searches
+------------------------------------------------------------------------
+r77 | jblyberg | 2009-06-19 10:05:34 -0400 (Fri, 19 Jun 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac-record.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   M /trunk/sopac_catalog.php
+
+Added x of y holds in display
+
+------------------------------------------------------------------------
+r76 | smaskit | 2009-05-18 14:11:49 -0400 (Mon, 18 May 2009) | 1 line
+Changed paths:
+   M /trunk/CHANGELOG.txt
+   M /trunk/sopac.module
+
+
+------------------------------------------------------------------------
+r75 | smaskit | 2009-03-26 06:45:32 -0400 (Thu, 26 Mar 2009) | 1 line
+Changed paths:
+   M /trunk/CHANGELOG.txt
+
+add date to CHANGELOG.txt
+------------------------------------------------------------------------
+r74 | smaskit | 2009-03-26 06:38:03 -0400 (Thu, 26 Mar 2009) | 1 line
+Changed paths:
+   A /trunk/CHANGELOG.txt
+   A /trunk/sopac-catalog-front.tpl.php
+   M /trunk/sopac-results-hitlist.tpl.php
+   A /trunk/sopac-user-links-block.tpl.php
+   M /trunk/sopac.module
+   M /trunk/sopac_admin.php
+   M /trunk/sopac_catalog.php
+   M /trunk/sopac_social.php
+   M /trunk/sopac_user.php
+
+Add support for multi-branch holds, default branch, and some additional theming
+------------------------------------------------------------------------
+r73 | jblyberg | 2009-03-18 09:22:56 -0400 (Wed, 18 Mar 2009) | 2 lines
+Changed paths:
+   M /trunk/sopac_catalog.php
+
+Modified the message a user gets when they place a hold.
+
+------------------------------------------------------------------------
+r70 | jblyberg | 2009-03-17 21:48:56 -0400 (Tue, 17 Mar 2009) | 1 line
+Changed paths:
+   D /images
+   D /js
+   D /sopac-facet-block.tpl.php
+   D /sopac-fines.tpl.php
+   D /sopac-pat-overview.tpl.php
+   D /sopac-ratings-page.tpl.php
+   D /sopac-record.tpl.php
+   D /sopac-request.tpl.php
+   D /sopac-results-hitlist.tpl.php
+   D /sopac-results-nohits.tpl.php
+   D /sopac-results.tpl.php
+   D /sopac-review.tpl.php
+   D /sopac-search-block.tpl.php
+   D /sopac-tags-page.tpl.php
+   D /sopac.css
+   D /sopac.info
+   D /sopac.install
+   D /sopac.module
+   D /sopac_admin.php
+   D /sopac_catalog.php
+   D /sopac_social.php
+   D /sopac_user.php
+   A /trunk
+   A /trunk/images (from /images:9)
+   R /trunk/images/1.png (from /images/1.png:69)
+   R /trunk/images/2.png (from /images/2.png:69)
+   R /trunk/images/3.png (from /images/3.png:69)
+   R /trunk/images/4.png (from /images/4.png:69)
+   R /trunk/images/5.png (from /images/5.png:69)
+   R /trunk/images/6.png (from /images/6.png:69)
+   R /trunk/images/9.png (from /images/9.png:69)
+   R /trunk/images/a.png (from /images/a.png:69)
+   R /trunk/images/b.png (from /images/b.png:69)
+   R /trunk/images/c.png (from /images/c.png:69)
+   R /trunk/images/d.png (from /images/d.png:69)
+   R /trunk/images/g.png (from /images/g.png:69)
+   R /trunk/images/h.png (from /images/h.png:69)
+   R /trunk/images/k.png (from /images/k.png:69)
+   R /trunk/images/m.png (from /images/m.png:69)
+   R /trunk/images/n.png (from /images/n.png:69)
+   R /trunk/images/nocover.png (from /images/nocover.png:69)
+   A /trunk/images/stars (from /images/stars:69)
+   A /trunk/images/treeview (from /images/treeview:69)
+   R /trunk/images/x.png (from /images/x.png:69)
+   A /trunk/js (from /js:37)
+   R /trunk/js/facet-browser.js (from /js/facet-browser.js:69)
+   A /trunk/js/jquery.rating.js (from /js/jquery.rating.js:69)
+   R /trunk/js/jquery.treeview.js (from /js/jquery.treeview.js:69)
+   A /trunk/sopac-facet-block.tpl.php (from /sopac-facet-block.tpl.php:38)
+   A /trunk/sopac-fines.tpl.php (from /sopac-fines.tpl.php:41)
+   A /trunk/sopac-pat-overview.tpl.php (from /sopac-pat-overview.tpl.php:54)
+   A /trunk/sopac-ratings-page.tpl.php (from /sopac-ratings-page.tpl.php:54)
+   A /trunk/sopac-record.tpl.php (from /sopac-record.tpl.php:47)
+   A /trunk/sopac-request.tpl.php (from /sopac-request.tpl.php:30)
+   A /trunk/sopac-results-hitlist.tpl.php (from /sopac-results-hitlist.tpl.php:53)
+   A /trunk/sopac-results-nohits.tpl.php (from /sopac-results-nohits.tpl.php:9)
+   A /trunk/sopac-results.tpl.php (from /sopac-results.tpl.php:53)
+   A /trunk/sopac-review.tpl.php (from /sopac-review.tpl.php:58)
+   A /trunk/sopac-search-block.tpl.php (from /sopac-search-block.tpl.php:64)
+   A /trunk/sopac-tags-page.tpl.php (from /sopac-tags-page.tpl.php:53)
+   A /trunk/sopac.css (from /sopac.css:68)
+   A /trunk/sopac.info (from /sopac.info:67)
+   A /trunk/sopac.install (from /sopac.install:68)
+   A /trunk/sopac.module (from /sopac.module:67)
+   A /trunk/sopac_admin.php (from /sopac_admin.php:40)
+   A /trunk/sopac_catalog.php (from /sopac_catalog.php:69)
+   A /trunk/sopac_social.php (from /sopac_social.php:69)
+   A /trunk/sopac_user.php (from /sopac_user.php:66)
+
+Moving root directory to trunk directory
+------------------------------------------------------------------------

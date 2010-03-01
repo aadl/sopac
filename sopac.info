@@ -2,7 +2,7 @@
 name = SOPAC
 description = The Social OPAC™ for Drupal.
 package = SOPAC
-version = 6.x-2.1
+version = 6.x-2.1-rc1
 core = 6.x
 
 dependencies[] = profile
