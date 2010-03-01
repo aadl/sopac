@@ -268,7 +268,7 @@ function sopac_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
   
-  if (variable_get('sopac_checkout_history_enable', 1)) {
+  if (variable_get('sopac_checkout_history_enable', 0)) {
     $items['user/checkouts/history'] = array(
       'title' => 'My Checkout History',
       'page callback' => 'sopac_checkout_history_page',

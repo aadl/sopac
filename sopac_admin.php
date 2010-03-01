@@ -209,13 +209,6 @@ function sopac_admin() {
     '#collapsed' => TRUE,
   );
   
-  $form['sopac_account']['sopac_history_hide'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Hide the Account History on the Account page'),
-    '#default_value' => variable_get('sopac_history_hide', 1),
-    '#description' => t("Check this box if you would like to hide the Account History on the Account page."),
-  );
-
   $form['sopac_account']['sopac_summary_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable the Account Summary on the Account page'),

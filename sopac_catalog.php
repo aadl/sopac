@@ -712,7 +712,6 @@ function sopac_search_form_adv() {
       '#multiple' => TRUE,
     );
   }
-  */
   
   $form['advanced']['narrow1']['location'] = array(
     '#type' => 'select',
@@ -722,6 +721,8 @@ function sopac_search_form_adv() {
     '#options' => $locum_cfg['locations'],
     '#multiple' => TRUE,
   );
+  
+  */
   
   $form['advanced']['narrow1']['search_format'] = array(
     '#type' => 'select',
