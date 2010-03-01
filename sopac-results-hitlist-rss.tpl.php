@@ -28,11 +28,11 @@ if (!$cover_img_url) {
       </author>
       <content type="xhtml" xml:lang="en" xml:base="http://<?php print $_SERVER['SERVER_NAME']; ?>/">
         <div xmlns="http://www.w3.org/1999/xhtml">
-          <p><img class="hitlist-cover" src="<?php print $cover_img_url ?>" /></p>
+          <p><img class="hitlist-cover" width="100" src="<?php print $cover_img_url ?>" /></p>
           <ul>
             <li id="publisher">Publisher: <?php print $locum_result['pub_info'] . ', ' . $locum_result['pub_year']; ?></li>
             <li id="added">Added on <?php print $locum_result['bib_created']; ?></li>
-            <li>Call number: <strong><?php print $locum_result['callnum']; ?></strong></li>
+            <?php if ($locum_result['callnum']) { ?><li>Call number: <strong><?php print $locum_result['callnum']; ?></strong></li> <?php } ?>
             <li>
               <?php 
               print $locum_result['status']['avail'] . t(' of ') . $locum_result['status']['total'] . ' ';
