@@ -91,6 +91,7 @@ function sopac_perm() {
  */
 function sopac_block($op='list', $delta=0) {
   global $locum_results_all, $locum_cfg;
+  $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 
   // listing of blocks, such as on the admin/block page
   switch ($op) {
@@ -98,28 +99,28 @@ function sopac_block($op='list', $delta=0) {
     case 'list':
       $block[0] = array(
          'info' => t('Catalog Facets'),
-        'pages' => variable_get('sopac_url_prefix', 'cat/seek') . '/search/*',
+        'pages' => $sopac_prefix . '/search/*',
       );
       $block[1] = array(
          'info' => t('Search Tracker'),
-        'pages' => variable_get('sopac_url_prefix', 'cat/seek') . '/search/*',
+        'pages' => $sopac_prefix . '/search/*',
       );
       $block[2] = array(
          'info' => t('Catalog Tags'),
-        'pages' => variable_get('sopac_url_prefix', 'cat/seek') . '/*',
+        'pages' => $sopac_prefix . '/*',
       );
       $block[3] = array(
          'info' => t('Catalog Reviews'),
-        'pages' => variable_get('sopac_url_prefix', 'cat/seek') . '/*',
+        'pages' => $sopac_prefix . '/*',
         'weight' => 1,
       );
       $block[4] = array(
          'info' => t('Item Tags'),
-        'pages' => variable_get('sopac_url_prefix', 'cat/seek') . '/record/*',
+        'pages' => $sopac_prefix . '/record/*',
       );
       $block[5] = array(
          'info' => t('Item Reviews'),
-        'pages' => variable_get('sopac_url_prefix', 'cat/seek') . '/record/*',
+        'pages' => $sopac_prefix . '/record/*',
         'weight' => 1,
       );
       $block[6] = array(
@@ -198,6 +199,7 @@ function sopac_block($op='list', $delta=0) {
  */
 function sopac_menu() {
   global $user;
+  $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek');
   
   $items = array();
 
@@ -218,7 +220,7 @@ function sopac_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/search'] = array(
+  $items[$sopac_prefix . '/search'] = array(
     'title' => 'Catalog Search',
     'page callback' => 'sopac_catalog_search',
     'access arguments' => array('access content'),
@@ -226,7 +228,7 @@ function sopac_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/savesearch'] = array(
+  $items[$sopac_prefix . '/savesearch'] = array(
     'title' => 'Save Search',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sopac_savesearch_form'),
@@ -235,7 +237,7 @@ function sopac_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/record/%'] = array(
+  $items[$sopac_prefix . '/record/%'] = array(
     'title' => 'Item Record',
     'page callback' => 'sopac_bib_record',
     'access arguments' => array('access content'),
@@ -243,7 +245,7 @@ function sopac_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/request'] = array(
+  $items[$sopac_prefix . '/request'] = array(
     'title' => 'Request an Item',
     'page callback' => 'sopac_request_item',
     'access arguments' => array('access content'),
