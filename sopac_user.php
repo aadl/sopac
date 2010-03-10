@@ -94,9 +94,23 @@ function sopac_user_info_table(&$account, &$locum) {
       if (variable_get('sopac_lcard_enable', 1)) {
         $rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
       }
-      // add row for home branch if appropriate
+      // Add row for home branch if appropriate
       if ($home_branch_link) {
         $rows[] = array(array('data' => t('Home Branch'), 'class' => 'attr_name'), $home_branch_link);
+      }
+      // Checkout history, if it's turned on
+      if (variable_get('sopac_checkout_history_enable', 0)) {
+        $cohist_enabled = $user->profile_pref_cohist ? 'Enabled' : 'Disabled';
+        $last_import = db_result(db_query("SELECT DATESUB(NOW() - last_hist_check) FROM {sopac_last_hist_check} WHERE uid = '" . $user->uid . "'"));
+        if ($cohist_enabled = 'Enabled') {
+          // TODO Check ILS, enable it if it's not (w/ cache check)
+          // Grab + update newest checkouts
+        } else {
+          // TODO Check ILS, disable it is it's not (w/ cache check)
+        }
+        // Reset cache age
+        db_query("UPDATE {sopac_last_hist_check} SET last_hist_check = NOW()");
+        $rows[] = array(array('data' => t('Checkout History'), 'class' => 'attr_name'), '<a href="/user/checkout/history">' . $cohist_enabled . '</a>');
       }
       if (variable_get('sopac_numco_enable', 1)) {
         $rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo['checkouts']);
@@ -325,39 +339,82 @@ function sopac_checkout_history_page() {
   global $user;
   profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
+
+    // Get the time since the last update
+    $last_import = db_result(db_query("SELECT DATESUB(NOW() - last_hist_check) FROM {sopac_last_hist_check} WHERE uid = '" . $user->uid . "'"));
+    
+    // Check profile to see if CO hist is enabled
+    $user_co_hist_enabled = $user->profile_pref_cohist;
+    if (!$user_co_hist_enabled) {
+      // CO hist is not enabled, would you like to enable it?
+      return $content;
+    }
+    // CO hist is enabled, would you like to disable it?
+    
+    // Set up our data sets
+    $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
+    $insurge = new insurge_client();
     $locum = new locum_client();
     $locum_pass = substr($user->pass, 0, 7);
     $cardnum = $user->profile_pref_cardnum;
-    $checkouts = $locum->get_patron_checkout_history($cardnum, $locum_pass);
-
-    if (!is_array($checkouts)) {
-      if ($checkouts == 'out') {
-        $content = '<div>This feature is currently turned off.</div>';
-        $toggle = l('Opt In', 'user/checkouts/history/opt/in');
+    $last_checkout_result = $insurge->get_checkout_history($user->uid, 1);
+    $last_checkout[(string) $last_checkout_result['bnum']] = $last_checkout_result['codate']; // Like this?
+    
+    // If we haven't imported data recently, do it now.
+    if ($last_import >= variable_get('sopac_checkout_history_cache_time', 60)) {
+      
+      $checkouts = $locum->get_patron_checkout_history($cardnum, $locum_pass, $last_checkout);
+      
+      // Check: if profile->co hist is enabled , verify that it's on in the ILS
+      // check: "" disables "" off
+      if (!is_array($checkouts)) {
+        if ($checkouts == 'out') {
+          $content = '<div>'. t('This feature is currently turned off.') . '</div>';
+          $toggle = l('Opt In', 'user/checkouts/history/opt/in');
+        }
+        if ($checkouts == 'in') {
+          $content = '<div>There are no items in your checkout history.</div>';
+          $toggle = l('Opt Out', 'user/checkouts/history/opt/out');
+        }
+      } else {
+        foreach ($checkouts as $checkout) {
+          $bib_item = $locum->get_bib_item($checkout['bnum']);
+          if ($bib_item['bnum']) {
+            $insurge->add_checkout_history($user->uid, $checkout['bnum'], $bib_item['title'], $bib_item['author'] . ' ' . $bib_item['addl_author']);
+          }
+        }
       }
-      if ($checkouts == 'in') {
-        $content = '<div>There are no items in your checkout history.</div>';
-        $toggle = l('Opt Out', 'user/checkouts/history/opt/out');
-      }
+      // Reset cache age
+      db_query("UPDATE {sopac_last_hist_check} SET last_hist_check = NOW()");
     }
-    else {
-      $toggle = l('Opt Out', 'user/checkouts/history/opt/out');
-      // Create the checkout history table
-      $header = array('Title', 'Author', 'Checked Out', 'Details');
+    
+    // Set up pagination
+    
+    // Grab checkout history from Insurge
+    $checkout_history = $insurge->get_checkout_history($user->uid);
+    
+    if (count ($checkout_history)) {
+      // Set up the table
+      $header = array('', t('Title'), t('Author'), t('Check-Out Date'));
       $rows = array();
-      foreach ($checkouts as $item) {
+      foreach ($checkout_history as $hist_item) {
+        $item = $locum->get_bib_item($hist_item['bnum']);
+        $new_author_str = sopac_author_format($item['author'], $item['addl_author']);
         $rows[] = array(
-          '<a href="/catalog/record/' . $item['bnum'] . '">' . $item['title'] . '</a>',
-          $item['author'],
-          $item['date'],
-          $item['details'],
+          '<a href="/' . $url_prefix . '/record/' . $item['bnum'] . '">' . ucwords($item['title']) . '</a>',
+          '<a href="/' . $url_prefix . '/search/author/' . urlencode($new_author_str) . '">' . $new_author_str . '</a>',
+          $hist_item['codate'], // Figure out the best way to format this
         );
+        $content = theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0'));
       }
-      $content = theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0'));
+    } else {
+      // nothing in users co hist
+      $content = t('You do not have anything in your checkout history yet.');
     }
-    $content .= '<div>' . $toggle . '</div>';
+    
+  } else {
+    $content = '<div class="cohist_nocard">' . t('Please register your library card to take advantage of this feature.') . '</div>';
   }
-  else {$content = '<div>' . t('Please register your library card to take advantage of this feature.') . '</div>';}
   return $content;
 }
 

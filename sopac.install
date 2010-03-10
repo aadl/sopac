@@ -179,6 +179,11 @@ function sopac_profile_setup() {
   
   // Insert the profile field configuration into the database.
   db_query("INSERT INTO {profile_fields} (title, name, explanation, category, type, weight, required, register, visibility, autocomplete, options, page) VALUES ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s')", 'Library Card Number', 'profile_pref_cardnum', $profile_desc_cardnum, 'Preferences', 'textfield', 0, 0, 1, 1, 0, '', '');
+
+  $profile_desc_cohist = "This option allows you to enable checkout history on your account.  By enabling checkout history, you are allowing the library to keep track of your checkouts on your behalf.  Checkout history allows you to see what you have checked out while it is enabled and is also used to help us reccomend other material that may be of interest to you.<br />";
+  
+  // Insert the profile field configuration into the database.
+  db_query("INSERT INTO {profile_fields} (title, name, explanation, category, type, weight, required, register, visibility, autocomplete, options, page) VALUES ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s')", 'Enable Checkout History', 'profile_pref_cohist', $profile_desc_cohist, 'Preferences', 'textfield', 0, 0, 0, 1, 0, '', '');
   
 }
 

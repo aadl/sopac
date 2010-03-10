@@ -240,7 +240,7 @@ function sopac_admin() {
   $form['sopac_account']['sopac_checkout_history_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display checkout history in the user area'),
-    '#default_value' => variable_get('sopac_checkout_history_enable', 1),
+    '#default_value' => variable_get('sopac_checkout_history_enable', 0),
     '#description' => t("Check this box if you would like checkout history to appear in the user area."),
   );
   
@@ -249,6 +249,15 @@ function sopac_admin() {
     '#title' => t('Delete checkout history from ILS after harvest'),
     '#default_value' => variable_get('sopac_checkout_history_wipe', 1),
     '#description' => t("Check this box if you would like to purge checkout history from the ILS after it's imported into SOPAC."),
+  );
+  
+  $form['sopac_account']['sopac_checkout_history_cache_time'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Checkout history cache time'),
+    '#default_value' => variable_get('sopac_checkout_history_cache_time', 60),
+    '#description' => t("How many minutes should SOPAC wait before checking the ILS for checkout history again?"),
+    '#size' => 6,
+    '#maxlength' => 5,
   );
   
   $form['sopac_account']['sopac_hold_freezes_enable'] = array(
