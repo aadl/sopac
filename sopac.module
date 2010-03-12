@@ -253,15 +253,6 @@ function sopac_menu() {
     'type' => MENU_CALLBACK,
   );
   
-  // url to help handle selecting from multiple pickup locations
-  $items['hold/location'] = array(
-    'title' => 'Select Pickup Location',
-    'page callback' => 'sopac_hold_location_page',
-    'access arguments' => array('access user pages'),
-    'file' => 'sopac_catalog.php',
-    'type' => MENU_CALLBACK,
-  );
-  
   $items['user/checkouts'] = array(
     'title' => 'My Checkouts',
     'page callback' => 'sopac_checkouts_page',
