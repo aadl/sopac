@@ -345,6 +345,7 @@ function sopac_put_request_link($bnum) {
  * @return array
  */
 function sopac_multibranch_hold_request(&$form_state, $bnum = null) {
+  global $user;
   $locum = new locum();
   $locum_cfg = $locum->locum_config;
   $options = $locum_cfg['branches'];
