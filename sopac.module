@@ -152,37 +152,37 @@ function sopac_block($op='list', $delta=0) {
           // SOPAC overview block for patron tags
           require_once('sopac_social.php');
           $block['subject'] = t('Popular Tags');
-          $block['content'] = theme_sopac_tag_block('overview');
+          $block['content'] = theme('sopac_tag_block', 'overview');
           break;
         case 3:
           // SOPAC overview block for patron reviews
           require_once('sopac_social.php');
           $block['subject'] = t('New Reviews');
-          $block['content'] = theme_sopac_review_block('overview');
+          $block['content'] = theme('sopac_review_block', 'overview');
           break;
         case 4:
           // SOPAC item record block for patron tags
           require_once('sopac_social.php');
           $block['subject'] = t('Record Tags');
-          $block['content'] = theme_sopac_tag_block('record');
+          $block['content'] = theme('sopac_tag_block', 'record');
           break;
         case 5:
           // SOPAC item record block for patron reviews
           require_once('sopac_social.php');
           $block['subject'] = t('Reviews');
-          $block['content'] = theme_sopac_review_block('record');
+          $block['content'] = theme('sopac_review_block', 'record');
           break;
         case 6:
           // SOPAC personal record block for patron's own tags
           require_once('sopac_social.php');
           $block['subject'] = t('My Top Tags');
-          $block['content'] = theme_sopac_tag_block('personal');
+          $block['content'] = theme('sopac_tag_block', 'personal');
           break;
         case 7:
           // SOPAC personal record block for patron's own reviews
           require_once('sopac_social.php');
           $block['subject'] = t('My Reviews');
-          $block['content'] = theme_sopac_review_block('personal');
+          $block['content'] = theme('sopac_review_block', 'personal');
           break;
       }
 
