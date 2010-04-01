@@ -82,6 +82,7 @@ function sopac_catalog_search() {
     if (count($getvars['facet_year'])) { $facet_args['facet_year'] = $getvars['facet_year']; }
     if (count($getvars['facet_decade'])) { $facet_args['facet_decade'] = $getvars['facet_decade']; }
     if (count($getvars['age'])) { $facet_args['age'] = $getvars['age']; }
+    if (count($getvars['facet_subject'])) { $facet_args['facet_subject'] = $getvars['facet_subject']; }
 
     // Get the search results from Locum
     $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args, FALSE, $limit_avail);
@@ -249,6 +250,7 @@ function sopac_search_block($locum_results_all, $locum_cfg) {
   $search['year'] = count($getvars['facet_year']) ? $getvars['facet_year'] : array();
   $search['decade'] = count($getvars['facet_decade']) ? $getvars['facet_decade'] : array();
   $search['age'] = count($getvars['age']) ? $getvars['age'] : array();
+  $search['subject'] = count($getvars['facet_subject']) ? $getvars['facet_subject'] : array();
 
   return theme('sopac_search_block', $search, $locum_results_all, $locum_cfg, $user);
 
