@@ -295,12 +295,11 @@ function sopac_user_tag_hitlist() {
   $actions = sopac_parse_uri();
   $tag = $actions[2];
 
-  $result_body = '<div class="overview-title">'.t('Items tagged with "') . $tag . '"</div><br />';
   $bnum_arr = $insurge->get_tagged_items($user->uid, $tag, $page_limit, $offset);
   sopac_pager_init($bnum_arr['total'], 0, $page_limit);
   $pager_body = theme('pager', NULL, $page_limit, 0, NULL, 6);
-  $result_body .= $pager_body . '<br />';
   $hitnum = $page_offset + 1;
+  $result_body = '';
   foreach ($bnum_arr['bnums'] as $bnum) {
     $locum_result = $locum->get_bib_item($bnum);
     
@@ -317,7 +316,7 @@ function sopac_user_tag_hitlist() {
     $result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum->locum_config, $no_circ);
     $hitnum++;
   }
-  $result_body .= $pager_body;
+  $result_body = theme('sopac_user_tag_hitlist', $tag, $pager_body, $result_body);
     
   return $result_body;
 }

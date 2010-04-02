@@ -505,6 +505,10 @@ function sopac_theme() {
       'template' => 'sopac-tags-page',
       'arguments' => array('tags_arr' => NULL),
     ),
+    'sopac_user_tag_hitlist' => array(
+      'template' => 'sopac-user-tag-hitlist',
+      'arguments' => array('tag' => NULL, 'pager_body' => NULL, 'result_body' => NULL),
+    ),
     'sopac_tag_block' => array(
       'arguments' => array('block_type' => NULL),
     ),
