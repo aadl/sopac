@@ -375,6 +375,7 @@ function sopac_menu() {
   $items['user/tag/show'] = array(
     'title' => 'Tagged Items',
     'page callback' => 'sopac_user_tag_hitlist',
+    'page arguments' => array(3),
     'access arguments' => array('access user pages'),
     'file' => 'sopac_social.php',
     'type' => MENU_CALLBACK,

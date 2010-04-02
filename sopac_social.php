@@ -277,7 +277,7 @@ function sopac_user_tag_delete_submit($form, &$form_state) {
   }
 }
 
-function sopac_user_tag_hitlist() {
+function sopac_user_tag_hitlist($tag) {
   global $user;
   
   require_once('sopac_catalog.php');
@@ -287,9 +287,6 @@ function sopac_user_tag_hitlist() {
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
   $offset = ($page_limit * $page);
   $no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
-  $actions = sopac_parse_uri();
-  $tag = $actions[2];
-
   $bnum_arr = $insurge->get_tagged_items($user->uid, $tag, $page_limit, $offset);
   sopac_pager_init($bnum_arr['total'], 0, $page_limit);
   $pager_body = theme('pager', NULL, $page_limit, 0, NULL, 6);
