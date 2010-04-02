@@ -140,11 +140,6 @@ function theme_sopac_tag_block($block_type) {
       $uri_arr = sopac_parse_uri();
       $bnum = $uri_arr[1];
       $bnum_arr[] = $bnum;
-      if ($_POST['tag_submit'] == '1' && $user->uid && $bnum) {
-        if (trim($_POST['tags'])) {
-          $insurge->submit_tags($user->uid, $bnum, trim($_POST['tags']));
-        }
-      }
       if ($_GET['deltag'] && $bnum && $user->uid) {
         $insurge->delete_user_tag($user->uid, $_GET['deltag'], $bnum);
         $new_link = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $_GET[q];
@@ -344,11 +339,35 @@ function sopac_tag_form() {
     '#value' => t('Add Tags'),
     '#attributes' => array('class' => 'tagsubmit'),
   );
-  $form['tagform']['tag_submit'] = array(
-    '#type' => 'hidden',
-    '#value' => 1,
-  );
+	$form['tagform']['bnum'] = array(
+		'#type' => 'hidden',
+		'#default_value' => 0,
+	);
   return $form;
+}
+
+function sopac_tag_form_validate($form, &$form_state) {
+	global $user;
+	if (!$user->uid) {
+		form_set_error('tags', t('Please log in to add tags.'));
+		return;
+	}
+	$bnum = $form_state['values']['bnum'];
+	if (!$bnum || !is_numeric($bnum)) {
+		form_set_error('tags', t('We\'re sorry, but we cannot determine which item you\'re trying to add a tag to. Please try again.'));
+		return;
+	}
+	if (!trim($form_state['values']['tags'])) {
+		form_set_error('tags', t('Please enter the tag(s) you wish to add to this item.'));
+		return;
+	}
+}
+
+function sopac_tag_form_submit($form, &$form_state) {
+	global $user;
+	$bnum = $form_state['values']['bnum'];
+	$insurge = new insurge_client();
+	$insurge->submit_tags($user->uid, $bnum, trim($form_state['values']['tags']));
 }
 
 function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $max_size = 24, $wraplength = 19) {
