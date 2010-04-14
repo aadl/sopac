@@ -24,6 +24,13 @@ function sopac_admin() {
     '#collapsed' => TRUE,
   );
   
+  $form['sopac_general']['sopac_ils'] = array(
+    '#type' => 'select',
+    '#title' => t('Your ILS name'),
+    '#default_value' => variable_get('sopac_ils', 'iii'),
+    '#options' => array('iii' => 'iii', 'koha' => 'koha', 'sirsi' => 'sirsi'),
+  );
+  
   $form['sopac_general']['sopac_lib_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Your Institution\'s name'),
