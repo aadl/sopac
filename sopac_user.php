@@ -40,7 +40,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 
   // Patron holds (bottom of the page)
   if ($account->valid_card && $account->bcode_verify) {
-    $holds_table = sopac_user_holds_table($account, $locum);
+    $holds_table = drupal_get_form('sopac_user_holds_form');
     if ($holds_table) {
       $result['patronholds']['#title'] = t('Requested Items');
       $result['patronholds']['#weight'] = 3;
@@ -216,90 +216,271 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 }
 
 /**
- * Returns a Drupal-themed table of on-hold items as well as the renewal form functionality.
+ * Use form API to creat holds table
  *
- * @param object $account Drupal user object for account being viewed
- * @param object $locum Instansiated Locum object
- * @return string Drupal themed table
+ * @return string
  */
-function sopac_user_holds_table(&$account, &$locum) {
+function sopac_user_holds_form() {
+  global $user;
+  $form = array();
+  $form['#redirect'] = $_GET['q'];
   
-  // Process any holds deletions that have been submitted
+  $cardnum = $user->profile_pref_cardnum;
+  $ils_pass = $user->locum_pass;
+  $locum = new locum_client();
+  $holds = $locum->get_patron_holds($cardnum, $ils_pass);
+  
+  if (!count($holds)) {
+    $form['empty'] = array(
+      '#type' => 'markup',
+      '#value' => t('No items on hold.'),
+    );
+    return $form;
+  }
+  
+  $ils = variable_get('sopac_ils', 'iii');
+  if ($ils == 'sirsi') {
+  	return _sopac_user_holds_form_sirsi($holds);
+  }
+  
+  $form['#theme'] = 'form_theme_bridge';
+  $form['#bridge_to_theme'] = 'sopac_user_holds_list';
+  
+  $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
   $freezes_enabled = variable_get('sopac_hold_freezes_enable', 1);
-  $submit_value = $freezes_enabled ? 'Update Holds' : 'Cancel Selected Holds';
-  $update_holds = FALSE;
-
-  if ($account->profile_pref_cardnum) {
-    $cardnum = $account->profile_pref_cardnum;
-    $holds = $locum->get_patron_holds($cardnum, $account->locum_pass);
-    
-    if ($_POST['sub_type'] == $submit_value) {
-      
-      // Queue up cancellations
-      $cancel_arr = array();
-      if (count($_POST['cancel'])) {
-        $cancel_arr = $_POST['cancel'];
-        $update_holds = TRUE;
-      }
-      
-      // Queue up freezes
-      $freeze_arr = array();
-      foreach ($holds as $hold) {
-        if (isset($_POST['freeze'][$hold['bnum']])) {
-          $freeze_arr[$hold['bnum']] = 1;
-          $update_holds = TRUE;
-        } else if ($hold['is_frozen'] == 1) {
-          $freeze_arr[$hold['bnum']] = 0;
-          $update_holds = TRUE;
-        }
-      }
-      
-      if ($update_holds) {
-        $locum->update_holds($cardnum, $account->locum_pass, $cancel_arr, $freeze_arr, NULL);
-        $holds = $locum->get_patron_holds($cardnum, $account->locum_pass);
-      }
-    }
-    
-    if (!count($holds)) { return t('No items on hold.'); }
+  
+  $holds_list = array(
+    '#iterable' => TRUE,
+  );
+  foreach ($holds as $hold) {
+    $bnum = $hold['bnum'];
+    $hold_to_theme = array();
     
     if ($freezes_enabled) {
-      $header = array('Delete', 'Title', 'Status', 'Pickup Location', 'Freeze');
-    }
-    else {
-      $header = array('', 'Title', 'Status', 'Pickup Location');
-    }
-    
-    $rows = array();
-    foreach ($holds as $hold) {
-      $hold_pickup_loc = $hold['pickuploc']['options'][$hold['pickuploc']['selected']];
-
-      if ($hold['can_freeze']) {
-        $freezer = 
-        '<input type="checkbox" name="freeze[' . $hold['bnum'] . ']" value="1"' . (($hold['is_frozen']) ? 'checked=checked' : '') . '>';
-      } else {
-        $freezer = '&nbsp;';
-      }
-      
-      $row = array(
-        '<input type="checkbox" name="cancel[' . $hold['bnum'] . ']" value="1">',
-        '<a href="/catalog/record/' . $hold['bnum'] . '">' . $hold['title'] . '</a>',
-        $hold['status'],
-        $hold_pickup_loc,
+      $hold_to_theme['cancel__' . $bnum] = array(
+        '#type' => 'checkbox',
+        '#default_value' => FALSE,
       );
-      
-      if ($freezes_enabled) {
-        $row[] = $freezer;
+    }
+    $hold_to_theme['title_link'] = array(
+      '#type' => 'markup',
+      '#value' => l(t($hold['title']), $sopac_prefix . $bnum),
+    );
+    $hold_to_theme['status'] = array(
+      '#type' => 'markup',
+      '#value' => $hold['status']
+    );
+    $hold_to_theme['pickup'] = array(
+      '#type' => 'markup',
+      '#value' => $hold['pickuploc']['options'][$hold['pickuploc']['selected']],
+    );
+    if ($freezes_enabled) {
+      if ($hold['can_freeze']) {
+        $hold_to_theme['freeze__' . $bnum] = array(
+          '#type' => 'checkbox',
+          '#default_value' => $hold['is_frozen'],
+        );
       }
-      $rows[] = $row;
+      else {
+        $hold_to_theme['freeze'] = array(
+          '#type' => 'markup',
+          '#value' => '&nbsp;'
+        );
+      }
     }
     
-    $submit_button = '<input type="submit" name="sub_type" value="' . $submit_value . '">';
-    $rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => $freezes_enabled ? 5 : 4)), 'class' => 'profile_button' );
-  } else {
-    return FALSE;
+    $holds_list[] = $hold_to_theme;
   }
-  $content = '<form method="post">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . '</form>';
-  return $content;
+  
+  $form['holds'] = $holds_list;
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#name' => 'op',
+    '#value' => $freezes_enabled ? t('Update Holds') : t('Cancel Selected Holds'),
+  );
+  
+  return $form;
+}
+
+/**
+ * Validate request to change holds.
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function sopac_user_holds_form_validate(&$form, &$form_state) {
+  global $user;
+  // Set defaults to avoid errors when debugging.
+  $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
+  form_theme_bridge_clean_submitted_values($form_state, 'base');
+  
+  // Get holds.
+  $cardnum = $user->profile_pref_cardnum;
+  $password = $user->locum_pass;
+  $locum = new locum_client();
+  $holds = $locum->get_patron_holds($cardnum, $password);
+  // Should be how it comes back from locum
+  $holds_by_bnum = array();
+  foreach ($holds as $hold) {
+    $holds_by_bnum[$hold['bnum']] = $hold;
+  }
+  
+  $update_holds = FALSE;
+  
+  $cancellations = array();
+  foreach ($form_state['values']['cancel'] as $bnum => $cancel_requested) {
+    if ($cancel_requested) {
+    	$cancellations[$bnum] = $cancel_requested;
+    	$update_holds = TRUE;
+    }
+  }
+  
+  $freeze_changes = array();
+  foreach ($form_state['values']['freeze'] as $bnum => $freeze_requested) {
+		if ($freeze_requested != $holds_by_bnum[$bnum]['is_frozen']) {
+		  $freeze_changes[$bnum] = $freeze_requested;
+		  $update_holds = TRUE;
+		}
+  }
+  
+  // Currently only sirsi allows changing pickup location, and suspend dates as part of holds.
+  $ils = variable_get('sopac_ils', 'iii');
+  $update_sirsi_holds = $update_holds;
+  if ($ils == 'sirsi') {
+    $pickup_changes = array();
+    foreach ($form_state['values']['pickup'] as $bnum => $pickup_location) {
+  		if ($pickup_location != $holds_by_bnum[$bnum]['pickuploc']['selected']) {
+  		  $pickup_changes[$bnum] = $pickup_location;
+  		  $update_sirsi_holds = TRUE;
+  		}
+    }
+    
+    $suspend_from_changes = array();
+    foreach ($form_state['values']['suspend_from'] as $bnum => $suspend_from_location) {
+  		if ($suspend_from_location != $holds_by_bnum[$bnum]['start_suspend']) {
+  		  $suspend_from_changes[$bnum] = $suspend_from_location;
+  		  $update_sirsi_holds = TRUE;
+  		}
+    }
+    
+    $suspend_to_changes = array();
+    foreach ($form_state['values']['suspend_to'] as $bnum => $suspend_to_location) {
+  		if ($suspend_to_location != $holds_by_bnum[$bnum]['end_suspend']) {
+  		  $suspend_to_changes[$bnum] = $suspend_to_location;
+  		  $update_sirsi_holds = TRUE;
+  		}
+    }
+  }
+  
+  if ( ($ils != 'sirsi' && !$update_holds) || ($ils == 'sirsi' && !$update_sirsi_holds)) {
+  	form_set_error('', 'Your request to ' . $form['submit']['#value'] . ' did not include any changes.');
+  	drupal_goto($form['#redirect']);
+  }
+  // Store data for use by submit function.
+  else {
+  	$form_state['sopac_user_holds'] = array(
+  	 'cancellations' => $cancellations,
+  	 'freeze_changes' => $freeze_changes,
+  	 'pickup_changes' => $pickup_changes,
+  	 'suspend_from_changes' => $suspend_from_changes,
+  	 'suspend_to_changes' => $suspend_to_changes,
+  	);
+  }
+}
+
+/**
+ * Pass locum validated request to update holds.
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function sopac_user_holds_form_submit(&$form, &$form_state) {
+  global $user;
+  $cardnum = $user->profile_pref_cardnum;
+  $password = $user->locum_pass;
+  $cancellations = $form_state['sopac_user_holds']['cancellations'];
+  $freeze_changes = $form_state['sopac_user_holds']['freeze_changes'];
+  $pickup_changes = $form_state['sopac_user_holds']['pickup_changes'];
+  $suspend_changes = array(
+    'from' => $form_state['sopac_user_holds']['suspend_from_changes'],
+    'to' => $form_state['sopac_user_holds']['suspend_to_changes'],
+  );
+  $locum = new locum_client();
+  $locum->update_holds($cardnum, $password, $cancellations, $freeze_changes, $pickup_changes, $suspend_changes);
+}
+
+/**
+ * Fork to allow support for changing hold pickup location, and suspend dates in sirsi. Not
+ * currently supported by III. Hopefully, this will change in future. Also uses different 
+ * theme tpl since extra options require different layout.
+ *
+ * @param array $holds
+ * @return array
+ */
+function _sopac_user_holds_form_sirsi($holds) {
+  // <CraftySpace+> TODO: do we need to check for multi-branch, else no pickup location?
+  $form = array(
+    '#redirect' => $_GET['q'],
+    '#theme' => 'form_theme_bridge',
+    '#bridge_to_theme' => 'sopac_user_holds_list_sirsi',
+  );
+  
+  $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
+  $holds_list = array(
+    '#iterable' => TRUE,
+  );
+  foreach ($holds as $hold) {
+    $bnum = $hold['bnum'];
+    $hold_to_theme = array();
+    
+    $hold_to_theme['cancel__' . $bnum] = array(
+      '#type' => 'checkbox',
+      '#default_value' => FALSE,
+    );
+    $hold_to_theme['title_link'] = array(
+      '#type' => 'markup',
+      '#value' => l(t($hold['title']), $sopac_prefix . $bnum),
+    );
+    $hold_to_theme['status'] = array(
+      '#type' => 'markup',
+      '#value' => $hold['status']
+    );
+    $hold_to_theme['pickup__' . $bnum] = array(
+      '#type' => 'select',
+      '#options' => sopac_get_branch_options(),
+      '#default_value' => $hold['pickuploc']['selected'],
+    );
+    $hold_to_theme['freeze__' . $bnum] = array(
+      '#type' => 'radios',
+      '#default_value' => $hold['is_frozen'],
+      '#options' => array(0 => t('Active'), 1 => t('Inactive')),
+    );
+    $hold_to_theme['suspend_from__' . $bnum] = array(
+      '#type' => 'textfield',
+      '#title' => 'From',
+      '#default_value' => $hold['start_suspend'],
+      '#attributes' => array('maxlength' => '10', 'size' => '15'),
+    );
+    $hold_to_theme['suspend_to__' . $bnum] = array(
+      '#type' => 'textfield',
+      '#title' => 'To',
+      '#default_value' => $hold['end_suspend'],
+      '#attributes' => array('maxlength' => '10', 'size' => '15'),
+    );
+    
+    $holds_list[$bnum] = $hold_to_theme;
+  }
+  
+  $form['holds'] = $holds_list;
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#name' => 'op',
+    '#value' => t('Update Holds'),
+  );
+  
+  return $form;
 }
 
 /**
@@ -466,7 +647,7 @@ function sopac_holds_page() {
   profile_load_profile(&$user);
   
   if ($account->valid_card && $bcode_verify) {
-    $content = sopac_user_holds_table(&$user, &$locum);
+    $content = drupal_get_form('sopac_user_holds_form');
   } else if ($account->valid_card && !$bcode_verify) {
     $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
   } else if ($cardnum && !$account->valid_card) {

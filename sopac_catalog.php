@@ -439,22 +439,14 @@ function sopac_request_item() {
   $button_txt = t('Request Selected Item');
   profile_load_profile(&$user);
   if ($user->uid && sopac_bcode_isverified(&$user)) {
-    if ($_POST['sub_type'] == $button_txt) {
-      if ($_POST['varname']) {
-        $varname = $_POST['varname'];
-      } else {
-        $request_error_msg = t('You need to select an item to request.');
-      }
-    }
-    
     // support multi-branch & user home branch
     $actions = sopac_parse_uri();
     $bnum = $actions[1];
     $pickup_arg = $actions[2] ? $actions[2] : NULL;
-      $pickup_name = $actions[3] ? $actions[3] : NULL;
-      $locum = new locum_client;
-      $bib_item = $locum->get_bib_item($bnum);
-      $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
+    $pickup_name = $actions[3] ? $actions[3] : NULL;
+    $locum = new locum_client;
+    $bib_item = $locum->get_bib_item($bnum);
+    $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
     
     if ($hold_result['success']) {
       // handling multi-branch scenario

@@ -522,7 +522,34 @@ function sopac_theme() {
     'sopac_get_rating_stars' => array(
       'arguments' => array('bnum' => NULL, 'rating' => NULL, 'show_label' => TRUE, 'post_redirect' => FALSE, 'id' => 'default'),
     ),
+    'sopac_user_holds_list' => array(
+      'template' => 'sopac-user-holds-list',
+      'arguments' => array('data' => array()),
+    ),
+    'sopac_user_holds_list_sirsi' => array(
+      'template' => 'sopac-user-holds-list-sirsi',
+      'arguments' => array('data' => array()),
+    ),
   );
+}
+
+/**
+ * Preprocess function (apparently needs to be in module page so found by theme register)
+ *
+ * @param array $variables
+ */
+function sopac_preprocess_sopac_user_holds_list(&$variables) {
+  $variables['freezes_enabled'] = variable_get('sopac_hold_freezes_enable', 1);
+  form_theme_bridge_parse_data_for_layout($variables);
+}
+
+/**
+ * Preprocess function (apparently needs to be in module page so found by theme register)
+ *
+ * @param array $variables
+ */
+function sopac_preprocess_sopac_user_holds_list_sirsi(&$variables) {
+  form_theme_bridge_parse_data_for_layout($variables);
 }
 
 /**
@@ -856,4 +883,3 @@ function sopac_cron() {
   }
   menu_rebuild();
 }
-
