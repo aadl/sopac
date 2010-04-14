@@ -1,0 +1,4 @@
+; $Id$
+name = Form Theme Bridge
+description = Enable handing rendered, but separate form api elements to theming system for layout.
+core = 6.x
