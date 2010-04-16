@@ -338,6 +338,9 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   
   $freeze_changes = array();
   foreach ($form_state['values']['freeze'] as $bnum => $freeze_requested) {
+    if (array_key_exists($bnum, $cancellations)) {
+    	continue;
+    }
 		if ($freeze_requested != $holds_by_bnum[$bnum]['is_frozen']) {
 		  $freeze_changes[$bnum] = $freeze_requested;
 		  $update_holds = TRUE;
@@ -350,32 +353,77 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   if ($ils == 'sirsi') {
     $pickup_changes = array();
     foreach ($form_state['values']['pickup'] as $bnum => $pickup_location) {
+      if (array_key_exists($bnum, $cancellations)) {
+      	continue;
+      }
   		if ($pickup_location != $holds_by_bnum[$bnum]['pickuploc']['selected']) {
   		  $pickup_changes[$bnum] = $pickup_location;
   		  $update_sirsi_holds = TRUE;
   		}
     }
     
+    // Set up time object for use in validating suspension dates
+    $locum = sopac_get_locum();
+    $sClosedByTimezone = $locum->locum_config['harvest_config']['timezone'];
+    $date_object = new DateTime(now, new DateTimeZone($sClosedByTimezone));
+    
     $suspend_from_changes = array();
-    foreach ($form_state['values']['suspend_from'] as $bnum => $suspend_from_location) {
-  		if ($suspend_from_location != $holds_by_bnum[$bnum]['start_suspend']) {
-  		  $suspend_from_changes[$bnum] = $suspend_from_location;
+    foreach ($form_state['values']['suspend_from'] as $bnum => $suspend_from) {
+      if (array_key_exists($bnum, $cancellations)) {
+      	continue;
+      }
+      // Catch unchanged default.
+      if ($suspend_from == 'mm/dd/yyyy') {
+      	continue;
+      }
+      // Make sure it's a date.
+      if (!preg_match('/([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/20[1-9][0-9]/', $suspend_from)) {
+      	form_set_error('suspend_from__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yy).'));
+      	continue;
+      }
+  		if ($suspend_from != $holds_by_bnum[$bnum]['start_suspend']) {
+  		  $suspend_from_changes[$bnum] = $suspend_from;
   		  $update_sirsi_holds = TRUE;
   		}
     }
     
     $suspend_to_changes = array();
-    foreach ($form_state['values']['suspend_to'] as $bnum => $suspend_to_location) {
-  		if ($suspend_to_location != $holds_by_bnum[$bnum]['end_suspend']) {
-  		  $suspend_to_changes[$bnum] = $suspend_to_location;
+    foreach ($form_state['values']['suspend_to'] as $bnum => $suspend_to) {
+      if (array_key_exists($bnum, $cancellations)) {
+      	continue;
+      }
+      // Catch unchanged default.
+      if ($suspend_to == 'mm/dd/yyyy') {
+      	continue;
+      }
+      // Make sure it's a date.
+      if (!preg_match('/([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/20[1-9][0-9]/', $suspend_to)) {
+      	form_set_error('suspend_to__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yy).'));
+      	continue;
+      }
+  		if ($suspend_to != $holds_by_bnum[$bnum]['end_suspend']) {
+  		  $suspend_to_changes[$bnum] = $suspend_to;
   		  $update_sirsi_holds = TRUE;
+  		}
+  		if (!$form_state['values']['suspend_from'][$bnum]) {
+  			form_set_error('suspend_to__' . $bnum, t('You cannot set a suspend to date without a corresponding suspend from date.'));
+  		}
+  		else {
+        $date_parts = explode('/', $form_state['values']['suspend_from'][$bnum]);
+        $date_object->setDate($date_parts[2], $date_parts[0], $date_parts[1]);
+        $from_date = $date_object->format('Ymd');
+        $date_parts = explode('/', $suspend_to);
+        $date_object->setDate($date_parts[2], $date_parts[0], $date_parts[1]);
+        $to_date = $date_object->format('Ymd');
+        if ($to_date < $from_date) {
+        	form_set_error('suspend_to__' . $bnum, t('A suspend to date cannot be before the corresponding suspend from date.'));
+        }
   		}
     }
   }
   
   if ( ($ils != 'sirsi' && !$update_holds) || ($ils == 'sirsi' && !$update_sirsi_holds)) {
   	form_set_error('', 'Your request to ' . $form['submit']['#value'] . ' did not include any changes.');
-  	drupal_goto($form['#redirect']);
   }
   // Store data for use by submit function.
   else {
@@ -459,13 +507,13 @@ function _sopac_user_holds_form_sirsi($holds) {
     $hold_to_theme['suspend_from__' . $bnum] = array(
       '#type' => 'textfield',
       '#title' => 'From',
-      '#default_value' => $hold['start_suspend'],
+      '#default_value' => $hold['start_suspend'] ? $hold['start_suspend'] : 'mm/dd/yyyy',
       '#attributes' => array('maxlength' => '10', 'size' => '15'),
     );
     $hold_to_theme['suspend_to__' . $bnum] = array(
       '#type' => 'textfield',
       '#title' => 'To',
-      '#default_value' => $hold['end_suspend'],
+      '#default_value' => $hold['end_suspend'] ? $hold['end_suspend'] : 'mm/dd/yyyy',
       '#attributes' => array('maxlength' => '10', 'size' => '15'),
     );
     
