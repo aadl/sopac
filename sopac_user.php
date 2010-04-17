@@ -13,7 +13,7 @@
  * This is a sub-function of the hook_user "view" operation.
  */
 function sopac_user_view($op, &$edit, &$account, $category = NULL) {
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   // SOPAC uses the first 7 characters of the MD5 hash instead of caching the user's password
   // like it used to do.  It's more secure this way, IMHO.
   $account->locum_pass = substr($account->pass, 0, 7);
@@ -227,7 +227,7 @@ function sopac_user_holds_form() {
   
   $cardnum = $user->profile_pref_cardnum;
   $ils_pass = $user->locum_pass;
-  $locum = new locum_client();
+  $locum = sopac_get_locum();
   $holds = $locum->get_patron_holds($cardnum, $ils_pass);
   
   if (!count($holds)) {
@@ -318,7 +318,7 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   // Get holds.
   $cardnum = $user->profile_pref_cardnum;
   $password = $user->locum_pass;
-  $locum = new locum_client();
+  $locum = sopac_get_locum();
   $holds = $locum->get_patron_holds($cardnum, $password);
   // Should be how it comes back from locum
   $holds_by_bnum = array();
@@ -454,7 +454,7 @@ function sopac_user_holds_form_submit(&$form, &$form_state) {
     'from' => $form_state['sopac_user_holds']['suspend_from_changes'],
     'to' => $form_state['sopac_user_holds']['suspend_to_changes'],
   );
-  $locum = new locum_client();
+  $locum = sopac_get_locum();
   $locum->update_holds($cardnum, $password, $cancellations, $freeze_changes, $pickup_changes, $suspend_changes);
 }
 
@@ -539,7 +539,7 @@ function sopac_checkouts_page() {
   
   $account = user_load($user->uid);
   $cardnum = $account->profile_pref_cardnum;
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $userinfo = $locum->get_patron_info($cardnum);
   $bcode_verify = sopac_bcode_isverified($account);
   if ($bcode_verify) { $account->bcode_verify = TRUE; } else { $account->bcode_verify = FALSE; }
@@ -583,7 +583,7 @@ function sopac_checkout_history_page() {
     // Set up our data sets
     $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
     $insurge = new insurge_client();
-    $locum = new locum_client();
+    $locum = sopac_get_locum();
     $locum_pass = substr($user->pass, 0, 7);
     $cardnum = $user->profile_pref_cardnum;
     $last_checkout_result = $insurge->get_checkout_history($user->uid, 1);
@@ -664,7 +664,7 @@ function sopac_checkout_history_toggle($action) {
       }
     }
     else {
-      $locum = new locum_client();
+      $locum = sopac_get_locum();
       $locum_pass = substr($user->pass, 0, 7);
       $cardnum = $user->profile_pref_cardnum;
       $success = $locum->set_patron_checkout_history($cardnum, $locum_pass, $action);
@@ -687,7 +687,7 @@ function sopac_holds_page() {
   
   $account = user_load($user->uid);
   $cardnum = $account->profile_pref_cardnum;
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $userinfo = $locum->get_patron_info($cardnum);
   $bcode_verify = sopac_bcode_isverified($account);
   if ($bcode_verify) { $account->bcode_verify = TRUE; } else { $account->bcode_verify = FALSE; }
@@ -715,7 +715,7 @@ function sopac_holds_page() {
 function sopac_fines_page() {
   global $user;
 
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   profile_load_profile(&$user);
 
   if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
@@ -791,7 +791,7 @@ function sopac_finespaid_page() {
 function sopac_makepayment_page() {
   global $user;
 
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   profile_load_profile(&$user);
 
   if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
@@ -951,7 +951,7 @@ function sopac_fine_payment_form() {
 
 function sopac_fine_payment_form_submit($form, &$form_state) {
   global $user;
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   profile_load_profile(&$user);
   $locum_pass = substr($user->pass, 0, 7);
 
@@ -1080,7 +1080,7 @@ function sopac_savesearch_form_submit($form, &$form_state) {
 
 function sopac_update_locum_acct($op, &$edit, &$account) {
   
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   
   // Make sure we're all legit on this account
   $cardnum = $account->profile_pref_cardnum;
@@ -1168,7 +1168,7 @@ function sopac_bcode_verify_form() {
 function sopac_bcode_verify_form_validate($form, $form_state) {
   global $account;
   
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $cardnum = $form_state['values']['cardnum'];
   $uid = $form_state['values']['uid'];
   $userinfo = $locum->get_patron_info($cardnum);

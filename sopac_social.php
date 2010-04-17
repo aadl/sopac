@@ -17,7 +17,7 @@ function sopac_personal_overview_page() {
   $num_ratings = 5; // TODO make these all configurable.
   
   $insurge = new insurge_client;
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
 
   // Pull together the reviews
   $reviews = $insurge->get_reviews($user->uid, NULL, NULL, $num_reviews);
@@ -75,7 +75,7 @@ function sopac_ratings_page() {
   global $user;
   
   $insurge = new insurge_client;
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $page_limit = 15; // TODO make this configurable
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
   $offset = ($page_limit * $page);
@@ -281,7 +281,7 @@ function sopac_user_tag_hitlist($tag) {
   global $user;
   
   require_once('sopac_catalog.php');
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $insurge = new insurge_client;
   $page_limit = variable_get('sopac_results_per_page', 20);
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
@@ -405,7 +405,7 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
 function sopac_review_page($page_type) {
   global $user;
 
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $insurge = new insurge_client;
   $page_limit = 5; // TODO make this configurable
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
@@ -587,7 +587,7 @@ function theme_sopac_review_block($block_type) {
 
   // get_reviews($uid = NULL, $bnum_arr = NULL, $rev_id_arr = NULL, $limit = 10, $offset = 0, $order = 'ORDER BY rev_create_date DESC')
   $insurge = new insurge_client;
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   switch ($block_type) {
     case 'personal':
       $reviews = $insurge->get_reviews($user->uid, NULL, NULL, $max_shown);

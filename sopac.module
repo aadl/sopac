@@ -28,14 +28,6 @@ function sopac_init() {
     if ($new_link) { header("Location: $new_link"); }
   }
   
-  // Grab the Locum path from config and load it
-  $locum_path = trim(variable_get('sopac_locum_path', '/usr/local/lib/locum'));
-  if ($locum_path[0] != '/') { $locum_path = '/' . $locum_path; }
-  if (substr($locum_path, -1) != '/') { $locum_path .= '/'; }
-  if (@file_exists($locum_path . 'locum-client.php')) {
-    @require_once($locum_path . 'locum-client.php');
-  }
-  
   // Grab the Insurge path from config and load it
   
   $insurge_path = trim(variable_get('sopac_insurge_path', '/usr/local/lib/insurge'));
@@ -618,7 +610,7 @@ function sopac_search_form($form_type = 'both') {
  * in template.php.
  */
 function theme_sopac_search_handler() {
-  $locum = new locum();
+  $locum = sopac_get_locum('locum');
   $locum_cfg = $locum->locum_config;
 
   $search_query = trim($_POST['search_query']);
@@ -875,6 +867,12 @@ function sopac_user_block_disp_query() {
   return FALSE;
 }
 
+function sopac_get_branch_options() {
+	$locum = sopac_get_locum();
+	$branches = $locum->locum_config['branches'];
+	return $branches;
+}
+
 function sopac_cron() {
   // Part of supporting user home branch in multibranch situation
   if (variable_get('sopac_home_branch_enable', FALSE) && !variable_get('sopac_home_selector_options', FALSE)) {
@@ -882,4 +880,30 @@ function sopac_cron() {
     sopac_setup_user_home_selector();
   }
   menu_rebuild();
+}
+
+/**
+ * Return an object which is a locum
+ * 
+ * @param string $type
+ * @param Boolean $refresh
+ * @return object
+ */
+function sopac_get_locum($type = 'client', $refresh = FALSE) {
+  static $instances = array();
+  
+  $new_type = !array_key_exists($type, $instances);
+  if ($new_type) {
+    $path = trim(variable_get('sopac_locum_path', '/usr/local/lib/locum'));
+    if ($path[0] != '/') {$path = '/' . $path;}
+    if (substr($path, -1) != '/') {$path .= '/';}
+    $path .= $type == 'locum' ? '' : 'locum-';
+    include_once($path . $type . '.php');
+  }
+  if ($new_type || $refresh) {
+    $class_name = $type == 'locum' ? '' : 'locum_';
+    $class_name .= $type;
+    $instances[$type] = new $class_name();
+  }
+  return $instances[$type];
 }

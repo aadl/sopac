@@ -27,7 +27,7 @@ function sopac_catalog_search() {
 
   $getvars = sopac_parse_get_vars();
   $actions = sopac_parse_uri();
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $locum_cfg = $locum->locum_config;
   $no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
   $valid_search_types = array('title', 'author', 'keyword', 'subject', 'series', 'callnum', 'tags', 'reviews'); // TODO handle this more dynamically
@@ -181,7 +181,7 @@ function sopac_catalog_search() {
 function sopac_bib_record() {
   global $user;
   
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $insurge = new insurge_client;
   $actions = sopac_parse_uri();
   $bnum = $actions[1];
@@ -348,7 +348,7 @@ function sopac_put_request_link($bnum) {
  */
 function sopac_multibranch_hold_request(&$form_state, $bnum = null) {
   global $user;
-  $locum = new locum();
+  $locum = sopac_get_locum('locum');
   $locum_cfg = $locum->locum_config;
   $options = $locum_cfg['branches'];
   
@@ -444,7 +444,7 @@ function sopac_request_item() {
     $bnum = $actions[1];
     $pickup_arg = $actions[2] ? $actions[2] : NULL;
     $pickup_name = $actions[3] ? $actions[3] : NULL;
-    $locum = new locum_client;
+    $locum = sopac_get_locum();
     $bib_item = $locum->get_bib_item($bnum);
     $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
     
@@ -522,7 +522,7 @@ function sopac_savesearch_url() {
  */
 function sopac_search_form_basic() {
 
-  $locum = new locum();
+  $locum = sopac_get_locum('locum');
   $locum_cfg = $locum->locum_config;
   $getvars = sopac_parse_get_vars();
 
@@ -625,7 +625,7 @@ function sopac_search_form_basic() {
  */
 function sopac_search_form_adv() {
   
-  $locum = new locum();
+  $locum = sopac_get_locum('locum');
   $locum_cfg = $locum->locum_config;
   $getvars = sopac_parse_get_vars();
 

@@ -361,7 +361,7 @@ function sopac_setup_user_home_selector() {
   if (!variable_get('sopac_home_branch_enable', 0) || variable_get('sopac_home_selector_options', FALSE)) {
     return FALSE;
   }
-  $locum = new locum_client;
+  $locum = sopac_get_locum();
   $branches = $locum->locum_config['branches'];
   if (!(is_array($branches) && count($branches))) {
   	return FALSE;
