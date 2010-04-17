@@ -182,7 +182,7 @@ function sopac_bib_record() {
   global $user;
   
   $locum = sopac_get_locum();
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $actions = sopac_parse_uri();
   $bnum = $actions[1];
   

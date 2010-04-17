@@ -16,7 +16,7 @@ function sopac_personal_overview_page() {
   $num_reviews = 3;
   $num_ratings = 5; // TODO make these all configurable.
   
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $locum = sopac_get_locum();
 
   // Pull together the reviews
@@ -74,7 +74,7 @@ function sopac_personal_overview_page() {
 function sopac_ratings_page() {
   global $user;
   
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $locum = sopac_get_locum();
   $page_limit = 15; // TODO make this configurable
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
@@ -97,7 +97,7 @@ function sopac_ratings_page() {
 function sopac_tags_page_cloud() {
   global $user;
   
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, TRUE, NULL);
   foreach ($tag_arr as $tag_pair) {
     $tags[$tag_pair['tag']] = $tag_pair['count'];
@@ -113,7 +113,7 @@ function sopac_tags_page_cloud() {
 function sopac_tags_page_list() {
   global $user;
   
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $tags_res = $insurge->get_tag_totals($user->uid, NULL, NULL, FALSE, NULL, NULL, 'ORDER BY tag ASC');
   foreach ($tags_res as $tag_arr) {
     $tags[$tag_arr['tag'][0]][$tag_arr['tag']] = $tag_arr['count'];
@@ -130,7 +130,7 @@ function sopac_tags_page_list() {
 function theme_sopac_tag_block($block_type) {
   global $user;
 
-  $insurge = new insurge_client();
+  $insurge = sopac_get_insurge();
   
   switch($block_type) {
     case 'overview':
@@ -224,7 +224,7 @@ function sopac_user_tag_edit() {
 function sopac_user_tag_edit_submit($form, &$form_state) {
   global $user;
   if ($user->uid) {
-    $insurge = new insurge_client;
+    $insurge = sopac_get_insurge();
     $insurge->update_tag($form_state['values']['oldtag'], $form_state['values']['newtag'], $user->uid);
   }
 }
@@ -232,7 +232,7 @@ function sopac_user_tag_edit_submit($form, &$form_state) {
 function sopac_user_tag_delete() {
   global $user;
   
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $pathinfo = explode('/', trim($_GET['q']));
   $tag = $pathinfo[3];
   $tag_total_arr = $insurge->get_tag_totals($user->uid, NULL, $tag);
@@ -271,7 +271,7 @@ function sopac_user_tag_delete_submit($form, &$form_state) {
   
   if (strtolower($form_state['values']['op']) == 'yes') {
     if ($user->uid && $form_state['values']['oldtag']) {
-      $insurge = new insurge_client;
+      $insurge = sopac_get_insurge();
       $insurge->delete_user_tag($user->uid, $form_state['values']['oldtag']);
     }
   }
@@ -282,7 +282,7 @@ function sopac_user_tag_hitlist($tag) {
   
   require_once('sopac_catalog.php');
   $locum = sopac_get_locum();
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $page_limit = variable_get('sopac_results_per_page', 20);
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
   $offset = ($page_limit * $page);
@@ -363,7 +363,7 @@ function sopac_tag_form_validate($form, &$form_state) {
 function sopac_tag_form_submit($form, &$form_state) {
 	global $user;
 	$bnum = $form_state['values']['bnum'];
-	$insurge = new insurge_client();
+	$insurge = sopac_get_insurge();
 	$insurge->submit_tags($user->uid, $bnum, trim($form_state['values']['tags']));
 }
 
@@ -406,7 +406,7 @@ function sopac_review_page($page_type) {
   global $user;
 
   $locum = sopac_get_locum();
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $page_limit = 5; // TODO make this configurable
   $page = isset($_GET['page']) ? $_GET['page'] : 0;
   $offset = ($page_limit * $page);
@@ -507,7 +507,7 @@ function sopac_review_form() {
   $pathinfo = explode('/', trim($_GET['q']));
   if ($pathinfo[1] == 'edit') {
     $title = t('Edit this Review');
-    $insurge = new insurge_client;
+    $insurge = sopac_get_insurge();
     $rev_id = $pathinfo[2];
     $insurge_review = $insurge->get_reviews($user->uid, NULL, array($rev_id));
     $review = $insurge_review['reviews'][0];
@@ -571,7 +571,7 @@ function sopac_review_form_submit($form, &$form_state) {
   global $user;
   
   if ($user->uid) {
-    $insurge = new insurge_client;
+    $insurge = sopac_get_insurge();
     if ($form_state['values']['form_type'] == 'edit') {
       $insurge->update_review($user->uid, $form_state['values']['rev_id'], $form_state['values']['rev_title'], $form_state['values']['rev_body']);
     } else if ($form_state['values']['form_type'] == 'new') {
@@ -586,7 +586,7 @@ function theme_sopac_review_block($block_type) {
   $uri = sopac_parse_uri();
 
   // get_reviews($uid = NULL, $bnum_arr = NULL, $rev_id_arr = NULL, $limit = 10, $offset = 0, $order = 'ORDER BY rev_create_date DESC')
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $locum = sopac_get_locum();
   switch ($block_type) {
     case 'personal':
@@ -659,7 +659,7 @@ function sopac_delete_review_form_submit($form, &$form_state) {
   global $user;
   
   if (strtolower($form_state['values']['op']) == 'yes') {
-    $insurge = new insurge_client;
+    $insurge = sopac_get_insurge();
     $insurge->delete_review($user->uid, $form_state['values']['rev_id']);
   }
 }
@@ -680,11 +680,11 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
   // Load Required JS libraries
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.rating.js');
   
-  $insurge = new insurge_client;
+  $insurge = sopac_get_insurge();
   $rate_options = array('0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0');
 
   if ($_POST[$id . '_rating_submit_' . $bnum] && $user->uid) {
-    $insurge = new insurge_client;
+    $insurge = sopac_get_insurge();
     $insurge->submit_rating($user->uid, $bnum, $_POST[$id . '_bib_rating_' . $bnum]);
     if ($post_redirect) { header('Location: ' . $_SERVER['REQUEST_URI']); }
   }

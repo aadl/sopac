@@ -582,7 +582,7 @@ function sopac_checkout_history_page() {
     
     // Set up our data sets
     $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
-    $insurge = new insurge_client();
+    $insurge = sopac_get_insurge();
     $locum = sopac_get_locum();
     $locum_pass = substr($user->pass, 0, 7);
     $cardnum = $user->profile_pref_cardnum;
