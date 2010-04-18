@@ -16,6 +16,15 @@
  * @return string Settings form HTML
  */
 function sopac_admin() {
+  $form = array();
+  $current_ils = variable_get('sopac_ils', FALSE);
+  
+  if (!$current_ils) {
+    $form['starter_instruction'] = array(
+      '#type' => 'markup',
+      '#value' => 'Please select your ILS, then submit this form to continue setup.',
+    );
+  }
 
   $form['sopac_general'] = array(
     '#type' => 'fieldset',
@@ -29,7 +38,17 @@ function sopac_admin() {
     '#title' => t('Your ILS name'),
     '#default_value' => variable_get('sopac_ils', 'iii'),
     '#options' => array('iii' => 'iii', 'koha' => 'koha', 'sirsi' => 'sirsi'),
+    '#required' => TRUE,
   );
+  
+  // Start admin with only choice of ILS.
+  if (!$current_ils) {
+    $form['sopac_general']['#collapsed'] = FALSE;
+    // This will call sopac_admin_submit() to clear menu cache
+    $form = system_settings_form($form);
+    $form['#submit'][] = 'sopac_admin_submit';
+    return $form;
+  }
   
   $form['sopac_general']['sopac_lib_name'] = array(
     '#type' => 'textfield',
@@ -346,6 +365,19 @@ function sopac_admin() {
     '#description' => t("This is the message that is displayed to users on their account page if they have not yet verified their library card number.  HTML is OK."),
     '#required' => TRUE,
   );
+  
+  if ($current_ils == 'sirsi') {
+    
+    $form['core']['sopac_changeable_pickup_location'] = array(
+      '#type' => 'hidden',
+      '#value' => 1,
+    );
+    
+    $form['core']['sopac_suspend_holds'] = array(
+      '#type' => 'hidden',
+      '#value' => 1,
+    );
+  }
   
   // This will call sopac_admin_submit() to clear menu cache
   $form = system_settings_form($form);

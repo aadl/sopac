@@ -509,8 +509,8 @@ function sopac_theme() {
       'template' => 'sopac-user-holds-list',
       'arguments' => array('data' => array()),
     ),
-    'sopac_user_holds_list_sirsi' => array(
-      'template' => 'sopac-user-holds-list-sirsi',
+    'sopac_user_holds_list_multirow' => array(
+      'template' => 'sopac-user-holds-list-multirow',
       'arguments' => array('data' => array()),
     ),
   );
@@ -531,7 +531,7 @@ function sopac_preprocess_sopac_user_holds_list(&$variables) {
  *
  * @param array $variables
  */
-function sopac_preprocess_sopac_user_holds_list_sirsi(&$variables) {
+function sopac_preprocess_sopac_user_holds_list_multirow(&$variables) {
   form_theme_bridge_parse_data_for_layout($variables);
 }
 

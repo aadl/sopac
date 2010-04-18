@@ -238,9 +238,9 @@ function sopac_user_holds_form() {
     return $form;
   }
   
-  $ils = variable_get('sopac_ils', 'iii');
-  if ($ils == 'sirsi') {
-  	return _sopac_user_holds_form_sirsi($holds);
+  $suspend_holds = variable_get('sopac_suspend_holds', FALSE);
+  if ($suspend_holds) {
+  	return _sopac_user_holds_form_complex($holds);
   }
   
   $form['#theme'] = 'form_theme_bridge';
@@ -347,10 +347,8 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
 		}
   }
   
-  // Currently only sirsi allows changing pickup location, and suspend dates as part of holds.
-  $ils = variable_get('sopac_ils', 'iii');
-  $update_sirsi_holds = $update_holds;
-  if ($ils == 'sirsi') {
+  $change_pickup = variable_get('sopac_changeable_pickup_location', FALSE);
+  if ($change_pickup) {
     $pickup_changes = array();
     foreach ($form_state['values']['pickup'] as $bnum => $pickup_location) {
       if (array_key_exists($bnum, $cancellations)) {
@@ -358,10 +356,13 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
       }
   		if ($pickup_location != $holds_by_bnum[$bnum]['pickuploc']['selected']) {
   		  $pickup_changes[$bnum] = $pickup_location;
-  		  $update_sirsi_holds = TRUE;
+  		  $update_holds = TRUE;
   		}
     }
+  }
     
+  $suspend_holds = variable_get('sopac_suspend_holds', FALSE);
+  if ($suspend_holds) {
     // Set up time object for use in validating suspension dates
     $locum = sopac_get_locum();
     $sClosedByTimezone = $locum->locum_config['harvest_config']['timezone'];
@@ -376,14 +377,14 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
       if ($suspend_from == 'mm/dd/yyyy') {
       	continue;
       }
-      // Make sure it's a date.
-      if (!preg_match('/([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/20[1-9][0-9]/', $suspend_from)) {
-      	form_set_error('suspend_from__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yy).'));
+      // Make sure it's a date (allow 2-digit years, but ask for 4).
+      if (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_from)) {
+      	form_set_error('suspend_from__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
       	continue;
       }
   		if ($suspend_from != $holds_by_bnum[$bnum]['start_suspend']) {
   		  $suspend_from_changes[$bnum] = $suspend_from;
-  		  $update_sirsi_holds = TRUE;
+  		  $update_holds = TRUE;
   		}
     }
     
@@ -396,14 +397,14 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
       if ($suspend_to == 'mm/dd/yyyy') {
       	continue;
       }
-      // Make sure it's a date.
-      if (!preg_match('/([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/20[1-9][0-9]/', $suspend_to)) {
-      	form_set_error('suspend_to__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yy).'));
+      // Make sure it's a date (allow 2-digit years, but ask for 4).
+      if (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_to)) {
+      	form_set_error('suspend_to__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
       	continue;
       }
   		if ($suspend_to != $holds_by_bnum[$bnum]['end_suspend']) {
   		  $suspend_to_changes[$bnum] = $suspend_to;
-  		  $update_sirsi_holds = TRUE;
+  		  $update_holds = TRUE;
   		}
   		if (!$form_state['values']['suspend_from'][$bnum]) {
   			form_set_error('suspend_to__' . $bnum, t('You cannot set a suspend to date without a corresponding suspend from date.'));
@@ -422,7 +423,11 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
     }
   }
   
-  if ( ($ils != 'sirsi' && !$update_holds) || ($ils == 'sirsi' && !$update_sirsi_holds)) {
+  $errors = form_get_errors();
+  if (is_array($errors)) {
+  	// Skip rest of this structure.
+  }
+  elseif (!$update_holds) {
   	form_set_error('', 'Your request to ' . $form['submit']['#value'] . ' did not include any changes.');
   }
   // Store data for use by submit function.
@@ -459,19 +464,18 @@ function sopac_user_holds_form_submit(&$form, &$form_state) {
 }
 
 /**
- * Fork to allow support for changing hold pickup location, and suspend dates in sirsi. Not
- * currently supported by III. Hopefully, this will change in future. Also uses different 
- * theme tpl since extra options require different layout.
+ * Fork to allow support for changing hold pickup location, and suspend dates. Uses  
+ * different tpl since extra options require different layout.
  *
  * @param array $holds
  * @return array
  */
-function _sopac_user_holds_form_sirsi($holds) {
+function _sopac_user_holds_form_complex($holds) {
   // <CraftySpace+> TODO: do we need to check for multi-branch, else no pickup location?
   $form = array(
     '#redirect' => $_GET['q'],
     '#theme' => 'form_theme_bridge',
-    '#bridge_to_theme' => 'sopac_user_holds_list_sirsi',
+    '#bridge_to_theme' => 'sopac_user_holds_list_complex',
   );
   
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
