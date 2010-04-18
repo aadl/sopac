@@ -240,7 +240,7 @@ function sopac_user_holds_form() {
   
   $suspend_holds = variable_get('sopac_suspend_holds', FALSE);
   if ($suspend_holds) {
-  	return _sopac_user_holds_form_complex($holds);
+  	return _sopac_user_holds_form_multirow($holds);
   }
   
   $form['#theme'] = 'form_theme_bridge';
@@ -470,12 +470,12 @@ function sopac_user_holds_form_submit(&$form, &$form_state) {
  * @param array $holds
  * @return array
  */
-function _sopac_user_holds_form_complex($holds) {
+function _sopac_user_holds_form_multirow($holds) {
   // <CraftySpace+> TODO: do we need to check for multi-branch, else no pickup location?
   $form = array(
     '#redirect' => $_GET['q'],
     '#theme' => 'form_theme_bridge',
-    '#bridge_to_theme' => 'sopac_user_holds_list_complex',
+    '#bridge_to_theme' => 'sopac_user_holds_list_multirow',
   );
   
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
