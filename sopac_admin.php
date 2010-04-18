@@ -367,15 +367,25 @@ function sopac_admin() {
   );
   
   if ($current_ils == 'sirsi') {
-    
     $form['core']['sopac_changeable_pickup_location'] = array(
       '#type' => 'hidden',
-      '#value' => 1,
+      '#value' => TRUE,
     );
     
     $form['core']['sopac_suspend_holds'] = array(
       '#type' => 'hidden',
-      '#value' => 1,
+      '#value' => TRUE,
+    );
+  }
+  else {
+    $form['core']['sopac_changeable_pickup_location'] = array(
+      '#type' => 'hidden',
+      '#value' => FALSE,
+    );
+    
+    $form['core']['sopac_suspend_holds'] = array(
+      '#type' => 'hidden',
+      '#value' => FALSE,
     );
   }
   
