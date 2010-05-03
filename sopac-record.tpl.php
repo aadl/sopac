@@ -194,14 +194,13 @@ if (sopac_prev_search_url(TRUE)) {
       }
 
       if (count($item_status['items']) && !$no_avail_mat_codes) {
-        print '<fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend>';
-        drupal_add_js('misc/collapse.js');
+        print '<div><fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend><div>';
         if (variable_get('sopac_multi_branch_enable', 0)) {
           print theme('table', array("Location", "Call Number", "Branch", "Item Status"), $copy_status_array);
         } else {
           print theme('table', array("Location", "Call Number", "Item Status"), $copy_status_array);
         }
-        print '</fieldset>';
+        print '</div></fieldset></div>';
       } else if ($item['download_link']) {
         print '<div class="item-request">';
         print '<p><a href="' . $item['download_link'] . '" target="_new">Download this Title</a></p>';

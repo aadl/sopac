@@ -206,6 +206,8 @@ function sopac_bib_record() {
   $item = $locum->get_bib_item($bnum, TRUE);
   $item_status = $locum->get_item_status($bnum);
   if ($item['bnum']) {
+    // Load javascript collapsible code
+    drupal_add_js('misc/collapse.js');
     
     // Grab Syndetics reviews, etc..
     $review_links = $locum->get_syndetics($item['stdnum']);
