@@ -130,7 +130,8 @@ function sopac_admin() {
   // the next two settings to support giving users ability to select a home branch
   
   $description =   t('Check this box if your library has multiple branches, and you would like each user to be able to select a home branch.');
-  $description .= t('<br />NOTE: the user option will be set up during the first cron job after at least 1 bib record has been harvested.');
+  $description .= t('<br />NOTE: this feature requires that branches are set up in the locum config.');
+  $description .= t('<br />NOTE: the user option will be set up during the first cron job after checking this box.');
   $form['sopac_general']['sopac_home_branch_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow Users to Select a Home Branch'),

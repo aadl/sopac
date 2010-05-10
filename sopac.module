@@ -924,3 +924,22 @@ function sopac_get_insurge($type = 'client', $refresh = FALSE) {
   }
   return $instances[$type];
 }
+
+/**
+ * implementation of hook_form_alter for user_profile_form
+ */
+function sopac_form_user_profile_form_alter(&$form, &$form_state) {
+  if (!in_array($form['#validate'], 'sopac_user_profile_form_validate')) {
+  	array_unshift($form['#validate'], 'sopac_user_profile_form_validate');
+  }
+}
+
+/**
+ * validate user_profile_form
+ *
+ * @param array $form
+ * @param array $form_state
+ */
+function sopac_user_profile_form_validate(&$form, &$form_state) {
+  $form_state['values']['profile_pref_cardnum'] = trim($form_state['values']['profile_pref_cardnum']);
+}

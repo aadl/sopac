@@ -223,7 +223,6 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 function sopac_user_holds_form() {
   global $user;
   $form = array();
-  $form['#redirect'] = $_GET['q'];
   
   $cardnum = $user->profile_pref_cardnum;
   $ils_pass = $user->locum_pass;
@@ -243,13 +242,16 @@ function sopac_user_holds_form() {
   	return _sopac_user_holds_form_multirow($holds);
   }
   
-  $form['#theme'] = 'form_theme_bridge';
-  $form['#bridge_to_theme'] = 'sopac_user_holds_list';
+  $form = array(
+    '#theme' => 'form_theme_bridge',
+    '#layout_theme' => 'sopac_user_holds_list',
+  );
   
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
   $freezes_enabled = variable_get('sopac_hold_freezes_enable', 1);
   
-  $holds_list = array(
+  $form['holds'] = array(
+    '#tree' => TRUE,
     '#iterable' => TRUE,
   );
   foreach ($holds as $hold) {
@@ -257,7 +259,7 @@ function sopac_user_holds_form() {
     $hold_to_theme = array();
     
     if ($freezes_enabled) {
-      $hold_to_theme['cancel__' . $bnum] = array(
+      $hold_to_theme['cancel'] = array(
         '#type' => 'checkbox',
         '#default_value' => FALSE,
       );
@@ -276,7 +278,7 @@ function sopac_user_holds_form() {
     );
     if ($freezes_enabled) {
       if ($hold['can_freeze']) {
-        $hold_to_theme['freeze__' . $bnum] = array(
+        $hold_to_theme['freeze'] = array(
           '#type' => 'checkbox',
           '#default_value' => $hold['is_frozen'],
         );
@@ -289,10 +291,8 @@ function sopac_user_holds_form() {
       }
     }
     
-    $holds_list[] = $hold_to_theme;
+    $form['holds'][$bnum] = $hold_to_theme;
   }
-  
-  $form['holds'] = $holds_list;
   
   $form['submit'] = array(
     '#type' => 'submit',
@@ -313,7 +313,12 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   global $user;
   // Set defaults to avoid errors when debugging.
   $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
-  form_theme_bridge_clean_submitted_values($form_state, 'base');
+  $update_holds = FALSE;
+  $cancellations = array();
+  $freeze_changes = array();
+  $pickup_changes = array();
+  $suspend_from_changes = array();
+  $suspend_to_changes = array();
   
   // Get holds.
   $cardnum = $user->profile_pref_cardnum;
@@ -325,99 +330,75 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   foreach ($holds as $hold) {
     $holds_by_bnum[$hold['bnum']] = $hold;
   }
-  
-  $update_holds = FALSE;
-  
-  $cancellations = array();
-  foreach ($form_state['values']['cancel'] as $bnum => $cancel_requested) {
-    if ($cancel_requested) {
-    	$cancellations[$bnum] = $cancel_requested;
-    	$update_holds = TRUE;
-    }
-  }
-  
-  $freeze_changes = array();
-  foreach ($form_state['values']['freeze'] as $bnum => $freeze_requested) {
-    if (array_key_exists($bnum, $cancellations)) {
-    	continue;
-    }
-		if ($freeze_requested != $holds_by_bnum[$bnum]['is_frozen']) {
-		  $freeze_changes[$bnum] = $freeze_requested;
-		  $update_holds = TRUE;
-		}
-  }
+  $submitted_holds = $form_state['values']['holds'];
   
   $change_pickup = variable_get('sopac_changeable_pickup_location', FALSE);
-  if ($change_pickup) {
-    $pickup_changes = array();
-    foreach ($form_state['values']['pickup'] as $bnum => $pickup_location) {
-      if (array_key_exists($bnum, $cancellations)) {
-      	continue;
-      }
-  		if ($pickup_location != $holds_by_bnum[$bnum]['pickuploc']['selected']) {
-  		  $pickup_changes[$bnum] = $pickup_location;
-  		  $update_holds = TRUE;
-  		}
-    }
-  }
-    
   $suspend_holds = variable_get('sopac_suspend_holds', FALSE);
   if ($suspend_holds) {
     // Set up time object for use in validating suspension dates
     $locum = sopac_get_locum();
     $sClosedByTimezone = $locum->locum_config['harvest_config']['timezone'];
     $date_object = new DateTime(now, new DateTimeZone($sClosedByTimezone));
-    
-    $suspend_from_changes = array();
-    foreach ($form_state['values']['suspend_from'] as $bnum => $suspend_from) {
-      if (array_key_exists($bnum, $cancellations)) {
-      	continue;
-      }
-      // Catch unchanged default.
-      if ($suspend_from == 'mm/dd/yyyy') {
-      	continue;
-      }
-      // Make sure it's a date (allow 2-digit years, but ask for 4).
-      if (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_from)) {
-      	form_set_error('suspend_from__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
-      	continue;
-      }
-  		if ($suspend_from != $holds_by_bnum[$bnum]['start_suspend']) {
-  		  $suspend_from_changes[$bnum] = $suspend_from;
+  }
+  
+  foreach ($submitted_holds as $bnum => $hold_data) {
+  	if ($hold_data['cancel']) {
+    	$cancellations[$bnum] = $cancel_requested;
+    	$update_holds = TRUE;
+    	continue;
+  	}
+  	$freeze_requested = $hold_data['freeze'];
+		if ($freeze_requested != $holds_by_bnum[$bnum]['is_frozen']) {
+		  $freeze_changes[$bnum] = $freeze_requested;
+		  $update_holds = TRUE;
+		}
+    if ($change_pickup) {
+      $pickup_location = $hold_data['pickup'];
+  		if ($pickup_location != $holds_by_bnum[$bnum]['pickuploc']['selected']) {
+  		  $pickup_changes[$bnum] = $pickup_location;
   		  $update_holds = TRUE;
   		}
     }
-    
-    $suspend_to_changes = array();
-    foreach ($form_state['values']['suspend_to'] as $bnum => $suspend_to) {
-      if (array_key_exists($bnum, $cancellations)) {
-      	continue;
-      }
+    if ($suspend_holds) {
+      $suspend_from = $hold_data['suspend_from'];
       // Catch unchanged default.
-      if ($suspend_to == 'mm/dd/yyyy') {
-      	continue;
+      if ($suspend_from == 'mm/dd/yyyy') {
+        $suspend_from = '';
       }
       // Make sure it's a date (allow 2-digit years, but ask for 4).
-      if (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_to)) {
-      	form_set_error('suspend_to__' . $bnum, t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
-      	continue;
+      elseif (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_from)) {
+      	form_set_error("holds[$bnum][suspend_from", t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
       }
-  		if ($suspend_to != $holds_by_bnum[$bnum]['end_suspend']) {
+  		elseif ($suspend_from != $holds_by_bnum[$bnum]['start_suspend']) {
+  		  $suspend_from_changes[$bnum] = $suspend_from;
+  		  $update_holds = TRUE;
+  		}
+    
+      $suspend_to = $hold_data['suspend_to'];
+      // Catch unchanged default.
+      if ($suspend_to == 'mm/dd/yyyy') {
+      	$suspend_to = '';
+      }
+      // Make sure it's a date (allow 2-digit years, but ask for 4).
+      elseif (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_to)) {
+      	form_set_error("holds[$bnum][suspend_to", t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
+      }
+  		elseif ($suspend_to != $holds_by_bnum[$bnum]['end_suspend']) {
   		  $suspend_to_changes[$bnum] = $suspend_to;
   		  $update_holds = TRUE;
   		}
-  		if (!$form_state['values']['suspend_from'][$bnum]) {
-  			form_set_error('suspend_to__' . $bnum, t('You cannot set a suspend to date without a corresponding suspend from date.'));
+  		if ($suspend_to && !$suspend_from) {
+  			form_set_error("holds][$bnum][suspend_to", t('You cannot set a suspend to date without a corresponding suspend from date.'));
   		}
-  		else {
-        $date_parts = explode('/', $form_state['values']['suspend_from'][$bnum]);
+  		elseif ($suspend_to && $suspend_from) {
+        $date_parts = explode('/', $suspend_from);
         $date_object->setDate($date_parts[2], $date_parts[0], $date_parts[1]);
         $from_date = $date_object->format('Ymd');
         $date_parts = explode('/', $suspend_to);
         $date_object->setDate($date_parts[2], $date_parts[0], $date_parts[1]);
         $to_date = $date_object->format('Ymd');
         if ($to_date < $from_date) {
-        	form_set_error('suspend_to__' . $bnum, t('A suspend to date cannot be before the corresponding suspend from date.'));
+        	form_set_error("holds[$bnum][suspend_to", t('A suspend to date cannot be before the corresponding suspend from date.'));
         }
   		}
     }
@@ -473,58 +454,54 @@ function sopac_user_holds_form_submit(&$form, &$form_state) {
 function _sopac_user_holds_form_multirow($holds) {
   // <CraftySpace+> TODO: do we need to check for multi-branch, else no pickup location?
   $form = array(
-    '#redirect' => $_GET['q'],
     '#theme' => 'form_theme_bridge',
-    '#bridge_to_theme' => 'sopac_user_holds_list_multirow',
+    '#layout_theme' => 'sopac_user_holds_list_multirow',
   );
   
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
-  $holds_list = array(
+  $form['holds'] = array(
+    '#tree' => TRUE,
     '#iterable' => TRUE,
   );
   foreach ($holds as $hold) {
     $bnum = $hold['bnum'];
-    $hold_to_theme = array();
-    
-    $hold_to_theme['cancel__' . $bnum] = array(
-      '#type' => 'checkbox',
-      '#default_value' => FALSE,
+    $form['holds'][$bnum] = array(
+      'cancel' => array(
+        '#type' => 'checkbox',
+        '#default_value' => FALSE,
+      ),
+      'title_link' => array(
+        '#type' => 'markup',
+        '#value' => l(t($hold['title']), $sopac_prefix . $bnum),
+      ),
+      'status' => array(
+        '#type' => 'markup',
+        '#value' => $hold['status']
+      ),
+      'pickup' => array(
+        '#type' => 'select',
+        '#options' => sopac_get_branch_options(),
+        '#default_value' => $hold['pickuploc']['selected'],
+      ),
+      'freeze' => array(
+        '#type' => 'radios',
+        '#default_value' => $hold['is_frozen'],
+        '#options' => array(0 => t('Active'), 1 => t('Inactive')),
+      ),
+      'suspend_from' => array(
+        '#type' => 'textfield',
+        '#title' => 'From',
+        '#default_value' => $hold['start_suspend'] ? $hold['start_suspend'] : 'mm/dd/yyyy',
+        '#attributes' => array('maxlength' => '10', 'size' => '15'),
+      ),
+      'suspend_to' => array(
+        '#type' => 'textfield',
+        '#title' => 'To',
+        '#default_value' => $hold['end_suspend'] ? $hold['end_suspend'] : 'mm/dd/yyyy',
+        '#attributes' => array('maxlength' => '10', 'size' => '15'),
+      ),
     );
-    $hold_to_theme['title_link'] = array(
-      '#type' => 'markup',
-      '#value' => l(t($hold['title']), $sopac_prefix . $bnum),
-    );
-    $hold_to_theme['status'] = array(
-      '#type' => 'markup',
-      '#value' => $hold['status']
-    );
-    $hold_to_theme['pickup__' . $bnum] = array(
-      '#type' => 'select',
-      '#options' => sopac_get_branch_options(),
-      '#default_value' => $hold['pickuploc']['selected'],
-    );
-    $hold_to_theme['freeze__' . $bnum] = array(
-      '#type' => 'radios',
-      '#default_value' => $hold['is_frozen'],
-      '#options' => array(0 => t('Active'), 1 => t('Inactive')),
-    );
-    $hold_to_theme['suspend_from__' . $bnum] = array(
-      '#type' => 'textfield',
-      '#title' => 'From',
-      '#default_value' => $hold['start_suspend'] ? $hold['start_suspend'] : 'mm/dd/yyyy',
-      '#attributes' => array('maxlength' => '10', 'size' => '15'),
-    );
-    $hold_to_theme['suspend_to__' . $bnum] = array(
-      '#type' => 'textfield',
-      '#title' => 'To',
-      '#default_value' => $hold['end_suspend'] ? $hold['end_suspend'] : 'mm/dd/yyyy',
-      '#attributes' => array('maxlength' => '10', 'size' => '15'),
-    );
-    
-    $holds_list[$bnum] = $hold_to_theme;
   }
-  
-  $form['holds'] = $holds_list;
   
   $form['submit'] = array(
     '#type' => 'submit',

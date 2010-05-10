@@ -6,3 +6,4 @@ version = 6.x-2.1-rc1
 core = 6.x
 
 dependencies[] = profile
+dependencies[] = form_theme_bridge
