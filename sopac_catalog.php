@@ -532,7 +532,7 @@ function sopac_search_form_basic() {
   $search_args_raw = explode('?', $actions[2]);
   $search_args = trim($search_args_raw[0]);
   $stype_selected = $actions[1] ? 'cat_' . $actions[1] : 'cat_keyword';
-  $sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : 'all';
+  $sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : NULL;
 
   $stypes = array(
     'cat_keyword' => t('Keyword'),
@@ -635,7 +635,7 @@ function sopac_search_form_adv() {
   $search_args_raw = explode('?', $actions[2]);
   $search_args = trim($search_args_raw[0]);
   $stype_selected = $actions[1] ? 'cat_' . $actions[1] : 'cat_keyword';
-  $sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : 'all';
+  $sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : NULL;
   foreach ($locum_cfg['format_groups'] as $sfmt => $sfmt_codes) {
     $sformats[preg_replace('/,[ ]*/', '|', trim($sfmt_codes))] = ucfirst($sfmt);
   }
