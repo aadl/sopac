@@ -8,9 +8,7 @@
 <div class="hitlist-nohits">
   <?php if ($locum_result['suggestion']) { ?>
   <div class="hitlist-suggestions">
-    Did you mean <i><a href="<?php print suggestion_link($locum_result); ?>"><?php 
-      print $locum_result['suggestion']; 
-    ?></a></i> ?
+    Did you mean <i><?php print suggestion_link($locum_result); ?></i> ?
   </div>
   <br />
   <?php } ?>

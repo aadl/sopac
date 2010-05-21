@@ -17,7 +17,7 @@
 <?php
   $zebra = 'even';
   foreach ($holds as $hold) {
-  	$zebra = $zebra == 'odd' ? 'even' : 'odd';
+    $zebra = $zebra == 'odd' ? 'even' : 'odd';
 ?>
     <tr class="<?php print $zebra ?>">
     <?php if ($freezes_enabled) { ?>

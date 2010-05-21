@@ -18,7 +18,7 @@
 function sopac_admin() {
   $form = array();
   $current_ils = variable_get('sopac_ils', FALSE);
-  
+
   if (!$current_ils) {
     $form['starter_instruction'] = array(
       '#type' => 'markup',
@@ -32,7 +32,7 @@ function sopac_admin() {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  
+
   $form['sopac_general']['sopac_ils'] = array(
     '#type' => 'select',
     '#title' => t('Your ILS name'),
@@ -40,7 +40,7 @@ function sopac_admin() {
     '#options' => array('iii' => 'iii', 'koha' => 'koha', 'sirsi' => 'sirsi'),
     '#required' => TRUE,
   );
-  
+
   // Start admin with only choice of ILS.
   if (!$current_ils) {
     $form['sopac_general']['#collapsed'] = FALSE;
@@ -49,7 +49,7 @@ function sopac_admin() {
     $form['#submit'][] = 'sopac_admin_submit';
     return $form;
   }
-  
+
   $form['sopac_general']['sopac_lib_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Your Institution\'s name'),
@@ -61,8 +61,12 @@ function sopac_admin() {
   );
 
   $locum_path = trim(variable_get('sopac_locum_path', '/usr/local/include/locum'));
-  if ($locum_path[0] != '/') { $locum_path = '/' . $locum_path; }
-  if (substr($locum_path, -1) != '/') { $locum_path .= '/'; }
+  if ($locum_path[0] != '/') {
+    $locum_path = '/' . $locum_path;
+  }
+  if (substr($locum_path, -1) != '/') {
+    $locum_path .= '/';
+  }
   if (!file_exists($locum_path . 'locum-client.php')) {
     $locum_error = '<br /><span style="color: red;">NOTE: ' . $locum_path . 'locum-client.php does not seem to exist!</span>' ;
   }
@@ -75,10 +79,14 @@ function sopac_admin() {
     '#description' => t("The path to where you have installed Locum." . $locum_error),
     '#required' => TRUE,
   );
-  
+
   $insurge_path = trim(variable_get('sopac_insurge_path', '/usr/local/include/insurge'));
-  if ($insurge_path[0] != '/') { $insurge_path = '/' . $insurge_path; }
-  if (substr($insurge_path, -1) != '/') { $insurge_path .= '/'; }
+  if ($insurge_path[0] != '/') {
+    $insurge_path = '/' . $insurge_path;
+  }
+  if (substr($insurge_path, -1) != '/') {
+    $insurge_path .= '/';
+  }
   if (!file_exists($insurge_path . 'insurge-client.php')) {
     $insurge_error = '<br /><span style="color: red;">NOTE: ' . $insurge_path . 'insurge-client.php does not seem to exist!</span>' ;
   }
@@ -91,14 +99,14 @@ function sopac_admin() {
     '#description' => t("The path to where you have installed Insurge." . $insurge_error),
     '#required' => TRUE,
   );
-  
+
   $form['sopac_general']['sopac_url_prefix'] = array(
     '#type' => 'textfield',
     '#title' => t('SOPAC URL prefix'),
     '#default_value' => variable_get('sopac_url_prefix', 'cat/seek'),
     '#size' => 24,
     '#maxlength' => 72,
-    '#description' => t("This is the URL prefix you wish SOPAC to use within the site, for example, to use www.yoursite.com/cat/seek as the base URL for SOPAC, enter 'cat/seek' without the leading or trailing slash.  If you change this, you will likely need to clear your site cache in your <a href=\"/admin/settings/performance\">performance settings</a>."),
+    '#description' => t("This is the URL prefix you wish SOPAC to use within the site, for example, to use www.yoursite.com/cat/seek as the base URL for SOPAC, enter 'cat/seek' without the leading or trailing slash.  If you change this, you will likely need to clear your site cache in your ") . l('performance settings', 'admin/settings/performance'),
     '#required' => TRUE,
   );
 
@@ -119,33 +127,33 @@ function sopac_admin() {
     '#description' => t("This option allows you to configure how you want the search form to be displayed from within the SOPAC context.  You can Display Just the basic search box, or the basic search box and the advanced search form drop-down option."),
     '#options' => array('basic' => t('Display just the basic form'), 'both' => t('Display both basic and advanced forms'))
   );
-  
+
   $form['sopac_general']['sopac_multi_branch_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Multi-Branch Support'),
     '#default_value' => variable_get('sopac_multi_branch_enable', 0),
     '#description' => t('Select this option if you plan to operate SOPAC in a multi-branch environment.'),
   );
-  
+
   // the next two settings to support giving users ability to select a home branch
-  
-  $description =   t('Check this box if your library has multiple branches, and you would like each user to be able to select a home branch.');
+  $description = t('Check this box if your library has multiple branches, and you would like each user to be able to select a home branch.');
   $description .= t('<br />NOTE: this feature requires that branches are set up in the locum config.');
   $description .= t('<br />NOTE: the user option will be set up during the first cron job after checking this box.');
+  
   $form['sopac_general']['sopac_home_branch_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow Users to Select a Home Branch'),
     '#default_value' => variable_get('sopac_home_branch_enable', 0),
     '#description' => $description,
   );
-  
+
   $form['sopac_general']['sopac_ssl_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable SSL for Account Management'),
     '#default_value' => variable_get('sopac_ssl_enable', 0),
     '#description' => t("Selecting this option will cause SOPAC to redirect browsers to an encrypted page if the user is accesing their personal information.  You will need to have SSL enabled on your web server.  This is HIGHLY RECCOMENDED.  If you enable this option, you must put the following setting in your Apache vhost configuration for this site's <VirtualHost *:443> section: SetEnv HTTPS TRUE"),
   );
-  
+
   $form['sopac_general']['sopac_ssl_port'] = array(
     '#type' => 'textfield',
     '#title' => t('SSL Connection Port'),
@@ -155,14 +163,14 @@ function sopac_admin() {
     '#description' => t("This is the port that your Apache SSL process is listening on."),
     '#required' => TRUE,
   );
-  
+
   $form['sopac_fines'] = array(
     '#type' => 'fieldset',
     '#title' => t('Fines Settings'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  
+
   $form['sopac_fines']['sopac_fines_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Fines Management'),
@@ -176,14 +184,14 @@ function sopac_admin() {
     '#default_value' => variable_get('sopac_payments_enable', 1),
     '#description' => t("Check this box to allow users to pay their fines through SOPAC."),
   );
-  
+
   $form['sopac_social_features'] = array(
     '#type' => 'fieldset',
     '#title' => t('Social Feature Settings'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  
+
   // This really isn't implemented yet and is here are a reminder
   $form['sopac_social_features']['sopac_social_enable'] = array(
     '#type' => 'checkbox',
@@ -191,14 +199,14 @@ function sopac_admin() {
     '#default_value' => variable_get('sopac_social_enable', 1),
     '#description' => t("Check this box if you would like to enable community-driven reviews, ratings, comments, and tagging in the catalog."),
   );
-  
+
   $form['sopac_social_features']['sopac_random_tags'] = array(
     '#type' => 'checkbox',
     '#title' => t('Random Tags'),
     '#default_value' => variable_get('sopac_random_tags', 1),
     '#description' => t("Check this box if you would like to display tags in random order."),
   );
-  
+
   $form['sopac_social_features']['sopac_tag_limit'] = array(
     '#type' => 'textfield',
     '#title' => t('Tag Limit'),
@@ -227,7 +235,7 @@ function sopac_admin() {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  
+
   $form['sopac_account']['sopac_summary_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable the Account Summary on the Account page'),
@@ -241,35 +249,35 @@ function sopac_admin() {
     '#default_value' => variable_get('sopac_pname_enable', 1),
     '#description' => t("Check this box if you would like to have patron names appear in the Account Summary."),
   );
-  
+
   $form['sopac_account']['sopac_lcard_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display Library Card Number in the Account Summary'),
     '#default_value' => variable_get('sopac_lcard_enable', 1),
     '#description' => t("Check this box if you would like to have library card numbers appear in the Account Summary."),
   );
-  
+
   $form['sopac_account']['sopac_numco_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display # of checkouts in the Account Summary'),
     '#default_value' => variable_get('sopac_numco_enable', 1),
     '#description' => t("Check this box if you would like # of checkouts appear in the Account Summary."),
   );
-  
+
   $form['sopac_account']['sopac_checkout_history_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display checkout history in the user area'),
     '#default_value' => variable_get('sopac_checkout_history_enable', 0),
     '#description' => t("Check this box if you would like checkout history to appear in the user area."),
   );
-  
+
   $form['sopac_account']['sopac_checkout_history_wipe'] = array(
     '#type' => 'checkbox',
     '#title' => t('Delete checkout history from ILS after harvest'),
     '#default_value' => variable_get('sopac_checkout_history_wipe', 1),
     '#description' => t("Check this box if you would like to purge checkout history from the ILS after it's imported into SOPAC."),
   );
-  
+
   $form['sopac_account']['sopac_checkout_history_cache_time'] = array(
     '#type' => 'textfield',
     '#title' => t('Checkout history cache time'),
@@ -278,7 +286,7 @@ function sopac_admin() {
     '#size' => 6,
     '#maxlength' => 5,
   );
-  
+
   $form['sopac_account']['sopac_hold_freezes_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable freezing holds'),
@@ -293,21 +301,21 @@ function sopac_admin() {
       '#description' => t("Check this box if you would like fine amounts to appear in the Account Summary."),
     );
   }
-  
+
   $form['sopac_account']['sopac_cardexp_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display Library Card Expiration Date in the Account Summary'),
     '#default_value' => variable_get('sopac_cardexp_enable', 1),
     '#description' => t("Check this box if you would like to have library card expiration dates appear in the Account Summary."),
   );
-  
+
   $form['sopac_account']['sopac_tel_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display telephone # in the Account Summary'),
     '#default_value' => variable_get('sopac_tel_enable', 1),
     '#description' => t("Check this box if you would like the patron telephone # to appear in the Account Summary."),
   );
-  
+
   $form['sopac_account']['sopac_email_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display Email Address in the Account Summary'),
@@ -322,14 +330,14 @@ function sopac_admin() {
     '#description' => t("This is the message that is displayed to users if they have entered an invalid library card number.  HTML is OK."),
     '#required' => TRUE,
   );
-  
+
   $form['sopac_cardnum_verify'] = array(
     '#type' => 'fieldset',
     '#title' => t('Card Number Verification Requirements'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  
+
   $form['sopac_cardnum_verify']['sopac_require_cfg'] = array(
     '#type' => 'select',
     '#title' => t('Require Patrons to Meet All or One of the Requirements'),
@@ -337,28 +345,28 @@ function sopac_admin() {
     '#description' => t("This option allows you to tell SOPAC if you would like to require users to fulfill all of the following enabled requirements, or just one.  For example, if this is set to just 'One', users would have to enter one correct value instead of all corect values in order to have their library card verified."),
     '#options' => array('one' => t('Just One'), 'all' => t('All Requirements'))
   );
-  
+
   $form['sopac_cardnum_verify']['sopac_require_name'] = array(
     '#type' => 'checkbox',
     '#title' => t('Require Patron name for Verification'),
     '#default_value' => variable_get('sopac_require_name', 1),
     '#description' => t("Check this box if you would like to require the patron to type in their name in order to verify their library card number."),
   );
-  
+
   $form['sopac_cardnum_verify']['sopac_require_tel'] = array(
     '#type' => 'checkbox',
     '#title' => t('Require Telephone Number for Verification'),
     '#default_value' => variable_get('sopac_require_tel', 1),
     '#description' => t("Check this box if you would like to require the patron to type in their telephone number in order to verify their library card number."),
   );
-  
+
   $form['sopac_cardnum_verify']['sopac_require_streetname'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use Address Street Name for Verification'),
     '#default_value' => variable_get('sopac_require_streetname', 1),
     '#description' => t("Check this box if you would like to use the street name of the patron's address to verify their library card number."),
   );
-  
+
   $form['sopac_cardnum_verify']['sopac_uv_cardnum'] = array(
     '#type' => 'textarea',
     '#title' => t('Unvalidated Library Card Message'),
@@ -366,13 +374,13 @@ function sopac_admin() {
     '#description' => t("This is the message that is displayed to users on their account page if they have not yet verified their library card number.  HTML is OK."),
     '#required' => TRUE,
   );
-  
+
   if ($current_ils == 'sirsi') {
     $form['core']['sopac_changeable_pickup_location'] = array(
       '#type' => 'hidden',
       '#value' => TRUE,
     );
-    
+
     $form['core']['sopac_suspend_holds'] = array(
       '#type' => 'hidden',
       '#value' => TRUE,
@@ -383,20 +391,20 @@ function sopac_admin() {
       '#type' => 'hidden',
       '#value' => FALSE,
     );
-    
+
     $form['core']['sopac_suspend_holds'] = array(
       '#type' => 'hidden',
       '#value' => FALSE,
     );
   }
-  
+
   // This will call sopac_admin_submit() to clear menu cache
   $form = system_settings_form($form);
   $form['#submit'][] = 'sopac_admin_submit';
-  
+
   // Return the SOPAC configuration form
   return $form;
-  
+
 }
 
 // Part of supporting user home branch in multibranch situation
@@ -407,19 +415,19 @@ function sopac_setup_user_home_selector() {
   $locum = sopac_get_locum();
   $branches = $locum->locum_config['branches'];
   if (!(is_array($branches) && count($branches))) {
-  	return FALSE;
+    return FALSE;
   }
   $options = array_values($branches);
   $options = join("\n\r", $options);
   $description = t('Choose a branch as your home. This will be the default pickup location when you place holds.');
   $result = db_query("
-    INSERT INTO {profile_fields} (title, name, explanation, category, type, weight, required, register, visibility, autocomplete, options, page) 
-    VALUES ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s')", 
+    INSERT INTO {profile_fields} (title, name, explanation, category, type, weight, required, register, visibility, autocomplete, options, page)
+    VALUES ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', '%s')",
     'Home Branch', 'profile_pref_home_branch', $description, 'Preferences', 'selection', 1, 0, 1, 1, 0, $options, ''
   );
   if ($result) {
-  	variable_set('sopac_home_selector_options', TRUE);
-  	return TRUE;
+    variable_set('sopac_home_selector_options', TRUE);
+    return TRUE;
   }
   return FALSE;
 }
@@ -428,4 +436,3 @@ function sopac_setup_user_home_selector() {
 function sopac_admin_submit($form, &$form_state) {
     menu_rebuild();
 }
-

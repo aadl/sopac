@@ -4,10 +4,10 @@
  * @file
  * Render form elements as separate strings of html in a structured
  * array. Pass that array to a theme set as an attribute of the form.
- * Useful for tasks such as allowing form elements to be rendered in a 
- * table, or other layout not natively supported by the form API. 
+ * Useful for tasks such as allowing form elements to be rendered in a
+ * table, or other layout not natively supported by the form API.
  * Especially useful when dealing with iterable data.
- * 
+ *
  * See README.txt for details.
  */
 
@@ -25,7 +25,7 @@ function form_theme_bridge_theme() {
 /**
  * Turn a form api array into a structured array containing individually rendered form elements,
  * then pass the result to a second theming function for layout.
- * 
+ *
  * See documentation for details.
  *
  * @param array $form_data
@@ -36,35 +36,35 @@ function theme_form_theme_bridge($form_data) {
   $dummy_form_state = array();
   foreach ($form_data as $name => $item) {
     if ($name[0] == '#') {
-    	continue;
+      continue;
     }
-  	if (is_array($item) && array_key_exists('#iterable', $item) && $item['#iterable']) {
-  		$result[$name] = array();
-  		foreach ($item as $subname => $subitem) {
+    if (is_array($item) && array_key_exists('#iterable', $item) && $item['#iterable']) {
+      $result[$name] = array();
+      foreach ($item as $subname => $subitem) {
         if ($subname[0] == '#') {
-        	continue;
+          continue;
         }
-  		  // Can skip theme() when recursing.
-  			$result[$name][$subname] = theme_form_theme_bridge($subitem);
-  		}
-  	}
-  	else if (is_array($item) && array_key_exists('#type', $item)) {
-  	  $parts = explode('__', $name);
-  	  $final_name = $parts[0];
-  	  if ($item['#type'] == 'markup') {
-  	  	$result[$final_name] = $item['#value'];
-  	  }
-  	  else {
-  	  	$result[$final_name] = drupal_render($item);
-  	  }
-  	}
-  	else {
-  		$result[$name] = $item;
-  	}
+        // Can skip theme() when recursing.
+        $result[$name][$subname] = theme_form_theme_bridge($subitem);
+      }
+    }
+    elseif (is_array($item) && array_key_exists('#type', $item)) {
+      $parts = explode('__', $name);
+      $final_name = $parts[0];
+      if ($item['#type'] == 'markup') {
+        $result[$final_name] = $item['#value'];
+      }
+      else {
+        $result[$final_name] = drupal_render($item);
+      }
+    }
+    else {
+      $result[$name] = $item;
+    }
   }
-  
+
   if (array_key_exists('#bridge_to_theme', $form_data) && $form_data['#bridge_to_theme']) {
-  	$result = theme($form_data['#bridge_to_theme'], $result);
+    $result = theme($form_data['#bridge_to_theme'], $result);
   }
   return $result;
 }
@@ -79,17 +79,17 @@ function form_theme_bridge_parse_data_for_layout(&$variables) {
   unset($variables['data']);
   $variables['required_hidden_fields'] = '';
   foreach ($data as $k => $v) {
-  	switch ($k) {
-  		case 'form_id':
-  		case 'form_build_id':
-  		case 'form_token':
-  			$variables['required_hidden_fields'] .= $v;
-  		break;
-  		// Allow adding elements in form definition function w/o needing rewrite here.
-  		default:
-  		  $variables[$k] = $v;
-  		break;
-  	}
+    switch ($k) {
+      case 'form_id':
+      case 'form_build_id':
+      case 'form_token':
+        $variables['required_hidden_fields'] .= $v;
+      break;
+      // Allow adding elements in form definition function w/o needing rewrite here.
+      default:
+        $variables[$k] = $v;
+      break;
+    }
   }
 }
 
@@ -104,22 +104,22 @@ function form_theme_bridge_parse_data_for_layout(&$variables) {
 function form_theme_bridge_clean_submitted_values(&$form_state, $order_by = 'id') {
   $result = array();
   foreach ($form_state['values'] as $element_name => $value) {
-  	$parts = explode('__', $element_name);
-  	$base = $parts[0];
-  	$id = $parts[1];
+    $parts = explode('__', $element_name);
+    $base = $parts[0];
+    $id = $parts[1];
     if (count($parts) != 2) {
-    	$result[$base] = $value;
-    	continue;
+      $result[$base] = $value;
+      continue;
     }
     switch ($order_by) {
-    	case 'id':
-    		$result[$id][$base] = $value;
-    	break;
-    	case 'base':
-    		$result[$base][$id] = $value;
-    	break;
+      case 'id':
+        $result[$id][$base] = $value;
+      break;
+      case 'base':
+        $result[$base][$id] = $value;
+      break;
     }
   }
-  
+
   $form_state['values'] = $result;
 }

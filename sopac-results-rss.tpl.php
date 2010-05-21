@@ -9,7 +9,7 @@ print '<?xml version="1.0" encoding="utf-8"?>' . "\n";
     <title type="text">Search for <?php print $search_term; ?></title>
     <updated><?php print date('Y-m-d') . 'T00:00:00-05:00'?></updated>
     <id>http://<?php print $_SERVER['SERVER_NAME']; ?>/</id>
-    <link rel="alternate" type="text/html" hreflang="en" href="http://<?php print $_SERVER['SERVER_NAME']; ?>/"/>
-    <link rel="self" type="application/atom+xml" href="http://<?php print urlencode($_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']); ?>"/>
-<?php print $hitlist_content ?>
+    <link rel="alternate" type="text/html" hreflang="en" href="<?php print url($base_path, array('absolute' => TRUE)); ?>"/>
+    <link rel="self" type="application/atom+xml" href="<?php print url($_GET['q'], array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)), 'absolute' => TRUE)); ?>"/>
+    <?php print $hitlist_content ?>
   </feed>

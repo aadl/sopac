@@ -21,8 +21,12 @@ foreach ($tags_arr as $tag_key => $tag_bundle) {
   $table_prefix = '';
   foreach ($tag_bundle as $tag => $tag_count) {
     $count = ($tag_count > 1) ? $tag_count . ' items' : $tag_count . ' item';
-    print $table_prefix . '<td><a href="/user/tag/show/' . urlencode($tag) . '">' . $tag . '</a></td><td>' . $count . '</td>';
-    print '<td id="nowrap">[ <a href="/user/tag/edit/' . urlencode($tag) . '?ref=' . urlencode($_SERVER['REQUEST_URI']) . '">Edit</a> ] [ <a href="/user/tag/delete/' . urlencode($tag) . '?ref=' . urlencode($_SERVER['REQUEST_URI']) . '">Delete</a> ]</tr>';
+    print $table_prefix . '<td>' . l($tag, 'user/tag/show/' . urlencode($tag)) . '</td><td>' . $count . '</td>';
+    print '<td id="nowrap">[ ' .
+          l('Edit', 'user/tag/edit/' . urlencode($tag), array('query' => array('ref' => $_GET['q']))) .
+          ' ] [ ' .
+          l('Delete', 'user/tag/delete/' . urlencode($tag), array('query' => array('ref' => $_GET['q']))) .
+          ' ]</td></tr>';
     $table_prefix = '<tr>';
   }
   $table_prefix = '';

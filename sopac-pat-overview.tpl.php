@@ -21,12 +21,13 @@
         print '<tr><td style="width: 100px;">';
         print theme_sopac_get_rating_stars($rating['bnum'], $rating['rating'], FALSE, TRUE, 'top') . ' ';
         print '</td><td>';
-        print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'] . '">' .
-          $ratings_chunk['bibs'][$rating['bnum']]['title'] . '</a>';
+        $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'];
+        print l($ratings_chunk['bibs'][$rating['bnum']]['title'], $path);
         print '</td></tr>';
       }
-    } else {
-        print $ratings_chunk['nodata'];
+    }
+    else {
+      print $ratings_chunk['nodata'];
     }
     ?>
     </table>
@@ -40,16 +41,17 @@
         print '<tr><td style="width: 100px;">';
         print theme_sopac_get_rating_stars($rating['bnum'], $rating['rating'], FALSE, TRUE, 'latest') . ' ';
         print '</td><td>';
-        print '<a href="/' . variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'] . '">' .
-          $ratings_chunk['bibs'][$rating['bnum']]['title'] . '</a>';
+        $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $rating['bnum'];
+        print l($ratings_chunk['bibs'][$rating['bnum']]['title'], $path);
         print '</td></tr>';
       }
-    } else {
+    }
+    else {
       print $ratings_chunk['nodata'];
     }
     ?>
     </table>
-    <div class="overview-more-info">[ <a href="/user/library/ratings"><?php print t('See All Your Ratings'); ?></a> ]</div>
+    <div class="overview-more-info">[ <?php print l('See All Your Ratings', 'user/library/ratings'); ?> ]</div>
   </td>
   </tr>
   <tr>
@@ -57,14 +59,14 @@
     <div class="overview-title"><?php print t('Top Tags'); ?></div>
     <?php print '<div class="overview-tag-cloud">' . $tag_cloud . '</div>'; ?>
     <br />
-    <div class="overview-more-info">[ <a href="/user/library/tags"><?php print t('See All Your Tags'); ?></a> ]</div>
+    <div class="overview-more-info">[ <?php print l('See All Your Tags', 'user/library/tags'); ?> ]</div>
   </td>
   </tr>
   <tr>
   <td colspan="2">
     <div class="overview-title"><?php print t('Recent Reviews'); ?></div>
     <?php print $review_display; ?>
-    <div class="overview-more-info">[ <a href="/user/library/reviews"><?php print t('See All Your Reviews'); ?></a> ]</div>
+    <div class="overview-more-info">[ <?php print l('See All Your Reviews', 'user/library/reviews'); ?> ]</div>
   </td>
   </tr>
 </table>

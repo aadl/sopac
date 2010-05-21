@@ -3,8 +3,7 @@
  * Search tracker Block template
  *
  */
-$uri_arr = explode('?', $_SERVER['REQUEST_URI']);
-$uri = $uri_arr[0];
+$uri = $_GET['q'];
 $getvars = sopac_parse_get_vars();
 $sortopts = array(
   '' => t('Relevance'),
@@ -34,37 +33,35 @@ if ($getvars['limit_avail'] && ($locum_config['branches'][$getvars['limit_avail'
   print '<br />Available at:';
   print '<div class="search-block-attr">';
 
-    $getvars_tmp = $getvars;
-    $getvars_tmp['limit_avail'] = '';
-    $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    if ($getvars['limit_avail'] == 'any') {
-      $limit_info = t('Any Location') . ' [<a href="' . $rem_link . '">x</a>]';
-    } else {
-      $limit_info = $locum_config['branches'][$getvars['limit_avail']] . ' [<a href="' . $rem_link . '">x</a>]';
-    }
+  $getvars_tmp = $getvars;
+  $getvars_tmp['limit_avail'] = '';
+  $getvars_tmp['page'] = '';
+  if ($getvars['limit_avail'] == 'any') {
+    $limit_info = t('Any Location') . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
+  }
+  else {
+    $limit_info = $locum_config['branches'][$getvars['limit_avail']] . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
+  }
   print $limit_info . '</div>';
 }
 ?>
 
 <br />
 By Format:
-<div class="search-block-attr"><?php 
+<div class="search-block-attr"><?php
   $search_format_flipped = is_array($getvars['search_format']) ? array_flip($getvars['search_format']) : array();
   if (count($search['format'])) {
     foreach ($search['format'] as $search_format) {
       $getvars_tmp = $getvars;
       unset($getvars_tmp['search_format'][$search_format_flipped[$search_format]]);
       $getvars_tmp['page'] = '';
-      $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-      $gvar_indicator = $pvars_tmp ? '?' : '';
-      $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-      $search_format_arr[trim($search_format)] = $locum_config['formats'][trim($search_format)] . ' [<a href="' . $rem_link . '">x</a>]';
+      $search_format_arr[trim($search_format)] = $locum_config['formats'][trim($search_format)] . ' [' .
+                                                 l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) .
+                                                 ']';
     }
     print implode('<br />', $search_format_arr);
-  } else {
+  }
+  else {
     print 'Everything';
   }
 ?></div>
@@ -78,10 +75,7 @@ if (is_array($getvars['age']) && count($getvars['age'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['age'][$age_flipped[$age]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $age_arr[$age] = $locum_config['ages'][$age] . ' [<a href="' . $rem_link . '">x</a>]';
+    $age_arr[$age] = $locum_config['ages'][$age] . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $age_arr);
   print '</div>';
@@ -96,10 +90,7 @@ if (is_array($getvars['collection']) && count($getvars['collection'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['collection'][$colection]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $coll_arr[$collection] = $collection . ' [<a href="' . $rem_link . '">x</a>]';
+    $coll_arr[$collection] = $collection . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $coll_arr);
   print '</div>';
@@ -115,10 +106,7 @@ if (is_array($getvars['location']) && count($getvars['location'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['location'][$location_flipped[$location]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $location_arr[trim($location)] = $locum_config['locations'][$location] . ' [<a href="' . $rem_link . '">x</a>]';
+    $location_arr[trim($location)] = $locum_config['locations'][$location] . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $location_arr);
   print '</div>';
@@ -138,10 +126,7 @@ if (is_array($getvars['facet_series']) && count($getvars['facet_series'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['facet_series'][$series_flipped[$series]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $series_arr[trim($series)] = $series . ' [<a href="' . $rem_link . '">x</a>]';
+    $series_arr[trim($series)] = $series . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $series_arr);
   print '</div>';
@@ -157,10 +142,7 @@ if (is_array($getvars['facet_lang']) && count($getvars['facet_lang'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['facet_lang'][$lang_flipped[$lang]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $lang_arr[trim($lang)] = ucfirst($locum_config['languages'][$lang]) . ' [<a href="' . $rem_link . '">x</a>]';
+    $lang_arr[trim($lang)] = ucfirst($locum_config['languages'][$lang]) . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $lang_arr);
   print '</div>';
@@ -176,10 +158,7 @@ if (is_array($getvars['facet_year']) && count($getvars['facet_year'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['facet_year'][$year_flipped[$year]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $year_arr[trim($year)] = $year . ' [<a href="' . $rem_link . '">x</a>]';
+    $year_arr[trim($year)] = $year . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $year_arr);
   print '</div>';
@@ -195,10 +174,7 @@ if (is_array($getvars['facet_decade']) && count($getvars['facet_decade'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['facet_decade'][$decade_flipped[$decade]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $decade_arr[trim($decade)] = $decade . '-' . ($decade + 9) . ' [<a href="' . $rem_link . '">x</a>]';
+    $decade_arr[trim($decade)] = $decade . '-' . ($decade + 9) . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $decade_arr);
   print '</div>';
@@ -215,21 +191,18 @@ if (is_array($getvars['facet_subject']) && count($getvars['facet_subject'])) {
     $getvars_tmp = $getvars;
     unset($getvars_tmp['facet_subject'][$subject_flipped[$subject]]);
     $getvars_tmp['page'] = '';
-    $pvars_tmp = trim(sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)));
-    $gvar_indicator = $pvars_tmp ? '?' : '';
-    $rem_link = $uri . $gvar_indicator . $pvars_tmp;
-    $subject_arr[trim($subject)] = $subject . ' [<a href="' . $rem_link . '">x</a>]';
+    $subject_arr[trim($subject)] = $subject . ' [' . l('x', $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp)))) . ']';
   }
   print implode('<br />', $subject_arr);
   print '</div>';
 }
 */
 ?>
-
 <br />
-<div style="float: right;">» <a href="/research_help">Need help?</a></div>
-<?php if ($user->uid) {
-  print '<div style="float: right;">» <a href="' . sopac_savesearch_url() . '">Save this search</a></div>';
+<?php
+print '<div style="float: right;">» ' . l('Need help?', 'research_help') . '</div>';
+if ($user->uid) {
+  print '<div style="float: right;">» ' . sopac_savesearch_link() . '&nbsp;</div>';
 }
 ?>
 <br />

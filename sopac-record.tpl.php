@@ -6,7 +6,7 @@
 // Set the page title
 drupal_set_title(ucwords($item['title']));
 
-// Set up some variables. 
+// Set up some variables.
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 $new_author_str = sopac_author_format($item['author'], $item['addl_author']);
 $dl_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['download']));
@@ -24,13 +24,16 @@ if ($item_status['avail'] == 0 && $item_status['holds'] > 0) {
   $class = "holds";
   $reqtext = "There are no copies available. " . $item_status['holds'] . " request" .
   ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ($item_status['total'] == 1 ? ' copy' : ' copies') . '.';
-} else if ($item_status['avail'] == 0) {
+}
+elseif ($item_status['avail'] == 0) {
   $class = "first";
   $reqtext = "There are no copies available.";
-} else if($item_status['holds'] > 0) {
+}
+elseif($item_status['holds'] > 0) {
   $class = "holds";
   $reqtext = "There " . ($item_status['avail'] == 1 ? 'is' : 'are') . " currently $item_status[avail] available and " . $item_status['holds'] . " request" . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
-} else {
+}
+else {
   $class = "avail";
   $reqtext = "There " . ($item_status['avail'] == 1 ? 'is' : 'are') . " currently $item_status[avail] available.";
 }
@@ -41,21 +44,24 @@ if (count($item_status['items'])) {
     if ($copy_status['avail'] > 0) {
       $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
       $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
-    } else if ($copy_status['due']) {
+    }
+    elseif ($copy_status['due']) {
       $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
-    } else {
+    }
+    else {
       $status_msg = $copy_status['statusmsg'];
     }
     if (variable_get('sopac_multi_branch_enable', 0)) {
       $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $locum_config['branches'][$copy_status['branch']], $status_msg);
-    } else {
+    }
+    else {
       $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
     }
   }
 }
 
 if (sopac_prev_search_url(TRUE)) {
-  print '<p><a href="' . sopac_prev_search_url() . '">&#171; Return to your search</a></p>';
+  print '<p>' . l("&#171; Return to your search", sopac_prev_search_url(), array('html' => TRUE)) . '</p>';
 }
 
 ?>
@@ -68,16 +74,20 @@ if (sopac_prev_search_url(TRUE)) {
 
     <!-- Cover Image -->
     <?php
-    if (module_exists('covercache')) {
-        print $cover_img;
-    } else {
-        $cover_img_url = ($item['cover_img'] && $locum_result['cover_img'] != 'CACHE') ? $item['cover_img'] : '/' . drupal_get_path('module', 'sopac') . '/images/nocover.png';
-        print '<img class="item-cover" width="200" src="' . $cover_img_url . '" />';
+    if (!module_exists('covercache')) {
+      if (strpos($item['cover_img'], 'http://') !== FALSE) {
+        $cover_img = $item['cover_img'];
+      }
+      else {
+        $cover_img = base_path() . drupal_get_path('module', 'sopac') . '/images/nocover.png';
+      }
+      $cover_img = '<img class="item-cover" width="200" src="' . $cover_img . '">';
     }
+    print $cover_img;
     ?>
 
     <!-- Ratings -->
-    <?php 
+    <?php
     if (variable_get('sopac_social_enable', 1)) {
       print '<div class="item-rating">';
       print theme_sopac_get_rating_stars($item['bnum']);
@@ -88,15 +98,30 @@ if (sopac_prev_search_url(TRUE)) {
     <!-- Item Details -->
     <ul>
       <?php
-      if ($item['pub_info']) { print '<li><b>Published:</b> ' . $item['pub_info'] . '</li>';  }
-      if ($item['pub_year']) { print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';  }
-      if ($item['series']) { print '<li><b>Series:</b> <a href="/' . 
-                           $url_prefix . '/search/series/' . urlencode($series) . '">' . $item['series'] . '</a></li>';  }
-      if ($item['edition']) { print '<li><b>Edition:</b> ' . $item['edition'] . '</li>';  }
-      if ($item['descr']) { print '<li><b>Description:</b> ' . nl2br($item['descr']) . '</li>';  }
-      if ($item['stdnum']) { print '<li><b>ISBN/Standard #:</b>' . $item['stdnum'] . '</li>';  }
-      if ($item['lang']) { print '<li><b>Language:</b> ' . $locum_config['languages'][$item['lang']] . '</li>';  }
-      if ($item['mat_code']) { print '<li><b>Format:</b> ' . $locum_config['formats'][$item['mat_code']] . '</li>';  }
+      if ($item['pub_info']) {
+        print '<li><b>Published:</b> ' . $item['pub_info'] . '</li>';
+      }
+      if ($item['pub_year']) {
+        print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';
+      }
+      if ($item['series']) {
+        print '<li><b>Series:</b> ' . l($item['series'], $url_prefix . '/search/series/' . urlencode($series)) . '</li>';
+      }
+      if ($item['edition']) {
+        print '<li><b>Edition:</b> ' . $item['edition'] . '</li>';
+      }
+      if ($item['descr']) {
+        print '<li><b>Description:</b> ' . nl2br($item['descr']) . '</li>';
+      }
+      if ($item['stdnum']) {
+        print '<li><b>ISBN/Standard #:</b>' . $item['stdnum'] . '</li>';
+      }
+      if ($item['lang']) {
+        print '<li><b>Language:</b> ' . $locum_config['languages'][$item['lang']] . '</li>';
+      }
+      if ($item['mat_code']) {
+        print '<li><b>Format:</b> ' . $locum_config['formats'][$item['mat_code']] . '</li>';
+      }
       ?>
     </ul>
 
@@ -106,8 +131,8 @@ if (sopac_prev_search_url(TRUE)) {
       print '<h3>Additional Credits</h3><ul>';
       $addl_author_arr = unserialize($item['addl_author']);
       foreach ($addl_author_arr as $addl_author) {
-        $addl_author_link = '/' . $url_prefix . '/search/author/%22' . urlencode($addl_author) .'%22';
-        print '<li><a href="' . $addl_author_link . '">' . $addl_author . '</a></li>';
+        $addl_author_link = $url_prefix . '/search/author/%22' . urlencode($addl_author) .'%22';
+        print '<li>' . l($addl_author, $addl_author_link) . '</li>';
       }
       print '</ul>';
     }
@@ -120,8 +145,8 @@ if (sopac_prev_search_url(TRUE)) {
       $subj_arr = unserialize($item['subjects']);
       if (is_array($subj_arr)) {
         foreach ($subj_arr as $subj) {
-          $subjurl = '/' . $url_prefix . '/search/subject/%22' . urlencode($subj) . '%22';
-          print '<li><a href="' . $subjurl . '">' . $subj . '</a></li>';
+          $subjurl = $url_prefix . '/search/subject/%22' . urlencode($subj) . '%22';
+          print '<li>' . l($subj, $subjurl) . '</li>';
         }
       }
       print '</ul>';
@@ -150,7 +175,7 @@ if (sopac_prev_search_url(TRUE)) {
       print '<div class="suppressed">This Record is Suppressed</div>';
     }
     ?>
-    
+
     <!-- Item Title -->
     <h1>
       <?php
@@ -168,10 +193,10 @@ if (sopac_prev_search_url(TRUE)) {
     </ul>
 
     <!-- Item Author -->
-    <?php 
-    if ($item['author']) { 
-      $authorurl = '/' . $url_prefix . '/search/author/' . $new_author_str;
-      print '<h3>by <a href="' . $authorurl . '">' . $new_author_str . '</a></h3>';
+    <?php
+    if ($item['author']) {
+      $authorurl = $url_prefix . '/search/author/' . $new_author_str;
+      print '<h3>by ' . l($new_author_str, $authorurl) . '</h3>';
     }
     ?>
 
@@ -182,14 +207,14 @@ if (sopac_prev_search_url(TRUE)) {
       print '<p>' . sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]) . '</p>';
       print '<h3>' . $reqtext . '</h3>';
       print '</div>';
-    } 
+    }
     ?>
 
     <!-- Where to find it -->
     <div class="item-avail-disp">
       <h2>Where To Find It</h2>
       <?php
-      if ($item_status['callnums']) { 
+      if ($item_status['callnums']) {
         print '<p>Call number: <strong>' . implode(", ", $item_status['callnums']) . '</strong></p>';
       }
 
@@ -197,16 +222,21 @@ if (sopac_prev_search_url(TRUE)) {
         print '<div><fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend><div>';
         if (variable_get('sopac_multi_branch_enable', 0)) {
           print theme('table', array("Location", "Call Number", "Branch", "Item Status"), $copy_status_array);
-        } else {
+        }
+        else {
           print theme('table', array("Location", "Call Number", "Item Status"), $copy_status_array);
         }
         print '</div></fieldset></div>';
-      } else if ($item['download_link']) {
+      }
+      elseif ($item['download_link']) {
         print '<div class="item-request">';
-        print '<p><a href="' . $item['download_link'] . '" target="_new">Download this Title</a></p>';
+        print '<p>' . l('Download this Title', $item['download_link'], array('attributes' => array('target' => '_new'))) . '</p>';
         print '</div>';
-      } else {
-        if (!$no_avail_mat_codes) { print '<p>No copies found.</p>'; }
+      }
+      else {
+        if (!$no_avail_mat_codes) {
+          print '<p>No copies found.</p>';
+        }
       }
       if (count($item_status['orders'])) {
         print '<p>' . implode("</p><p>", $item_status['orders']) . '</p>';
@@ -233,7 +263,7 @@ if (sopac_prev_search_url(TRUE)) {
       print '<h2>Reviews &amp; Summaries</h2>';
       print '<ul>';
       foreach ($item['review_links'] as $rev_title => $rev_link) {
-        print '<li><a href="' . $rev_link . '" target="_new">' . $rev_title . '</a>';
+        print '<li>' . l($rev_title, $rev_link, array('attributes' => array('target' => '_new'))) . '</li>';
       }
       print '</ul></div>';
     }
@@ -246,21 +276,26 @@ if (sopac_prev_search_url(TRUE)) {
       if (count($rev_arr)) {
         foreach ($rev_arr as $rev_item) {
           print '<div class="hreview">';
-          print '<h3 class="summary"><a href="/review/view/' . $rev_item['rev_id'] . '" class="fn url">' . $rev_item['rev_title'] . '</a></h3>';
+          print '<h3 class="summary">' . l($rev_item['rev_title'], 'review/view/' . $rev_item['rev_id'], array('attributes' => array('class' => 'fn url'))) . '</h3>';
           if ($rev_item['uid']) {
             $rev_user = user_load(array('uid' => $rev_item['uid']));
-            print '<p class="review-byline">submitted by <span class="review-author"><a href="/review/user/' . $rev_item['uid'] . '">' . $rev_user->name . '</a> on <abbr class="dtreviewed" title="' . date("c", $rev_item['timestamp']) . '">' . date("F j, Y, g:i a", $rev_item['timestamp']) . '</abbr></span>';
+            print '<p class="review-byline">submitted by <span class="review-author">' . l($rev_user->name, 'review/user/' . $rev_item['uid']) . ' on <abbr class="dtreviewed" title="' . date("c", $rev_item['timestamp']) . '">' . date("F j, Y, g:i a", $rev_item['timestamp']) . '</abbr></span>';
             if ($user->uid == $rev_item['uid']) {
-              print ' &nbsp; [ <a title="Delete this review" href="/review/delete/' . $rev_item['rev_id'] . '?ref=' . urlencode($_SERVER['REQUEST_URI']) . '">delete</a> ] [ <a title="Edit this review" href="/review/edit/' . $rev_item['rev_id'] . '?ref=' . urlencode($_SERVER['REQUEST_URI']) . '">edit</a> ]';
+              print ' &nbsp; [ ' .
+                    l('delete', 'review/delete/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Delete this review'), 'query' => array('ref' => $_GET['q']))) .
+                    ' ] [ ' .
+                    l('edit', 'review/edit/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Edit this review'), 'query' => array('ref' => $_GET['q']))) .
+                    ' ]';
             }
             print '</p>';
           }
           print '<div class="review-body description">' . nl2br($rev_item['rev_body']) . '</div></div>';
         }
-      } else {
+      }
+      else {
         print '<p>No reviews have been written yet.  You could be the first!</p>';
       }
-      print $rev_form ? $rev_form : '<p><a href="/user/login?destination=' . $_SERVER['REQUEST_URI'] . '">Login</a> to write a review of your own.</p>';
+      print $rev_form ? $rev_form : '<p>' . l('Login', 'user/login', array('query' => array('destination' => $_GET['q']))) . ' to write a review of your own.</p>';
       ?>
     </div>
 
