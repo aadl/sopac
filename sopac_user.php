@@ -146,7 +146,7 @@ function sopac_user_info_table(&$account, &$locum) {
     }
   }
   else {
-    $cardnum_link = l('Click to add your library card', 'user/' . $account->uid . '/edit/Preferences');
+    $cardnum_link = l(t('Click to add your library card'), 'user/' . $account->uid . '/edit/Preferences');
     $rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
     // add row for home branch if appropriate
     if ($home_branch_link) {
@@ -570,10 +570,10 @@ function sopac_checkouts_page() {
     $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that the library card number stored on our website is invalid. If you have received a new card, or feel that this is an error, please click on the card number above to change it to your most recent library card. If you need further help, please contact us.')) . '</div>';
   }
   elseif (!$user->uid) {
-    $content = '<div class="error">' . t('You must be ') . l('logged in', 'user') . t(' to view this page.') . '</div>';
+    $content = '<div class="error">' . t('You must be ') . l(t('logged in'), 'user') . t(' to view this page.') . '</div>';
   }
   elseif (!$cardnum) {
-    $content = '<div class="error">' . t('You must register a valid ') . l('library card number', 'user/' . $user->uid . '/edit/Preferences') . t(' to view this page.') . '</div>';
+    $content = '<div class="error">' . t('You must register a valid ') . l(t('library card number'), 'user/' . $user->uid . '/edit/Preferences') . t(' to view this page.') . '</div>';
   }
 
   return $content;
@@ -617,11 +617,11 @@ function sopac_checkout_history_page() {
       if (!is_array($checkouts)) {
         if ($checkouts == 'out') {
           $content = '<div>'. t('This feature is currently turned off.') . '</div>';
-          $toggle = l('Opt In', 'user/checkouts/history/opt/in');
+          $toggle = l(t('Opt In'), 'user/checkouts/history/opt/in');
         }
         if ($checkouts == 'in') {
           $content = '<div>There are no items in your checkout history.</div>';
-          $toggle = l('Opt Out', 'user/checkouts/history/opt/out');
+          $toggle = l(t('Opt Out'), 'user/checkouts/history/opt/out');
         }
       }
       else {
@@ -678,7 +678,7 @@ function sopac_checkout_history_toggle($action) {
   profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
     if (!$_GET['confirm']) {
-      $confirm_link = l('confirm', $_GET['q'], array('query' => 'confirm=true'));
+      $confirm_link = l(t('confirm'), $_GET['q'], array('query' => 'confirm=true'));
       $content = "<div>Please $confirm_link that you wish to turn $adjective your checkout history.";
       if ($action == 'out') {
         $content .= ' ' . t('Please note: this will delete your entire checkout history.');
@@ -738,10 +738,10 @@ function sopac_holds_page() {
     $content = '<div class="error">' . variable_get('sopac_invalid_cardnum', t('It appears that the library card number stored on our website is invalid. If you have received a new card, or feel that this is an error, please click on the card number above to change it to your most recent library card. If you need further help, please contact us.')) . '</div>';
   }
   elseif (!$user->uid) {
-    $content = '<div class="error">' . t('You must be ') . l('logged in', 'user') . t(' to view this page.') . '</div>';
+    $content = '<div class="error">' . t('You must be ') . l(t('logged in'), 'user') . t(' to view this page.') . '</div>';
   }
   elseif (!$cardnum) {
-    $content = '<div class="error">' . t('You must register a valid ') . l('library card number', 'user/' . $user->uid . '/edit/Preferences') . t(' to view this page.') . '</div>';
+    $content = '<div class="error">' . t('You must register a valid ') . l(t('library card number'), 'user/' . $user->uid . '/edit/Preferences') . t(' to view this page.') . '</div>';
   }
 
   return $content;
@@ -788,7 +788,7 @@ function sopac_fines_page() {
     }
   }
   else {
-    $notice = t('You do not yet have a library card validated with our system.  You can add and validate a card using your ') . l('account page', 'user') . '.';
+    $notice = t('You do not yet have a library card validated with our system.  You can add and validate a card using your ') . l(t('account page'), 'user') . '.';
   }
 
   $result_page = theme('sopac_fines', $notice, $fine_table, &$user);
@@ -870,7 +870,7 @@ function sopac_makepayment_page() {
     }
   }
   else {
-    $notice = t('You do not yet have a library card validated with our system.  You can add and validate a card using your ') . l('account page', 'user') . '.';
+    $notice = t('You do not yet have a library card validated with our system.  You can add and validate a card using your ') . l(t('account page'), 'user') . '.';
   }
 
   $result_page = theme('sopac_fines', $notice, $fine_table, &$user, $payment_form);
@@ -1121,7 +1121,7 @@ function sopac_savesearch_form_submit($form, &$form_state) {
   db_query('INSERT INTO {sopac_saved_searches} VALUES (0, ' . $user->uid . ', NOW(), "' . $desc . '", "' . $form_state['values']['uri'] . '")');
 
   $parts = explode('?', $form_state['values']['uri']);
-  $submsg = '<strong>»</strong> ' . t('You have saved this search.') . '<br /><strong>»</strong> ' . l('Return to your search', $parts[0], array('query' => $parts[1])) . '<br /><br />';
+  $submsg = '<strong>»</strong> ' . t('You have saved this search.') . '<br /><strong>»</strong> ' . l(t('Return to your search'), $parts[0], array('query' => $parts[1])) . '<br /><br />';
   drupal_set_message($submsg);
 
 }

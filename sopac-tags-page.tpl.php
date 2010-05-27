@@ -23,9 +23,9 @@ foreach ($tags_arr as $tag_key => $tag_bundle) {
     $count = ($tag_count > 1) ? $tag_count . ' items' : $tag_count . ' item';
     print $table_prefix . '<td>' . l($tag, 'user/tag/show/' . urlencode($tag)) . '</td><td>' . $count . '</td>';
     print '<td id="nowrap">[ ' .
-          l('Edit', 'user/tag/edit/' . urlencode($tag), array('query' => array('ref' => $_GET['q']))) .
+          l(t('Edit'), 'user/tag/edit/' . urlencode($tag), array('query' => array('ref' => $_GET['q']))) .
           ' ] [ ' .
-          l('Delete', 'user/tag/delete/' . urlencode($tag), array('query' => array('ref' => $_GET['q']))) .
+          l(t('Delete'), 'user/tag/delete/' . urlencode($tag), array('query' => array('ref' => $_GET['q']))) .
           ' ]</td></tr>';
     $table_prefix = '<tr>';
   }

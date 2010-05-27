@@ -230,7 +230,7 @@ if (sopac_prev_search_url(TRUE)) {
       }
       elseif ($item['download_link']) {
         print '<div class="item-request">';
-        print '<p>' . l('Download this Title', $item['download_link'], array('attributes' => array('target' => '_new'))) . '</p>';
+        print '<p>' . l(t('Download this Title'), $item['download_link'], array('attributes' => array('target' => '_new'))) . '</p>';
         print '</div>';
       }
       else {
@@ -282,9 +282,9 @@ if (sopac_prev_search_url(TRUE)) {
             print '<p class="review-byline">submitted by <span class="review-author">' . l($rev_user->name, 'review/user/' . $rev_item['uid']) . ' on <abbr class="dtreviewed" title="' . date("c", $rev_item['timestamp']) . '">' . date("F j, Y, g:i a", $rev_item['timestamp']) . '</abbr></span>';
             if ($user->uid == $rev_item['uid']) {
               print ' &nbsp; [ ' .
-                    l('delete', 'review/delete/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Delete this review'), 'query' => array('ref' => $_GET['q']))) .
+                    l(t('delete'), 'review/delete/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Delete this review'), 'query' => array('ref' => $_GET['q']))) .
                     ' ] [ ' .
-                    l('edit', 'review/edit/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Edit this review'), 'query' => array('ref' => $_GET['q']))) .
+                    l(t('edit'), 'review/edit/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Edit this review'), 'query' => array('ref' => $_GET['q']))) .
                     ' ]';
             }
             print '</p>';
@@ -295,7 +295,7 @@ if (sopac_prev_search_url(TRUE)) {
       else {
         print '<p>No reviews have been written yet.  You could be the first!</p>';
       }
-      print $rev_form ? $rev_form : '<p>' . l('Login', 'user/login', array('query' => array('destination' => $_GET['q']))) . ' to write a review of your own.</p>';
+      print $rev_form ? $rev_form : '<p>' . l(t('Login'), 'user/login', array('query' => array('destination' => $_GET['q']))) . ' to write a review of your own.</p>';
       ?>
     </div>
 
