@@ -106,7 +106,7 @@ function sopac_admin() {
     '#default_value' => variable_get('sopac_url_prefix', 'cat/seek'),
     '#size' => 24,
     '#maxlength' => 72,
-    '#description' => t("This is the URL prefix you wish SOPAC to use within the site, for example, to use www.yoursite.com/cat/seek as the base URL for SOPAC, enter 'cat/seek' without the leading or trailing slash.  If you change this, you will likely need to clear your site cache in your ") . l('performance settings', 'admin/settings/performance'),
+    '#description' => t("This is the URL prefix you wish SOPAC to use within the site, for example, to use www.yoursite.com/cat/seek as the base URL for SOPAC, enter 'cat/seek' without the leading or trailing slash.  If you change this, you will likely need to clear your site cache in your ") . l(t('performance settings'), 'admin/settings/performance'),
     '#required' => TRUE,
   );
 
@@ -139,7 +139,7 @@ function sopac_admin() {
   $description = t('Check this box if your library has multiple branches, and you would like each user to be able to select a home branch.');
   $description .= t('<br />NOTE: this feature requires that branches are set up in the locum config.');
   $description .= t('<br />NOTE: the user option will be set up during the first cron job after checking this box.');
-  
+
   $form['sopac_general']['sopac_home_branch_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow Users to Select a Home Branch'),

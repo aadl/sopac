@@ -173,7 +173,7 @@ function theme_sopac_tag_block($block_type) {
   }
   else {
     if ($put_tag_form) {
-      $block_suffix = '<br /><br />' . l('Login to add tags', 'user/login', array('query' => drupal_get_destination()));
+      $block_suffix = '<br /><br />' . l(t('Login to add tags'), 'user/login', array('query' => drupal_get_destination()));
     }
   }
 
@@ -457,7 +457,7 @@ function sopac_review_page($page_type) {
           $rev_form = drupal_get_form('sopac_review_form', $item['bnum']);
         }
         elseif (!$user->uid) {
-          $rev_form = '<div class="review-login">' . l('Login', 'user/login', array('query' => drupal_get_destination())) . t(' to write a review') . '</div>';
+          $rev_form = '<div class="review-login">' . l(t('Login'), 'user/login', array('query' => drupal_get_destination())) . t(' to write a review') . '</div>';
         }
         $result_page = theme('sopac_review', $user, $title, $rev_arr, $page_type, $rev_form, $ratings, $no_rev_msg);
         $result_page .= theme('pager', NULL, $page_limit, 0, NULL, 6);
@@ -716,7 +716,7 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
 
   if (!$user->uid) {
     $disable_flag = ' disabled="disabled" ';
-    $login_string = ' - ' . l('Login', 'user/login', array('query' => drupal_get_destination())) . t(' to add yours');
+    $login_string = ' - ' . l(t('Login'), 'user/login', array('query' => drupal_get_destination())) . t(' to add yours');
   }
 
   $ratings_info_arr = $insurge->get_rating($bnum);

@@ -51,7 +51,7 @@ if (!module_exists('covercache')) {
                   print ($locum_result['status']['total'] == 1) ? t('copy available') : t('copies available');
                   ?>
                 </li>
-                <li id="item-request">» <?php print l('Request this item', $url_prefix . '/record/' . $locum_result['bnum'], array('absolute' => TRUE)); ?></li>
+                <li id="item-request">» <?php print l(t('Request this item'), $url_prefix . '/record/' . $locum_result['bnum'], array('absolute' => TRUE)); ?></li>
               </ul>
             </td>
           </tr>

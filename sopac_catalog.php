@@ -352,20 +352,20 @@ function sopac_put_request_link($bnum) {
         return $form;
       }
       else {
-        $link = l('Request this item', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum);
+        $link = l(t('Request this item'), variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum);
       }
     }
     elseif ($user->profile_pref_cardnum) {
       // User is logged in but does not have a verified card number
-      $link = l('Verify your card to request this item', 'user/' . $user->uid);
+      $link = l(t('Verify your card to request this item'), 'user/' . $user->uid);
     }
     else {
       // User is logged in but does not have a card number.
-      $link = l('Register your card to request this item', 'user/' . $user->uid);
+      $link = l(t('Register your card to request this item'), 'user/' . $user->uid);
     }
   }
   else {
-    $link = l('Please log in to request this item', 'user/login', array('query' => drupal_get_destination()));
+    $link = l(t('Please log in to request this item'), 'user/login', array('query' => drupal_get_destination()));
   }
 
   return $link;
@@ -551,7 +551,7 @@ function sopac_request_item() {
  * @return string link
  */
 function sopac_savesearch_link() {
-  $search_link = l('Save this search', str_replace('/search/', '/savesearch/', $_GET['q']),
+  $search_link = l(t('Save this search'), str_replace('/search/', '/savesearch/', $_GET['q']),
                    array('query' => sopac_make_pagevars(sopac_parse_get_vars())));
   return $search_link;
 }
@@ -599,8 +599,9 @@ function sopac_search_form_basic() {
 
   // Initialize the form
   $form = array(
-    '#action' => '/search_handler',
     '#attributes' => array('class' => 'search-form'),
+    '#validate' => array('sopac_search_catalog_validate'),
+    '#submit' => array('sopac_search_catalog_submit'),
   );
 
   // Start creating the basic search form
@@ -612,13 +613,11 @@ function sopac_search_form_basic() {
     '#default_value' => $search_args,
     '#size' => 25,
     '#maxlength' => 255,
-    '#value' => $actions[0] == 'search' ? $search_args : '',
   );
   $form['basic']['inline']['search_type'] = array(
     '#type' => 'select',
     '#title' => t(' by '),
     '#default_value' => $stype_selected,
-    '#value' => $stype_selected,
     '#options' => $stypes,
   );
   $form['basic']['inline']['search_format'] = array(
@@ -629,7 +628,10 @@ function sopac_search_form_basic() {
     '#options' => $sformats,
   );
 
-  $form['basic']['inline']['submit'] = array('#type' => 'submit', '#value' => t('Search'));
+  $form['basic']['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Search')
+  );
 
   if (variable_get('sopac_multi_branch_enable', 0)) {
     $form['basic']['limit']['limit'] = array(
@@ -708,8 +710,9 @@ function sopac_search_form_adv() {
 
   // Initialize the form
   $form = array(
-    '#action' => '/search_handler',
     '#attributes' => array('class' => 'search-form'),
+    '#validate' => array('sopac_search_catalog_validate'),
+    '#submit' => array('sopac_search_catalog_submit'),
   );
 
   // Start creating the advanced search form
@@ -730,20 +733,17 @@ function sopac_search_form_adv() {
     '#default_value' => $search_args,
     '#size' => 20,
     '#maxlength' => 255,
-    '#value' => $search_args,
   );
   $form['advanced']['keywords']['search_type'] = array(
     '#type' => 'select',
     '#title' => t('Search by'),
     '#default_value' => $stype_selected,
-    '#value' => $stype_selected,
     '#options' => $stypes,
   );
   $form['advanced']['keywords']['sort'] = array(
     '#type' => 'select',
     '#title' => t('Sorted by'),
-    '#default_value' => '',
-    '#value' => $getvars['sort'],
+    '#default_value' => $getvars['sort'],
     '#options' => $sortopts,
   );
 
@@ -792,7 +792,7 @@ function sopac_search_form_adv() {
     '#type' => 'select',
     '#title' => t('In these formats'),
     '#size' => 5,
-    '#value' => $getvars['search_format'],
+    '#default_value' => $getvars['search_format'],
     '#options' => $locum_cfg['formats'],
     '#multiple' => TRUE,
   );
@@ -838,4 +838,124 @@ function sopac_search_form_adv() {
   );
 
   return $form;
+}
+
+/**
+ * validate on form submission
+ */
+function sopac_search_catalog_validate($form, &$form_state) {
+  if (trim($form_state['values']['search_query']) == '') {
+    form_set_error('search_query', t('Please enter a search term to start your search'));
+  }
+}
+
+/**
+ * build a search url based on form submission, handles both basic and advanced search forms
+ */
+function sopac_search_catalog_submit($form, &$form_state) {
+  $locum = sopac_get_locum('locum');
+  $locum_cfg = $locum->locum_config;
+
+  $search_query = trim($form_state['values']['search_query']);
+  if (!$search_query) {
+    $search_query = '*';
+  }
+  $search_type = $form_state['values']['search_type'];
+  $search_type_arr = explode('_', $search_type);
+  if ($search_type_arr[0] == 'cat') {
+    $search_type = $search_type_arr[1];
+    $search_fmt = $search_type_arr[2];
+    $search_url = variable_get('sopac_url_prefix', 'cat/seek') . '/search/' . $search_type . '/' . $search_query;
+
+    // Material / Format types
+    if ($search_fmt) {
+      if ($search_fmt != 'all') {
+        $uris['search_format'] = $locum->csv_parser($locum_cfg['format_groups'][$search_fmt], '|');
+      }
+    }
+    elseif ($form_state['values']['search_format']) {
+      if (is_array($form_state['values']['search_format'])) {
+        $uris['search_format'] = trim(implode('|', $form_state['values']['search_format']));
+      }
+      else {
+        $uris['search_format'] = $form_state['values']['search_format'];
+      }
+    }
+
+    // Location selections overrule collection selections and act as
+    // a filter if they are in a selection colection.
+    if ($form_state['values']['collection']) {
+      $locations = array();
+      $uris['collection'] = trim(implode('|', $form_state['values']['collection']));
+      foreach ($form_state['values']['collection'] as $collection) {
+        $collection_arr = $locum->csv_parser($locum_cfg['collections'][$collection]);
+        if ($form_state['values']['location']) {
+          $valid_locs = array_intersect($form_state['values']['location'], $collection_arr);
+          if (count($valid_locs)) {
+            $locations = array_merge($locations, $valid_locs);
+          }
+          else {
+            $locations = array_merge($locations, $collection_arr);
+          }
+        }
+        else {
+          $locations = array_merge($locations, $collection_arr);
+        }
+      }
+      if ($form_state['values']['location']) {
+        $locations = array_merge($locations, array_diff($form_state['values']['location'], $locations));
+      }
+    }
+    elseif ($form_state['values']['location']) {
+      $locations = $form_state['values']['location'];
+    }
+    if (count($locations)) {
+      $uris['location'] = trim(implode('|', $locations));
+    }
+
+    // Sort variable
+    if ($form_state['values']['sort']) {
+      $uris['sort'] = $form_state['values']['sort'];
+    }
+
+    // Age Group variable
+    if ($form_state['values']['age']) {
+      $uris['age'] = $form_state['values']['age'];
+    }
+
+    // Limit to Available
+    if ($form_state['values']['limit_avail'] || $form_state['values']['limit']) {
+      if (variable_get('sopac_multi_branch_enable', 0)) {
+        if ($form_state['values']['limit_avail'] && $form_state['values']['limit']) {
+          $uris['limit_avail'] = $form_state['values']['limit_avail'];
+        }
+      }
+      else {
+        $uris['limit_avail'] = 'any';
+      }
+    }
+
+    // Publisher Search
+    if ($form_state['values']['publisher']) {
+      $uris['pub'] = trim($form_state['values']['publisher']);
+    }
+
+    // Publication date ranges
+    if ($form_state['values']['pub_year_start'] || $form_state['values']['pub_year_end']) {
+      $uris['pub_year'] = trim($form_state['values']['pub_year_start']) . '|' .
+                          trim($form_state['values']['pub_year_end']);
+    }
+  }
+  elseif ($search_type_arr[0] == 'web') {
+    switch ($search_type_arr[1]) {
+      case 'local':
+        $search_url = 'search/node/' . utf8_urldecode($search_query);
+        break;
+      case 'google':
+        $search_url = 'http://www.google.com/search?hl=en&q=' . utf8_urldecode($search_query);
+        break;
+    }
+  }
+
+  drupal_goto($search_url, $uris);
 }

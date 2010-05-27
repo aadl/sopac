@@ -51,7 +51,7 @@
     }
     ?>
     </table>
-    <div class="overview-more-info">[ <?php print l('See All Your Ratings', 'user/library/ratings'); ?> ]</div>
+    <div class="overview-more-info">[ <?php print l(t('See All Your Ratings'), 'user/library/ratings'); ?> ]</div>
   </td>
   </tr>
   <tr>
@@ -59,14 +59,14 @@
     <div class="overview-title"><?php print t('Top Tags'); ?></div>
     <?php print '<div class="overview-tag-cloud">' . $tag_cloud . '</div>'; ?>
     <br />
-    <div class="overview-more-info">[ <?php print l('See All Your Tags', 'user/library/tags'); ?> ]</div>
+    <div class="overview-more-info">[ <?php print l(t('See All Your Tags'), 'user/library/tags'); ?> ]</div>
   </td>
   </tr>
   <tr>
   <td colspan="2">
     <div class="overview-title"><?php print t('Recent Reviews'); ?></div>
     <?php print $review_display; ?>
-    <div class="overview-more-info">[ <?php print l('See All Your Reviews', 'user/library/reviews'); ?> ]</div>
+    <div class="overview-more-info">[ <?php print l(t('See All Your Reviews'), 'user/library/reviews'); ?> ]</div>
   </td>
   </tr>
 </table>

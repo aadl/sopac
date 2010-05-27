@@ -34,9 +34,9 @@ if (count($rev_arr)) {
       print ':: <span class="review-date">' . date("F j, Y, g:i a", $rev_item['timestamp']) . '</span></span>';
       if ($user->uid == $rev_item['uid']) {
         print ' [ ' .
-              l('delete', 'review/delete/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Delete this review'), 'query' => array('ref' => $_GET['q']))) .
+              l(t('delete'), 'review/delete/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Delete this review'), 'query' => array('ref' => $_GET['q']))) .
               ' ] [ ' .
-              l('edit', 'review/edit/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Edit this review'), 'query' => array('ref' => $_GET['q']))) .
+              l(t('edit'), 'review/edit/' . $rev_item['rev_id'], array('attributes' => array('title' => 'Edit this review'), 'query' => array('ref' => $_GET['q']))) .
               ' ]';
       }
     }
