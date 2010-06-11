@@ -242,8 +242,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
  */
 function sopac_user_holds_form() {
   global $user;
-  $form = array();
+  profile_load_profile(&$user);
 
+  $form = array();
   $cardnum = $user->profile_pref_cardnum;
   $ils_pass = $user->locum_pass;
   $locum = sopac_get_locum();
@@ -294,7 +295,7 @@ function sopac_user_holds_form() {
     );
     $hold_to_theme['pickup'] = array(
       '#type' => 'markup',
-      '#value' => $hold['pickuploc']['options'][$hold['pickuploc']['selected']],
+      '#value' => $hold['pickuploc'],
     );
     if ($freezes_enabled) {
       if ($hold['can_freeze']) {
@@ -310,7 +311,6 @@ function sopac_user_holds_form() {
         );
       }
     }
-
     $form['holds'][$bnum] = $hold_to_theme;
   }
 

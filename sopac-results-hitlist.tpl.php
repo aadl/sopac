@@ -5,7 +5,6 @@
  */
 
 // Prep some stuff here
-
 $new_author_str = sopac_author_format($locum_result['author'], $locum_result['addl_author']);
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 
@@ -53,13 +52,29 @@ if (!module_exists('covercache')) {
       <br />
       <li>
       <?php
-      print $locum_result['status']['avail'] . t(' of ') . $locum_result['status']['total'] . ' ';
-      print ($locum_result['status']['total'] == 1) ? t('copy available') : t('copies available');
+      if ($locum_result['status']['avail']) {
+        // Build list of locations
+        $locations = array();
+        foreach ($locum_result['status']['items'] as $item) {
+          if ($item['avail']) {
+            $locations[$item['loc_code']] = $item['location'];
+          }
+        }
+        $locations = implode(', ', $locations);
+
+        print $locum_result['status']['avail'] . t(' of ') . $locum_result['status']['total'] . ' ';
+        print ($locum_result['status']['total'] == 1 ? t('copy') : t('copies')) . ' ';
+        print t('available at') . ' ' . $locations;
+      }
+      else {
+        print t('No copies available');
+      }
       ?>
       </li>
       <?php
       if (!in_array($locum_result['loc_code'], $no_circ)) {
-        print '<li class="item-request"><strong>» ' . sopac_put_request_link($locum_result['bnum']) . '</strong></li>';
+        $avail_class = ($locum_result['status']['avail'] ? "request-avail" : "request-unavail");
+        print '<li class="item-request ' . $avail_class . '">' . sopac_put_request_link($locum_result['bnum']) . '</li>';
       }
       ?>
     </ul>
@@ -77,7 +92,7 @@ if (!module_exists('covercache')) {
   ?>
   <td width="15%">
   <ul class="hitlist-format-icon">
-    <li><img src="<?php print '/' . drupal_get_path('module', 'sopac') . '/images/' . $locum_result['mat_code'] . '.png' ?>"></li>
+    <li><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $locum_result['mat_code'] . '.png' ?>"></li>
     <li style="margin-top: -2px;"><?php print wordwrap($locum_config['formats'][$locum_result['mat_code']], 8, '<br />'); ?></li>
   </ul>
 

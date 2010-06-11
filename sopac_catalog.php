@@ -368,7 +368,7 @@ function sopac_put_request_link($bnum) {
     $link = l(t('Please log in to request this item'), 'user/login', array('query' => drupal_get_destination()));
   }
 
-  return $link;
+  return '» ' . $link;
 }
 
 /**
@@ -384,12 +384,14 @@ function sopac_multibranch_hold_request(&$form_state, $bnum = null) {
   $locum_cfg = $locum->locum_config;
   $options = $locum_cfg['branches'];
 
-  $form = array();
+  $form = array(
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
   $form['hold_location'] = array(
     '#type' => 'select',
-    '#title' => t('Request this item for pickup at'),
+    '#title' => '» ' . t('Request this item for pickup at'),
     '#options' => $options,
-    '#required' => TRUE,
   );
   if (isset($user->profile_pref_home_branch)) {
     $options = array_flip($options);

@@ -188,7 +188,7 @@ if (sopac_prev_search_url(TRUE)) {
 
     <!-- Item Format Icon -->
     <ul class="item-format-icon">
-      <li><img src="<?php print '/' . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png' ?>"></li>
+      <li><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png' ?>"></li>
       <li style="margin-top: -2px;"><?php print wordwrap($locum_config['formats'][$item['mat_code']], 8, '<br />'); ?></li>
     </ul>
 
@@ -203,7 +203,8 @@ if (sopac_prev_search_url(TRUE)) {
     <!-- Request Link -->
     <?php
     if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
-      print '<div class="item-request">';
+      $avail_class = ($item_status['avail'] ? "request-avail" : "request-unavail");
+      print '<div class="item-request ' . $avail_class . '">';
       print '<p>' . sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]) . '</p>';
       print '<h3>' . $reqtext . '</h3>';
       print '</div>';
@@ -219,6 +220,19 @@ if (sopac_prev_search_url(TRUE)) {
       }
 
       if (count($item_status['items']) && !$no_avail_mat_codes) {
+        if ($item_status['avail']) {
+          // Build list of locations
+          $locations = array();
+          foreach ($item_status['items'] as $item) {
+            if ($item['avail']) {
+              $locations[$item['loc_code']] = $item['location'];
+            }
+          }
+          $locations = implode(', ', $locations);
+
+          print "<p>Available Copies: <strong>$locations</strong></p>";
+        }
+
         print '<div><fieldset class="collapsible collapsed"><legend>Show All Copies (' . count($item_status['items']) . ')</legend><div>';
         if (variable_get('sopac_multi_branch_enable', 0)) {
           print theme('table', array("Location", "Call Number", "Branch", "Item Status"), $copy_status_array);

@@ -109,12 +109,12 @@
 /*
  * Item record styles
  */
- 
+
 .itemrecord {
   padding: 0px 0px 0px 10px;
   width: 100%;
 }
- 
+
 .itemrecord h1, .itemrecord h2 {
   color:#777765;
   font-size:2.4em;
@@ -232,6 +232,19 @@ padding: 5px;
 
 .item-request {
   color:#E45A19;
+  font-weight: bold;
+}
+
+.request-avail {
+  background-color: #CCFFCC;
+  border: 1px solid #66CC99;
+  padding: 5px 1em;
+}
+
+.request-unavail {
+  background-color: #EEEEEE;
+  border: 1px solid #CCCCCC;
+  padding: 5px 1em;
 }
 
 .item-avail-label th {
@@ -398,7 +411,7 @@ padding-left:10px;
   text-align: center;
 }
 
-.treeview, .treeview ul { 
+.treeview, .treeview ul {
   padding: 0;
   margin: 0;
   list-style: none;
@@ -422,7 +435,7 @@ padding-left:10px;
   float:none;
 }
 
-.treeview li { 
+.treeview li {
   margin: 0;
   padding: 3px 0pt 3px 16px;
 }
@@ -432,7 +445,7 @@ padding-left:10px;
 }
 
 #treecontrol { margin: 1em 0; display: none; }
-#tree-kid { 
+#tree-kid {
   padding: 3px 0pt 3px 0px;
   margin-left: -5px;
 }
@@ -666,7 +679,5 @@ input.tagsubmit {
 }
 
 .overview-nodata {
-  
+
 }
-
-
