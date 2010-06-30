@@ -131,6 +131,11 @@ function sopac_user_info_table(&$account, &$locum) {
         $rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo['checkouts']);
       }
       if (variable_get('sopac_fines_display', 1) && variable_get('sopac_fines_enable', 1)) {
+        if (variable_get('sopac_fines_warning_amount', 0) > 0 && $userinfo['balance'] > variable_get('sopac_fines_warning_amount', 0)) {
+          drupal_set_message('WARNING: Your fine balance of $' .
+                             number_format($userinfo['balance'], 2, '.', '') .
+                             ' exceeds the limit. You will not be able to request or renew items.');
+        }
         $amount_link = l('$' . number_format($userinfo['balance'], 2, '.', ''), 'user/fines');
         $rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $amount_link);
       }
@@ -203,7 +208,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     if (!count($checkouts)) {
       return t('No items checked out.');
     }
-    $header = array('',t('Title'),t('Due Date'));
+
+    $locum_cfg = $locum->locum_config;
+    $header = array('', t('Title'), t('Format'), t('Author'), t('Renews'), t('Due Date'));
     foreach ($checkouts as $co) {
       if ($renew_status[$co['inum']]['error']) {
         $duedate = '<span style="color: red;">' . $renew_status[$co['inum']]['error'] . '</span>';
@@ -217,14 +224,28 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
         }
       }
 
+      // Use Author formatting from the catalog
+      include_once('sopac_catalog.php');
+      $new_author_str = sopac_author_format($co['bib']['author'], $co['bib']['addl_author']);
+
+      // Hover text for the bib
+      $hover = $co['title'] . "\n" .
+               $new_author_str . "\n" .
+               $co['bib']['callnum'] . "\n" .
+               $co['bib']['pub_info'] . "\n" .
+               $co['bib']['descr'];
+
       $rows[] = array(
         '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">',
-        l($co['title'], 'catalog/record/' . $co['bnum']),
+        l($co['title'], 'catalog/record/' . $co['bnum'], array('attributes' => array('title' => $hover))),
+        $locum_cfg['formats'][$co['bib']['mat_code']],
+        l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str)),
+        $co['numrenews'],
         $duedate,
       );
     }
     $submit_buttons = '<input type="submit" name="sub_type" value="' . t('Renew Selected') . '"> <input type="submit" name="sub_type" value="' . t('Renew All') . '">';
-    $rows[] = array( 'data' => array(array('data' => $submit_buttons, 'colspan' => 3)), 'class' => 'profile_button' );
+    $rows[] = array('data' => array(array('data' => $submit_buttons, 'colspan' => count($rows[0]))), 'class' => 'profile_button' );
   }
   else {
     return FALSE;
@@ -248,15 +269,18 @@ function sopac_user_holds_form() {
   $cardnum = $user->profile_pref_cardnum;
   $ils_pass = $user->locum_pass;
   $locum = sopac_get_locum();
+  $locum_cfg = $locum->locum_config;
   $holds = $locum->get_patron_holds($cardnum, $ils_pass);
 
   if (!count($holds)) {
     $form['empty'] = array(
       '#type' => 'markup',
-      '#value' => t('No items on hold.'),
+      '#value' => t('No items requested.'),
     );
     return $form;
   }
+
+  include_once('sopac_catalog.php');
 
   $suspend_holds = variable_get('sopac_suspend_holds', FALSE);
   if ($suspend_holds) {
@@ -265,7 +289,7 @@ function sopac_user_holds_form() {
 
   $form = array(
     '#theme' => 'form_theme_bridge',
-    '#layout_theme' => 'sopac_user_holds_list',
+    '#bridge_to_theme' => 'sopac_user_holds_list',
   );
 
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
@@ -277,17 +301,36 @@ function sopac_user_holds_form() {
   );
   foreach ($holds as $hold) {
     $bnum = $hold['bnum'];
+    $new_author_str = sopac_author_format($hold['bib']['author'], $hold['bib']['addl_author']);
+    // Hover text for the bib
+    $hover = $hold['title'] . "\n" .
+             $new_author_str . "\n" .
+             $hold['bib']['callnum'] . "\n" .
+             $hold['bib']['pub_info'] . "\n" .
+             $hold['bib']['descr'];
+    $ready = (strpos($hold['status'], 'Ready') !== FALSE || strpos($hold['status'], 'MEL RECEIVED') !== FALSE);
+
     $hold_to_theme = array();
 
-    if ($freezes_enabled) {
-      $hold_to_theme['cancel'] = array(
-        '#type' => 'checkbox',
-        '#default_value' => FALSE,
-      );
-    }
+    $hold_to_theme['cancel'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => FALSE,
+    );
     $hold_to_theme['title_link'] = array(
       '#type' => 'markup',
-      '#value' => l(t($hold['title']), $sopac_prefix . $bnum),
+      '#value' => l(t($hold['title']), $sopac_prefix . $bnum, array('attributes' => array('title' => $hover))),
+    );
+    $hold_to_theme['format'] = array(
+      '#type' => 'markup',
+      '#value' => $locum_cfg['formats'][$hold['bib']['mat_code']],
+    );
+    $hold_to_theme['author'] = array(
+      '#type' => 'markup',
+      '#value' => l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str)),
+    );
+    $hold_to_theme['ready'] = array(
+      '#type' => 'markup',
+      '#value' => $ready ? 'request-ready' : 'request-waiting',
     );
     $hold_to_theme['status'] = array(
       '#type' => 'markup',
@@ -317,7 +360,7 @@ function sopac_user_holds_form() {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'op',
-    '#value' => $freezes_enabled ? t('Update Holds') : t('Cancel Selected Holds'),
+    '#value' => $freezes_enabled ? t('Update Requests') : t('Cancel Selected Requests'),
   );
 
   return $form;
@@ -335,6 +378,7 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
 
   $update_holds = FALSE;
+  $cancel_requested = TRUE;
   $cancellations = array();
   $freeze_changes = array();
   $pickup_changes = array();
@@ -529,7 +573,7 @@ function _sopac_user_holds_form_multirow($holds) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'op',
-    '#value' => t('Update Holds'),
+    '#value' => t('Update Requests'),
   );
 
   return $form;

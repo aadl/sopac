@@ -247,6 +247,11 @@ padding: 5px;
   padding: 5px 1em;
 }
 
+.request-ready {
+  color: #4A9930;
+  font-weight: bold;
+}
+
 .item-avail-label th {
   padding:3px 20px;
 }
@@ -276,24 +281,24 @@ padding: 5px;
 }
 
 #item-syndetics ul {
-list-style-image:none;
-list-style-position:outside;
-list-style-type:none;
-margin-left:10px;
-margin-top:10px;
-padding-left:0;
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin-left: 10px;
+  margin-top: 10px;
+  padding-left: 0;
 }
 
 #item-reviews p, #item-notes p, #item-avail p {
-padding:0 10px;
+  padding:0 10px;
 }
 
 table.availtable {
-width:100%;
+  width:100%;
 }
 
 #item-reviews h3, .review-byline {
-padding-left:10px;
+  padding-left:10px;
 }
 
 /* Request Template Styles */

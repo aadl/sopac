@@ -185,6 +185,15 @@ function sopac_admin() {
     '#description' => t("Check this box to allow users to pay their fines through SOPAC."),
   );
 
+  $form['sopac_fines']['sopac_fines_warning_amount'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Fine Warning Amount'),
+    '#default_value' => variable_get('sopac_fines_warning_amount', ''),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#description' => t("Warning will appear on the My Account page if fines are equal to or greater than this amount"),
+  );
+
   $form['sopac_social_features'] = array(
     '#type' => 'fieldset',
     '#title' => t('Social Feature Settings'),
@@ -434,5 +443,5 @@ function sopac_setup_user_home_selector() {
 
 // Rebuild menu cache
 function sopac_admin_submit($form, &$form_state) {
-    menu_rebuild();
+  menu_rebuild();
 }

@@ -257,8 +257,8 @@ function sopac_menu() {
       'type' => MENU_CALLBACK,
     );
   }
-  $items['user/holds'] = array(
-    'title' => 'My Holds',
+  $items['user/requests'] = array(
+    'title' => 'My Requests',
     'page callback' => 'sopac_holds_page',
     'access arguments' => array('access user pages'),
     'file' => 'sopac_user.php',
@@ -830,8 +830,8 @@ function sopac_get_insurge($type = 'client', $refresh = FALSE) {
  * implementation of hook_form_alter for user_profile_form
  */
 function sopac_form_user_profile_form_alter(&$form, &$form_state) {
-  if (!in_array($form['#validate'], 'sopac_user_profile_form_validate')) {
-  	array_unshift($form['#validate'], 'sopac_user_profile_form_validate');
+  if (!in_array('sopac_user_profile_form_validate', $form['#validate'])) {
+    array_unshift($form['#validate'], 'sopac_user_profile_form_validate');
   }
 }
 
@@ -842,5 +842,5 @@ function sopac_form_user_profile_form_alter(&$form, &$form_state) {
  * @param array $form_state
  */
 function sopac_user_profile_form_validate(&$form, &$form_state) {
-  $form_state['values']['profile_pref_cardnum'] = trim($form_state['values']['profile_pref_cardnum']);
+  $form_state['values']['profile_pref_cardnum'] = preg_replace('[^0-9]', '', $form_state['values']['profile_pref_cardnum']);
 }

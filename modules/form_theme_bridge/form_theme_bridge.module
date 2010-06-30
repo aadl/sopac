@@ -62,7 +62,6 @@ function theme_form_theme_bridge($form_data) {
       $result[$name] = $item;
     }
   }
-
   if (array_key_exists('#bridge_to_theme', $form_data) && $form_data['#bridge_to_theme']) {
     $result = theme($form_data['#bridge_to_theme'], $result);
   }
