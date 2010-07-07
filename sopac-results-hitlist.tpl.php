@@ -20,6 +20,7 @@ if (!module_exists('covercache')) {
                  variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['bnum'],
                  array('html' => TRUE));
 }
+
 ?>
 <div class="hitlist-item">
 

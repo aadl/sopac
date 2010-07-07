@@ -27,7 +27,6 @@ $sortopts = array(
   'popular_total' => t('All Time Most Popular'),
 );
 $default_perpage = variable_get('sopac_results_per_page', 10);
-
 ?>
 
 <?php if ($result_info['num_results'] > 0) { ?>
