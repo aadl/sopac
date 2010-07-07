@@ -16,6 +16,7 @@ if ($_GET['search_format']) {
 else {
   $show_mel_link = TRUE; // show link if not limited by format
 }
+
 ?>
 <div class="hitlist-nohits">
   <?php if ($locum_result['suggestion']) { ?>
@@ -25,5 +26,5 @@ else {
   <br />
   <?php } ?>
   » Sorry, your search produced no results.
-  <?php if ($show_mel_link) print ' ' . l("Try this search at other Michigan libraries", 'http://elibrary.mel.org'); ?>
+  <?php if ($show_mel_link) echo ' ' , l("Try this search at other Michigan libraries", 'http://elibrary.mel.org/search/X' .  $locum_result['term']); ?>
 </div>

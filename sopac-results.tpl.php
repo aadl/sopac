@@ -27,6 +27,20 @@ $sortopts = array(
   'popular_total' => t('All Time Most Popular'),
 );
 $default_perpage = variable_get('sopac_results_per_page', 10);
+
+
+// Only show mel link on searches for books
+if ($_GET['search_format']) {
+  foreach(explode('|', $_GET['search_format']) as $format) {
+    if (strpos($locum_config['format_groups']['books'], $format) !== FALSE) {
+      $show_mel_link = TRUE;
+    }
+  }
+}
+else {
+  $show_mel_link = TRUE; // show link if not limited by format
+}
+
 ?>
 
 <?php if ($result_info['num_results'] > 0) { ?>
