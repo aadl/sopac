@@ -116,3 +116,7 @@ else {
 <div class="hitlist-pager">
 <?php print $hitlist_pager; ?>
 </div>
+<?php if ($show_mel_link) {
+  echo '<p class="mel">' , l("Try this search at other Michigan libraries", 'http://elibrary.mel.org/search/X' .  $locum_result['term']) , '</p>';
+}
+?>
