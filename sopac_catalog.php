@@ -489,12 +489,21 @@ function sopac_request_item() {
     $locum = sopac_get_locum();
     $bib_item = $locum->get_bib_item($bnum);
     $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
-
     if ($hold_result['success']) {
       // handling multi-branch scenario
       $request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item['title'] . '</span>';
       if ($pickup_name) {
         $request_result_msg .= t(' for pickup at ') . $pickup_name;
+      }
+    }
+    else if (count($hold_result['choose_location'])) {
+      $request_result_msg = t('Please select a pickup location for your request:');
+      $locum = sopac_get_locum();
+      foreach ($locum->locum_config['branches'] as $branch) {
+        $link = l('<span>' . t('Request this item for pickup at ') . $branch . '</span>',
+                  variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch,
+                  array('html' => TRUE, 'attributes' => array('class' => 'button')));
+        $request_result_msg .= '<div class="item-request">' . $link . '</div>';
       }
     }
     else {

@@ -207,11 +207,6 @@ padding: 5px;
   width: 45px;
 }
 
-.item-request h3 {
-  clear: both;
-  padding-top: 0.5em;
-}
-
 .item-request-other {
   line-height: 24px;
 }
@@ -234,8 +229,16 @@ padding: 5px;
 }
 
 .item-request {
-  color:#E45A19;
+  clear: both;
+  color: #E45A19;
+  display: block;
   font-weight: bold;
+  padding: 0.5em 0;
+}
+
+.item-request h3 {
+  clear: both;
+  padding-top: 0.5em;
 }
 
 .request-avail a.button {
@@ -316,6 +319,15 @@ table.availtable {
   color: #5C5D5F;
   margin-bottom: 1em;
   font-size: 1.5em;
+}
+
+.req_return_link {
+  clear: both;
+  padding-top: 1em;
+}
+
+.req_return_link strong {
+  color: #E25A10;
 }
 
 /* Search form stuff */

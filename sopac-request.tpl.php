@@ -12,12 +12,12 @@ if ($item_form) {
   print $item_form;
 }
 
-print '<div class="req_return_link>"<strong class="item-request">»</strong> ' .
+print '<div class="req_return_link"><strong>»</strong> ' .
       l(t('Return to the record display'), variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum) .
       '</div>';
 
 if (sopac_prev_search_url(TRUE)){
-  print '<div class="req_return_link>"<strong class="item-request">»</strong> ' .
+  print '<div class="req_return_link"><strong>»</strong> ' .
         l(t('Return to your search'), sopac_prev_search_url(TRUE)) .
         '</div>';
 }
