@@ -82,8 +82,9 @@
 }
 
 .hitlist-title {
-  color: #366B8E;
-  font-size: 12pt;
+  color: #E25A10;
+  font-size: 1.5em;
+  line-height: 1.25em;
   margin-top: 3px;
   padding-bottom: 3px;
 }
@@ -206,11 +207,13 @@ padding: 5px;
   width: 45px;
 }
 
-.item-request p a {
-  background-color:#EEEEEE;
-  border:1px solid #CCCCCC;
-  font-size:1.4em;
-  padding:4px;
+.item-request h3 {
+  clear: both;
+  padding-top: 0.5em;
+}
+
+.item-request-other {
+  line-height: 24px;
 }
 
 .item-detail-block th {
@@ -235,16 +238,8 @@ padding: 5px;
   font-weight: bold;
 }
 
-.request-avail {
-  background-color: #CCFFCC;
-  border: 1px solid #66CC99;
-  padding: 5px 1em;
-}
-
-.request-unavail {
-  background-color: #EEEEEE;
-  border: 1px solid #CCCCCC;
-  padding: 5px 1em;
+.request-avail a.button {
+  color: #006600;
 }
 
 .request-ready {
@@ -313,14 +308,14 @@ table.availtable {
 
 .req_error_msg {
   color: #E87119;
-  margin-bottom: 15px;
-  font-size: 12pt;
+  margin-bottom: 1em;
+  font-size: 1.5em;
 }
 
 .req_result_msg {
-  color: #366B8E;
-  margin-bottom: 15px;
-  font-size: 12pt;
+  color: #5C5D5F;
+  margin-bottom: 1em;
+  font-size: 1.5em;
 }
 
 /* Search form stuff */

@@ -348,8 +348,11 @@ function sopac_put_request_link($bnum) {
     if (sopac_bcode_isverified(&$user)) {
       // User is logged in and has a verified card number
       if (variable_get('sopac_multi_branch_enable', 0)) {
-        $form = drupal_get_form('sopac_multibranch_hold_request', $bnum);
-        return $form;
+        $link = l('<span>' . t('Request this item for pickup at ') . $user->profile_pref_home_branch . '</span>',
+                  variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
+                  array('html' => TRUE, 'attributes' => array('class' => 'button')));
+        $link .= '&nbsp;' . l('other location', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
+                              array('attributes' => array('class' => 'item-request-other')));
       }
       else {
         $link = l(t('Request this item'), variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum);
@@ -368,7 +371,7 @@ function sopac_put_request_link($bnum) {
     $link = l(t('Please log in to request this item'), 'user/login', array('query' => drupal_get_destination()));
   }
 
-  return '» ' . $link;
+  return $link;
 }
 
 /**

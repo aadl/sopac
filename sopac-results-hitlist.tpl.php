@@ -75,7 +75,7 @@ if (!module_exists('covercache')) {
       <?php
       if (!in_array($locum_result['loc_code'], $no_circ)) {
         $avail_class = ($locum_result['status']['avail'] ? "request-avail" : "request-unavail");
-        print '<li class="item-request ' . $avail_class . '">' . sopac_put_request_link($locum_result['bnum']) . '</li>';
+        print '<br /><li class="item-request ' . $avail_class . '">' . sopac_put_request_link($locum_result['bnum']) . '</li>';
       }
       ?>
     </ul>
