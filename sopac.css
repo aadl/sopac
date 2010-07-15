@@ -233,7 +233,7 @@ padding: 5px;
   color: #E45A19;
   display: block;
   font-weight: bold;
-  padding: 0.5em 0;
+  /* padding: 0.5em 0; */
 }
 
 .item-request h3 {

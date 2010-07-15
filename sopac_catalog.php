@@ -340,7 +340,7 @@ function suggestion_link($locum_result) {
  *
  * @return string HTML string for the request link
  */
-function sopac_put_request_link($bnum) {
+function sopac_put_request_link($bnum, $mat_type = 'item') {
   global $user;
   profile_load_profile(&$user);
 
@@ -348,9 +348,10 @@ function sopac_put_request_link($bnum) {
     if (sopac_bcode_isverified(&$user)) {
       // User is logged in and has a verified card number
       if (variable_get('sopac_multi_branch_enable', 0)) {
-        $link = l('<span>' . t('Request this item for pickup at ') . $user->profile_pref_home_branch . '</span>',
+        $link = l('<span>' . t('Request') . ' ' . $mat_type . '</span>',
                   variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
                   array('html' => TRUE, 'attributes' => array('class' => 'button')));
+        $link .= '&nbsp;' . t('at') . ' ' . $user->profile_pref_home_branch;
         $link .= '&nbsp;' . l('other location', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
                               array('attributes' => array('class' => 'item-request-other')));
       }
