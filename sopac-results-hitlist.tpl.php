@@ -20,7 +20,6 @@ if (!module_exists('covercache')) {
                  variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['bnum'],
                  array('html' => TRUE));
 }
-
 ?>
 <div class="hitlist-item">
 
@@ -75,7 +74,12 @@ if (!module_exists('covercache')) {
       <?php
       if (!in_array($locum_result['loc_code'], $no_circ)) {
         $avail_class = ($locum_result['status']['avail'] ? "request-avail" : "request-unavail");
-        print '<br /><li class="item-request ' . $avail_class . '">' . sopac_put_request_link($locum_result['bnum']) . '</li>';
+        print '<br /><li class="item-request ' . $avail_class . '">' .
+              sopac_put_request_link($locum_result['bnum'],
+                                     $locum_result['status']['avail'],
+                                     $locum_result['status']['holds'],
+                                     $locum_config['formats'][$locum_result['mat_code']]) .
+              '</li>';
       }
       ?>
     </ul>

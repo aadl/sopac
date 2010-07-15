@@ -205,8 +205,8 @@ if (sopac_prev_search_url(TRUE)) {
     if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
       $avail_class = ($item_status['avail'] ? "request-avail" : "request-unavail");
       print '<div class="item-request ' . $avail_class . '">';
-      print '<p>' . sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]) . '</p>';
       print '<h3>' . $reqtext . '</h3>';
+      print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
       print '</div>';
     }
     ?>

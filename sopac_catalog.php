@@ -340,39 +340,57 @@ function suggestion_link($locum_result) {
  *
  * @return string HTML string for the request link
  */
-function sopac_put_request_link($bnum, $mat_type = 'item') {
-  global $user;
-  profile_load_profile(&$user);
+function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item') {
+  if (variable_get('sopac_catalog_disabled', 0)) {
+    return 'Requesting Currently Disabled';
+  } else {
+    global $user;
+    profile_load_profile(&$user);
 
-  if ($user->uid) {
-    if (sopac_bcode_isverified(&$user)) {
-      // User is logged in and has a verified card number
-      if (variable_get('sopac_multi_branch_enable', 0)) {
-        $link = l('<span>' . t('Request') . ' ' . $mat_type . '</span>',
-                  variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
+    if ($user->uid) {
+      if (sopac_bcode_isverified(&$user)) {
+        // User is logged in and has a verified card number
+        if ($avail > 0) {
+          $link_text = t('Request this ') . $mattype;
+        }
+        else if ($avail == 0) {
+          $link_text = t('Request next available copy');
+        }
+        if (variable_get('sopac_multi_branch_enable', 0)) {
+          $link = l("<span>$link_text</span>",
+                    variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
+                    array('html' => TRUE, 'attributes' => array('class' => 'button')));
+          $link .= '<div class="request-location-details">' . t('for') . ' ' . $user->profile_pref_home_branch;
+          $link .= '&nbsp;' . l('&raquo;&nbsp;other location', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
+                                array('html' => TRUE, 'attributes' => array('class' => 'item-request-other'))) . '</div>';
+        }
+        else {
+          $link = l("<span>$link_text</span>",
+                    variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
+                    array('html' => TRUE, 'attributes' => array('class' => 'button')));
+        }
+      }
+      elseif ($user->profile_pref_cardnum) {
+        // User is logged in but does not have a verified card number
+        $link = l('<span>' . t('Verify card to request') . '</span>',
+                  'user/' . $user->uid,
                   array('html' => TRUE, 'attributes' => array('class' => 'button')));
-        $link .= '&nbsp;' . t('at') . ' ' . $user->profile_pref_home_branch;
-        $link .= '&nbsp;' . l('other location', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
-                              array('attributes' => array('class' => 'item-request-other')));
       }
       else {
-        $link = l(t('Request this item'), variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum);
+        // User is logged in but does not have a card number.
+        $link = l('<span>' . t('Register card to request') . '</span>',
+                  'user/' . $user->uid,
+                  array('html' => TRUE, 'attributes' => array('class' => 'button')));
       }
     }
-    elseif ($user->profile_pref_cardnum) {
-      // User is logged in but does not have a verified card number
-      $link = l(t('Verify your card to request this item'), 'user/' . $user->uid);
-    }
     else {
-      // User is logged in but does not have a card number.
-      $link = l(t('Register your card to request this item'), 'user/' . $user->uid);
+      $link = l('<span>' . t('Log in to request') . '</span>',
+                'user/login',
+                array('query' => drupal_get_destination(), 'html' => TRUE, 'attributes' => array('class' => 'button')));
     }
-  }
-  else {
-    $link = l(t('Please log in to request this item'), 'user/login', array('query' => drupal_get_destination()));
-  }
 
-  return $link;
+    return $link;
+  }
 }
 
 /**
@@ -605,6 +623,7 @@ function sopac_search_form_basic() {
     'oldest' => t('Oldest First'),
   );
 
+  $sformats = array('' => 'Everything');
   foreach ($locum_cfg['format_groups'] as $sfmt => $sfmt_codes) {
     $sformats[preg_replace('/,[ ]*/', '|', trim($sfmt_codes))] = ucfirst($sfmt);
   }
