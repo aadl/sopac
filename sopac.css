@@ -425,6 +425,7 @@ table.availtable {
 #sidetreecontrol {
   font-size: 10px;
   text-align: center;
+  margin-top: 1em;
 }
 
 .treeview, .treeview ul {

@@ -4,13 +4,9 @@ $uri = $_GET['q'];
 $getvars = sopac_parse_get_vars();
 
 ?>
-<div id="container">
-  <div id="content">
   <div id="sidetreecontrol"><a href="?#">Collapse All</a> | <a href="?#">Expand All</a></div>
-  <br />
-    <ul id="facet" class="treeview">
+  <ul id="facet" class="treeview">
 <?php
-
 $mat_count = count($locum_result['facets']['mat']);
 $search_formats = is_array($getvars['search_format']) ? $getvars['search_format'] : array();
 if ($mat_count) {
@@ -264,6 +260,4 @@ if ($subject_count) {
 */
 
 ?>
-    </ul>
-  </div>
-</div>
+  </ul>
