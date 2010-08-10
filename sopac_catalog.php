@@ -601,10 +601,19 @@ function sopac_search_form_basic() {
   $getvars = sopac_parse_get_vars();
 
   $actions = sopac_parse_uri();
-  $search_args_raw = explode('?', $actions[2]);
-  $search_args = trim($search_args_raw[0]);
-  $stype_selected = $actions[1] ? 'cat_' . $actions[1] : 'cat_keyword';
-  $sformat_selected = $_GET['search_format'] ? $_GET['search_format'] : NULL;
+  if ($actions[0] == "search") {
+    if ($actions[3]) {
+      utf8_urldecode($actions[2]);
+      $actions[2] = $actions[2] . "/" . $actions[3];
+      urlencode($actions[2]);
+    }
+    $search_query = $actions[2];
+    $stype_selected = $actions[1] ? 'cat_' . $actions[1] : 'cat_keyword';
+  }
+  $sformats = array('' => 'Everything');
+  foreach ($locum_cfg[format_groups] as $sfmt => $sfmt_codes) {
+    $sformats[preg_replace('/,[ ]*/', '|', trim($sfmt_codes))] = ucfirst($sfmt);
+  }
 
   $stypes = array(
     'cat_keyword' => t('Keyword'),
@@ -644,7 +653,7 @@ function sopac_search_form_basic() {
   $form['basic']['inline']['search_query'] = array(
     '#type' => 'textfield',
     '#title' => t('Search '),
-    '#default_value' => $search_args,
+    '#default_value' => $search_query,
     '#size' => 25,
     '#maxlength' => 255,
   );
@@ -657,8 +666,8 @@ function sopac_search_form_basic() {
   $form['basic']['inline']['search_format'] = array(
     '#type' => 'select',
     '#title' => t(' in '),
-    '#default_value' => $sformat_selected,
-    '#selected' => $sformat_selected,
+    '#default_value' => $_GET['search_format'],
+    '#selected' => $_GET['search_format'],
     '#options' => $sformats,
   );
 
