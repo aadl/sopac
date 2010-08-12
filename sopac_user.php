@@ -211,12 +211,15 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 
     $locum_cfg = $locum->locum_config;
     $header = array('', t('Title'), t('Format'), t('Author'), t('Renews'), t('Due Date'));
+    $now = time();
+    $ill_bnums = array(1358991, 1356138, 1358990, 1358993, 1358992); // Make config option
+
     foreach ($checkouts as $co) {
       if ($renew_status[$co['inum']]['error']) {
         $duedate = '<span style="color: red;">' . $renew_status[$co['inum']]['error'] . '</span>';
       }
       else {
-        if (time() > $co['duedate']) {
+        if ($now > $co['duedate']) {
           $duedate = '<span style="color: red;">' . date('m-d-Y', $co['duedate']) . '</span>';
         }
         else {
@@ -235,11 +238,28 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
                $co['bib']['pub_info'] . "\n" .
                $co['bib']['descr'];
 
+      $checkbox = '';
+      // CUSTOM ILL DISPLAY
+      if (in_array($co['bnum'], $ill_bnums)) {
+        // Display call number as the title
+        $title = $co['callnum'];
+        $author = 'Interlibrary Loan';
+      }
+      else {
+        $title = l($co['title'], 'catalog/record/' . $co['bnum'], array('attributes' => array('title' => $hover)));
+        $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
+        if ($co['avail']['holds'] == 0 &&
+            $co['bib']['mat_code'] != 's' &&
+            !($co['ill'] == 1 && $co['numrenews'] > 0)) {
+          $checkbox = '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">';
+        }
+      }
+
       $rows[] = array(
-        '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">',
-        l($co['title'], 'catalog/record/' . $co['bnum'], array('attributes' => array('title' => $hover))),
+        $checkbox,
+        $title,
         $locum_cfg['formats'][$co['bib']['mat_code']],
-        l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str)),
+        $author,
         $co['numrenews'],
         $duedate,
       );
