@@ -246,7 +246,12 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
         $author = 'Interlibrary Loan';
       }
       else {
-        $title = l($co['title'], 'catalog/record/' . $co['bnum'], array('attributes' => array('title' => $hover)));
+        if ($co['bib']['active']) { // Not suppressed
+          $title = l($co['title'], 'catalog/record/' . $co['bnum'], array('attributes' => array('title' => $hover)));
+        }
+        else {
+          $title = $co['title'];
+        }
         $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
         if ($co['avail']['holds'] == 0 &&
             $co['bib']['mat_code'] != 's' &&
@@ -314,6 +319,7 @@ function sopac_user_holds_form() {
 
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
   $freezes_enabled = variable_get('sopac_hold_freezes_enable', 1);
+  $ill_bnums = array(1358991, 1356138, 1358990, 1358993, 1358992); // Make config option
 
   $form['holds'] = array(
     '#tree' => TRUE,
@@ -322,6 +328,36 @@ function sopac_user_holds_form() {
   foreach ($holds as $hold) {
     $bnum = $hold['bnum'];
     $new_author_str = sopac_author_format($hold['bib']['author'], $hold['bib']['addl_author']);
+
+    // CUSTOM ILL DISPLAY
+    if (in_array($hold['bnum'], $ill_bnums)) {
+      if (preg_match('/canceli([\d]{7})/', $hold['varname'], $matches)) {
+        // If item is ready, grab the item record info
+        $item_url = 'http://' . $locum_cfg['ils_config']['ils_server'] . '/xrecord=i' . $matches[1];
+        $xrecord = simplexml_load_file($item_url);
+        foreach ($xrecord->VARFLD as $varfld) {
+          if ((string)$varfld->HEADER->TAG == "VOLUME") {
+            $title = trim((string)$varfld->FIELDDATA);
+            break;
+          }
+        }
+      }
+      else {
+        // Item isn't in yet, use the bib call number at the title
+        $title = $hold['bib']['callnum'];
+      }
+      $author = 'Interlibrary Loan';
+    }
+    else {
+      if ($hold['bib']['active']) { // Not suppressed
+        $title = l($hold['title'], $sopac_prefix . $bnum, array('attributes' => array('title' => $hover)));
+      }
+      else {
+        $title = $hold['title'];
+      }
+      $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
+    }
+
     // Hover text for the bib
     $hover = $hold['title'] . "\n" .
              $new_author_str . "\n" .
@@ -338,7 +374,7 @@ function sopac_user_holds_form() {
     );
     $hold_to_theme['title_link'] = array(
       '#type' => 'markup',
-      '#value' => l(t($hold['title']), $sopac_prefix . $bnum, array('attributes' => array('title' => $hover))),
+      '#value' => $title,
     );
     $hold_to_theme['format'] = array(
       '#type' => 'markup',
@@ -346,7 +382,7 @@ function sopac_user_holds_form() {
     );
     $hold_to_theme['author'] = array(
       '#type' => 'markup',
-      '#value' => l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str)),
+      '#value' => $author,
     );
     $hold_to_theme['ready'] = array(
       '#type' => 'markup',
