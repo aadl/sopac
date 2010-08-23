@@ -336,8 +336,8 @@ function sopac_user_holds_form() {
         $item_url = 'http://' . $locum_cfg['ils_config']['ils_server'] . '/xrecord=i' . $matches[1];
         $xrecord = simplexml_load_file($item_url);
         foreach ($xrecord->VARFLD as $varfld) {
-          if ((string)$varfld->HEADER->TAG == "VOLUME") {
-            $title = trim((string)$varfld->FIELDDATA);
+          if ((string)$varfld->HEADER->TAG == "CALL #") {
+            $title = trim((string)$varfld->MARCSUBFLD->SUBFIELDDATA);
             break;
           }
         }
