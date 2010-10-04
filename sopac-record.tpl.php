@@ -176,6 +176,26 @@ if (sopac_prev_search_url(TRUE)) {
     }
     ?>
 
+    <div class="item-main">
+    <!-- Item Format Icon -->
+    <ul class="item-format-icon">
+      <li><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png' ?>"></li>
+      <li style="margin-top: -2px;"><?php print wordwrap($locum_config['formats'][$item['mat_code']], 8, '<br />'); ?></li>
+    </ul>
+
+    <!-- Actions -->
+    <ul class="item-actions">
+      <?php
+      if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
+        print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
+      }
+      if ($user->uid) {
+        include_once('sopac_user.php');
+        print sopac_put_list_links($item['bnum']);
+      }
+      ?>
+    </ul>
+
     <!-- Item Title -->
     <h1>
       <?php
@@ -186,31 +206,17 @@ if (sopac_prev_search_url(TRUE)) {
       ?>
     </h1>
 
-    <!-- Item Format Icon -->
-    <ul class="item-format-icon">
-      <li><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png' ?>"></li>
-      <li style="margin-top: -2px;"><?php print wordwrap($locum_config['formats'][$item['mat_code']], 8, '<br />'); ?></li>
-    </ul>
-
     <!-- Item Author -->
     <?php
     if ($item['author']) {
       $authorurl = $url_prefix . '/search/author/' . $new_author_str;
       print '<h3>by ' . l($new_author_str, $authorurl) . '</h3>';
     }
+    $avail_class = ($item_status['avail'] ? "request-avail" : "request-unavail");
+    print '<p class="item-request ' . $avail_class . '">' . $reqtext . '</p>';
     ?>
-
-    <!-- Request Link -->
-    <?php
-    if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
-      $avail_class = ($item_status['avail'] ? "request-avail" : "request-unavail");
-      print '<div class="item-request ' . $avail_class . '">';
-      print '<h3>' . $reqtext . '</h3>';
-      print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
-      print '</div>';
-    }
-    ?>
-
+    </div>
+    
     <!-- Where to find it -->
     <div class="item-avail-disp">
       <h2>Where To Find It</h2>

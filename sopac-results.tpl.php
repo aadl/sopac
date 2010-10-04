@@ -55,6 +55,22 @@ else {
 
   <div class="hitlist-range">
     <span class="range">Showing results <strong><?php print $result_info['hit_lowest'] . '</strong> to <strong>' . $result_info['hit_highest'] . '</strong> of <strong>' . $result_info['num_results'] .'</strong>'; ?></span>
+    <span class="hitlist-sorter">
+      <script>
+        jQuery(document).ready(function() {$('#sortlist').change(function(){ location.href = $(this).val();});});
+      </script>
+      Sort by: <select name="sort" id="sortlist">
+      <?php
+        foreach($sortopts as $key => $value) {
+          print '<option value="' . url($_GET['q'], array('query' => sopac_make_pagevars(sopac_parse_get_vars(array('page' => '', 'limit' => '', 'sort' => $key))))) . '" ';
+          if ($sorted_by == $key) {
+            print 'selected';
+          }
+          print '>' . $value . '</option>';
+        }
+      ?>
+      </select>
+    </span>
     <span class="pagination">Show:
       <?php
         if ($perpage == $default_perpage || !$perpage) {
@@ -85,22 +101,6 @@ else {
         }
       ?>
     </span>
-    <span class="hitlist-sorter">
-      <script>
-        jQuery(document).ready(function() {$('#sortlist').change(function(){ location.href = $(this).val();});});
-      </script>
-      Sort by: <select name="sort" id="sortlist">
-      <?php
-        foreach($sortopts as $key => $value) {
-          print '<option value="' . url($_GET['q'], array('query' => sopac_make_pagevars(sopac_parse_get_vars(array('page' => '', 'limit' => '', 'sort' => $key))))) . '" ';
-          if ($sorted_by == $key) {
-            print 'selected';
-          }
-          print '>' . $value . '</option>';
-        }
-      ?>
-      </select>
-    </span>
   </div>
 
 </div>
@@ -110,9 +110,10 @@ else {
 </div>
 <?php } ?>
 
-<div class="hitlist-content">
+<table class="hitlist-content">
 <?php print $hitlist_content; ?>
-</div>
+</table>
+
 <div class="hitlist-pager">
 <?php print $hitlist_pager; ?>
 </div>

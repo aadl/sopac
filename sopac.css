@@ -4,19 +4,17 @@
 
 .hitlist-content {
   margin-top: 25px;
+  width: 100%;
 }
 
 .hitlist-item {
-  margin-top: 0pt;
-  margin-right: 0pt;
-  margin-bottom: 1.5em;
-  margin-left: 0pt;
   border-bottom-width: 1px;
   border-bottom-style: dotted;
   border-bottom-color: #CCCCCC;
 }
 
 .hitlist-item td {
+  padding-top: 1.5em;
   vertical-align: top;
 }
 
@@ -31,15 +29,14 @@
 
 .range {
   float: left;
-  width: 30%;
   display: block;
 }
 
 .pagination {
-  float: left;
   display: block;
-  width: 30%;
   text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hitlist-sorter {
@@ -48,35 +45,53 @@
   margin-top: -3px;
 }
 
-
 .hitlist-info {
-  list-style-image:none;
-  list-style-position:outside;
-  list-style-type:none;
+  min-width: 220px;
+}
+
+.hitlist-info ul {
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
   margin-top: 0px;
-  margin-left: 25px;
+  padding-left: 0px;
+}
+
+.hitlist-info ul.hitlist-avail {
+  margin: 1em 0;
+}
+
+.hitlist-actions {
+  width: 200px;
+}
+
+.hitlist-actions ul {
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin-top: 0px;
   padding-left: 0px;
 }
 
 .hitlist-number {
-  margin-left: 5px;
-  padding-right: 10px;
+
 }
 
-.hitlist-cover {
-  float: left;
+td.hitlist-cover {
+  width: 100px;
+  text-align: center;
+}
+
+.hitlist-cover img {
   border: 1px solid #666;
-  padding: 2px;
 }
 
 .hitlist-format-icon {
-  float: right;
   list-style: none;
   font-size: 8pt;
   text-align: center;
-  margin-right: 20px;
   color: #8D8A81;
-  margin-top: 5px;
+  width: 100px;
 }
 
 .hitlist-title {
@@ -147,10 +162,10 @@
   margin-left: 10px;
 }
 .item-right h2 {
-background-color:#777765;
-color:#FFFFFF;
-margin: 0px;
-padding: 5px;
+  background-color:#777765;
+  color:#FFFFFF;
+  margin: 0px;
+  padding: 5px;
 }
 
 .item-cover-block {
@@ -201,7 +216,6 @@ padding: 5px;
   font-size: 8pt;
   text-align: center;
   color: #8D8A81;
-  margin-top: -35px;
   width: 45px;
 }
 
@@ -218,12 +232,28 @@ padding: 5px;
 }
 
 .item-detail-block td {
-  padding-right:20px;
-  vertical-align:top;
+  padding-right: 20px;
+  vertical-align: top;
 }
 
 .item-details-list {
   margin-top:10px;
+}
+
+.item-actions {
+  float: right;
+  width: 200px;
+}
+
+.item-actions ul {
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin-top: 0px;
+  padding-left: 0px;
+}
+
+.item-actions li {
 }
 
 .item-request {
@@ -241,7 +271,6 @@ padding: 5px;
 }
 
 .request-location-details {
-  clear: both;
   margin-bottom: 0.5em;
 }
 
@@ -256,6 +285,10 @@ padding: 5px;
 
 .item-avail-label th {
   padding:3px 20px;
+}
+
+div.item-avail-disp {
+  clear: right;
 }
 
 .item-avail-disp td {
@@ -678,8 +711,8 @@ input.tagsubmit {
 
 .overview-rating-title {
   font-size: 8pt;
-  margin-top -5px;
-  margin-bottom 5px;
+  margin-top: -5px;
+  margin-bottom: 5px;
 }
 
 .overview-title {
@@ -698,3 +731,31 @@ input.tagsubmit {
 .overview-nodata {
 
 }
+
+.sopac-list {
+  border-bottom-width: 1px;
+  border-bottom-style: dotted;
+  border-bottom-color: #CCCCCC;
+  padding-bottom: 1em;
+}
+
+.sopac-list-actions {
+  float: right;
+  width: 200px;
+  margin: 0;
+  padding: 0;
+}
+
+.list-overview-actions {
+  padding-left: 0;
+}
+/*
+html.js fieldset.collapsible {
+  position: absolute;
+  background-color: #EEEEEE;
+}
+
+html.js fieldset.collapsed {
+  background-color: transparent;
+}
+*/

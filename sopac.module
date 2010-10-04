@@ -385,6 +385,64 @@ function sopac_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['user/lists'] = array(
+    'title' => 'My Lists',
+    'page callback' => 'sopac_lists_page',
+    'access arguments' => array('access content'),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['user/lists/edit'] = array(
+    'title' => 'Modify List',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sopac_list_edit_form', 3),
+    'access callback' => 'sopac_lists_access',
+    'access arguments' => array(3),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['user/lists/delete/%'] = array(
+    'title' => 'Delete List',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sopac_list_confirm_delete', 3),
+    'access callback' => 'sopac_lists_access',
+    'access arguments' => array(3),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['user/listadd/%/%'] = array(
+    'title' => 'Add To List',
+    'page callback' => 'sopac_list_add',
+    'page arguments' => array(2, 3),
+    'access callback' => 'sopac_lists_access',
+    'access arguments' => array(3),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['user/listmovetop/%/%'] = array(
+    'title' => 'Add To List',
+    'page callback' => 'sopac_list_move_top',
+    'page arguments' => array(2, 3),
+    'access callback' => 'sopac_lists_access',
+    'access arguments' => array(2),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['user/listdelete/%/%'] = array(
+    'title' => 'Add To List',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sopac_list_confirm_item_delete', 2, 3),
+    'access callback' => 'sopac_lists_access',
+    'access arguments' => array(2),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+
   $items['review/delete'] = array(
     'title' => 'Delete Review',
     'page callback' => 'drupal_get_form',
@@ -420,6 +478,7 @@ function sopac_menu() {
     'file' => 'sopac_social.php',
     'type' => MENU_CALLBACK,
   );
+
 
   return $items;
 }
@@ -508,6 +567,12 @@ function sopac_theme() {
     'sopac_user_holds_list_multirow' => array(
       'template' => 'sopac-user-holds-list-multirow',
       'arguments' => array('data' => array()),
+    ),
+    'sopac_list' => array(
+      'arguments' => array('list' => NULL),
+    ),
+    'sopac_list_form' => array(
+      'arguments' => array('form' => NULL),
     ),
   );
 }
@@ -843,4 +908,26 @@ function sopac_form_user_profile_form_alter(&$form, &$form_state) {
  */
 function sopac_user_profile_form_validate(&$form, &$form_state) {
   $form_state['values']['profile_pref_cardnum'] = preg_replace('[^0-9]', '', $form_state['values']['profile_pref_cardnum']);
+}
+
+function sopac_lists_access($list_id) {
+  if (intval($list_id)) {
+    // Existing list
+    $access = FALSE;
+    if (user_access('administer sopac')) {
+      $access = TRUE;
+    }
+    else {
+      global $user;
+      $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
+      if ($user->uid == $list->uid) {
+        $access = TRUE;
+      }
+    }
+  }
+  else {
+    // New list or wishlist
+    $access = TRUE;
+  }
+  return $access;
 }

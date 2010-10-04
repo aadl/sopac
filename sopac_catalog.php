@@ -342,54 +342,59 @@ function suggestion_link($locum_result) {
  */
 function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item') {
   if (variable_get('sopac_catalog_disabled', 0)) {
-    return 'Requesting Currently Disabled';
+    $text = 'Requesting Currently Disabled';
   } else {
     global $user;
+    $class = 'button green';
     profile_load_profile(&$user);
 
     if ($user->uid) {
       if (sopac_bcode_isverified(&$user)) {
         // User is logged in and has a verified card number
-        if ($avail > 0) {
-          $link_text = t('Request this ') . $mattype;
-        }
-        else if ($avail == 0) {
-          $link_text = t('Request next available copy');
-        }
+        $text = "Request this";
         if (variable_get('sopac_multi_branch_enable', 0)) {
-          $link = l("<span>$link_text</span>",
-                    variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
-                    array('html' => TRUE, 'attributes' => array('class' => 'button')));
-          $link .= '<div class="request-location-details">' . t('for') . ' ' . $user->profile_pref_home_branch;
-          $link .= '&nbsp;' . l('&raquo;&nbsp;other location', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
-                                array('html' => TRUE, 'attributes' => array('class' => 'item-request-other'))) . '</div>';
+          $locum = sopac_get_locum();
+          $branches = $locum->locum_config['branches'];
+
+          $class .= ' hassub';
+          $extra .= " onclick='$(\"#request_$bnum\").slideToggle();'";
+
+          $text .= "<ul class=\"submenu\" id=\"request_$bnum\"><li>for pickup at</li>";
+          $text .= '<li>' .
+                   l($user->profile_pref_home_branch,
+                     variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
+                     array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                   '</li>';
+          $text .= '<li>Other Location...</li>';
+          foreach ($branches as $branch) {
+            if ($branch != $user->profile_pref_home_branch) {
+              $text .= '<li>' .
+                       l($branch,
+                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch) .
+                       '</li>';
+            }
+          }
+          $text .= "</ul><span></span>";
         }
         else {
-          $link = l("<span>$link_text</span>",
-                    variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,
-                    array('html' => TRUE, 'attributes' => array('class' => 'button')));
+          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum);
         }
       }
       elseif ($user->profile_pref_cardnum) {
         // User is logged in but does not have a verified card number
-        $link = l('<span>' . t('Verify card to request') . '</span>',
-                  'user/' . $user->uid,
-                  array('html' => TRUE, 'attributes' => array('class' => 'button')));
+        $text = l(t('Verify card to request'), 'user/' . $user->uid);
       }
       else {
         // User is logged in but does not have a card number.
-        $link = l('<span>' . t('Register card to request') . '</span>',
-                  'user/' . $user->uid,
-                  array('html' => TRUE, 'attributes' => array('class' => 'button')));
+        $text = l(t('Register card to request'), 'user/' . $user->uid);
       }
     }
     else {
-      $link = l('<span>' . t('Log in to request') . '</span>',
-                'user/login',
-                array('query' => drupal_get_destination(), 'html' => TRUE, 'attributes' => array('class' => 'button')));
+      $text = l(t('Log in to request'), 'user/login', array('query' => drupal_get_destination() . '&lightbox=1',
+                                                            'attributes' => array('rel' => 'lightframe')));
     }
 
-    return $link;
+    return "<li class=\"$class\"$extra>$text</li>";
   }
 }
 

@@ -153,8 +153,8 @@ function theme_sopac_tag_block($block_type) {
       $bnum_arr[] = $bnum;
       if ($_GET['deltag'] && $bnum && $user->uid) {
         $insurge->delete_user_tag($user->uid, $_GET['deltag'], $bnum);
-        $new_link = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $_GET[q];
-        header("Location: $new_link");
+        drupal_set_message('Tag "' . $_GET['deltag'] . '" Deleted');
+        drupal_goto($_GET[q]);
       }
       $tag_arr = $insurge->get_tag_totals(NULL, $bnum_arr);
       $tag_arr_user = $insurge->get_tag_totals($user->uid, $bnum_arr, NULL, FALSE, NULL, NULL, 'ORDER BY tag ASC');
@@ -168,7 +168,7 @@ function theme_sopac_tag_block($block_type) {
 
   if ($user->uid){
     if ($put_tag_form) {
-      $block_suffix = '<br /><br />' . drupal_get_form('sopac_tag_form');
+      $block_suffix = '<br /><br />' . drupal_get_form('sopac_tag_form', $bnum);
     }
   }
   else {
@@ -333,7 +333,7 @@ function sopac_user_tag_hitlist($tag) {
  *
  * @return array Drupal form array.
  */
-function sopac_tag_form() {
+function sopac_tag_form($form_state, $bnum) {
   $form['tagform'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add tags '),
@@ -353,7 +353,7 @@ function sopac_tag_form() {
   );
   $form['tagform']['bnum'] = array(
     '#type' => 'hidden',
-    '#default_value' => 0,
+    '#default_value' => $bnum,
   );
   return $form;
 }

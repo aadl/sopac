@@ -883,7 +883,7 @@ function sopac_fines_page() {
       if (variable_get('sopac_payments_enable', 1)) {
         $rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 3)), 'class' => 'profile_button' );
       }
-      $fine_table = '<form method="post" action="/user/fines/pay">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . $hidden_vars . '</form>';
+      $fine_table = '<form method="post" action="' . url('user/fines/pay') . '">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . $hidden_vars . '</form>';
       $notice = t('Your current fine balance is $') . number_format($fine_total, 2) . '.';
     }
   }
@@ -1422,4 +1422,502 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
     db_query("INSERT INTO {sopac_card_verify} VALUES ($uid, '$cardnum', 1, NOW())");
   }
 
+}
+
+function sopac_lists_page($list_id = 0) {
+  global $user;
+  $insurge = sopac_get_insurge();
+
+  if ($list_id) {
+    // display list contents
+    $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
+    if ($user->uid == $list['uid'] || $list['public'] || user_access('administer sopac')) {
+      // set up header for sorting
+      $header = array(
+        array(
+          'data' => 'Place',
+          'field' => 'value',
+          'sort' => 'ASC',
+        ),
+        array(
+          'data' => 'Cover',
+        ),
+        array(
+          'data' => 'Title',
+          'field' => 'title',
+        ),
+        array(
+          'data' => 'Rating',
+        ),
+        array(
+          'data' => 'Actions',
+        ),
+        array(
+          'data' => 'Material',
+          'field' => 'mat_code',
+        ),
+      );
+      $ts = tablesort_init($header);
+      $list['items']= $insurge->get_list_items($list_id, $ts['sql'], $ts['sort']);
+      $output .= theme('sopac_list', $list, TRUE);
+    }
+    else {
+      $output .= '<p>You do not have permission to view this list.</p>';
+      $output .= '<ul><li class="button green">';
+      $output .= ($user->uid ? l('View your lists', 'user/lists') : l('Log in to create lists', 'user', array('query' => 'destination=user/lists')));
+      $output .= '</li></ul>';
+    }
+  }
+  else {
+    if ($user->uid) {
+      $output = "<h1>My Lists</h1>";
+      // display lists
+      $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d", $user->uid);
+      while ($list = db_fetch_array($res)) {
+        $list['items'] = $insurge->get_list_items($list['list_id']);
+        $output .= theme('sopac_list', $list);
+      }
+      $output .= '<ul class="list-overview-actions"><li class="button green">' . l('Create New List', 'user/lists/edit') . '</li></ul>';
+    }
+    else {
+      // Anonymous user
+      drupal_set_message('You must log in to create and edit your lists');
+      drupal_goto('user', drupal_get_destination());
+    }
+  }
+
+  return $output;
+}
+
+function sopac_list_form($form_state, $list, $header) {
+  include_once('sopac_catalog.php');
+  $locum = sopac_get_locum();
+  $formats = $locum->locum_config['formats'];
+  $form = array('#list_id' => $list['list_id'], '#header' => $header);
+  foreach ($list['items'] as $item) {
+    // Cover Image
+    if ($item['cover_img'] == "CACHE")
+      $item['cover_img'] = "http://media.aadl.org/covers/" . $item['bnum'] . "_50.jpg";
+    else if (!$item['cover_img'])
+      $item['cover_img'] = base_path() . drupal_get_path('module', 'sopac') . '/images/nocover' . rand(1,4) . '_50.jpg';
+    $item['cover_img'] = '<img src="' . $item['cover_img'] . '" />';
+
+    // Material Icon
+    $material_icon = '<img src="' . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png"><br />' .
+                     wordwrap($formats[$item['mat_code']], 8, '<br />');
+
+    $data = array(
+      'place' => $item['value'],
+      'type' => $material_icon,
+      'cover' => $item['cover_img'],
+      'title' => l($item['title'], variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $item['bnum']),
+      'author' => sopac_author_format($item['author'], $item['addl_author']),
+      'date' => $item['tag_date'],
+      'actions' => sbl('Remove Item', 'user/listdelete/' . $list['list_id'] . '/' . $item['bnum'], array('iconafter' => 'cross')) .
+                   '<br />' .
+                   sbl('Move to Top', 'user/listmovetop/' . $list['list_id'] . '/' . $item['value'], array('iconafter' => 'arrow_up')) .
+                   '<br />' .
+                   sbl('Request Item', variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $item['bnum'], array('iconafter' => 'book_go')),
+    );
+
+    $form['rows'][$item['bnum']]['data'] = array(
+      '#type' => 'value',
+      '#value' => $data,
+    );
+    $form['rows'][$item['bnum']]['places'][$item['bnum']] = array(
+      '#type' => 'textfield',
+      '#size' => 4,
+      '#default_value' => $item['value'],
+      '#attributes' => array('class' => 'sopac-list-place'),
+    );
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Changes'),
+  );
+
+  return $form;
+}
+
+function sopac_list_form_submit($form, &$form_state) {
+  $new_places = array();
+  foreach($form_state['values'] as $current => $new) {
+    if (intval($current)) {
+      $places[$current] = $new;
+    }
+  }
+  // See if we need to adjust the new values to get down to lowest being 1
+  if ($diff = min($places) - 1) {
+    foreach($places as &$place) {
+      $place = $place - $diff;
+    }
+  }
+
+  $insurge = sopac_get_insurge();
+  $insurge->reorder_list($form['#list_id'], $places);
+  drupal_set_message('List order updated');
+}
+
+function theme_sopac_list_form($form) {
+  // loop through each "row" in the table array
+  foreach($form['rows'] as $id => $row) {
+    // we are only interested in numeric keys
+    if (intval($id)){
+      $this_row = $row['data']['#value'];
+
+      //Add the place field to the row
+      $this_row[] = drupal_render($form['rows'][$id]['places'][$id]);
+
+      //Add the row to the array of rows
+      $table_rows[] = array('data' => $this_row, 'class' => 'draggable');
+    }
+  }
+
+  //Make sure the header count matches the column count
+  $header = $form['#header'];
+  $header[] = 'New Place';
+
+  $output .= theme('table', $header, $table_rows, array('id' => 'sopac-list-table'));
+  $output .= drupal_render($form);
+
+  // Call add_tabledrag to add and setup the JS for us
+  // The key thing here is the first param - the table ID
+  // and the 4th param, the class of the form item which holds the weight
+  drupal_add_tabledrag('sopac-list-table', 'order', 'sibling', 'sopac-list-place');
+
+  return $output;
+}
+
+function sopac_list_edit_form($form_state, $list_id = 0) {
+  if ($list_id) {
+    $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
+    $form['list_id'] = array(
+      '#type' => 'value',
+      '#value' => $list['list_id'],
+    );
+  }
+  else if ($bnum = intval($_GET['bnum'])) {
+    $locum = sopac_get_locum();
+    $bib = $locum->get_bib_item($bnum);
+    // only auto-add an item when creating a new list
+    $form['bnum'] = array(
+      '#type' => 'value',
+      '#value' => $bnum,
+    );
+    $form['bib_info'] = array(
+      '#value' => "<h1>Add " . $bib['title'] . ' to a new list:</h1>',
+    );
+  }
+  if ($list['title'] == 'Wishlist') {
+    $form['title'] = array(
+      '#type' => 'value',
+      '#value' => 'Wishlist',
+    );
+    $form['title_markup'] = array(
+      '#value' => "<h1>Wishlist</h1>",
+    );
+  }
+  else {
+    $form['title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('List Title'),
+      '#default_value' => $list['title'],
+      '#size' => 64,
+      '#maxlength' => 128,
+      '#description' => t('Name your new list (e.g. My Wishlist, Vacation Reading, Favorites'),
+    );
+  }
+  $form['description'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Description'),
+    '#default_value' => $list['description'],
+    '#size' => 64,
+    '#maxlength' => 256,
+    '#description' => t('Describe your list (optional)'),
+  );
+  $form['public'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Public'),
+    '#description' => t('Allow anyone to see this list?'),
+    '#default_value' => $list['public'],
+  );
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  return $form;
+}
+
+function sopac_list_edit_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  if ($values['list_id']) {
+    // Update existing list
+    db_query("UPDATE {sopac_lists} SET title = '%s', description = '%s', public = '%d' WHERE list_id = '%d'",
+             $values['title'], $values['description'], $values['public'], $values['list_id']);
+    drupal_set_message('List "' . $values['title'] . '" updated');
+  }
+  else {
+    // New list
+    global $user;
+    db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
+             $user->uid, $values['title'], $values['description'], $values['public']);
+    drupal_set_message('List "' . $values['title'] . '" created');
+    if ($values['bnum']) {
+      $insurge = sopac_get_insurge();
+      $list_id = db_last_insert_id('sopac_lists', 'list_id');
+      $insurge->add_list_item($user->uid, $list_id, $values['bnum']);
+      drupal_set_message("Item added to your list");
+      drupal_goto("user/lists/$list_id");
+    }
+  }
+  drupal_goto('user/lists');
+}
+
+function sopac_list_add($bnum, $list_id = 0) {
+  global $user;
+  $insurge = sopac_get_insurge();
+  $bnum = intval($bnum);
+
+  if ($list_id == 'wish') {
+    // Find the user's wishlist
+    $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE title = 'Wishlist' AND uid = %d", $user->uid));
+    if ($list->list_id) {
+      $list_id = $list->list_id;
+    }
+    else {
+      // Create a new list named "Wishlist" and add the item
+      db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
+               $user->uid, 'Wishlist', '', 0);
+      drupal_set_message('New Wishlist created');
+      $list_id = db_last_insert_id('sopac_lists', 'list_id');
+    }
+  }
+  else {
+    $list_id = intval($list_id);
+    // Check to see if $user owns the list
+    $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d' AND uid = %d", $list_id, $user->uid));
+    if (!$list->list_id && !user_access('administer sopac')) {
+      drupal_set_message('Error: Unable to add item to list, you do not own this list');
+      drupal_goto('user/lists');
+    }
+  }
+
+  // add to list and redirect to that list
+  $insurge->add_list_item($user->uid, $list_id, $bnum);
+  drupal_set_message("Item added to your list");
+  drupal_goto("user/lists/$list_id");
+}
+
+function sopac_list_move_top($list_id, $cur_pos) {
+  global $user;
+  $insurge = sopac_get_insurge();
+  $insurge->move_list_item($list_id, $cur_pos, 1);
+  drupal_set_message("Item moved to top of list");
+  drupal_goto("user/lists/$list_id");
+}
+
+function sopac_list_confirm_delete(&$form_state, $list_id) {
+  $form = array('#list_id' => $list_id);
+  return confirm_form(
+    $form,
+    t('Delete List'),
+    'user/lists',
+    t('Are you sure you want to delete this list? The list and all items on it will be removed permanently. This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel'),
+    'sopac_list_confirm_delete');
+}
+
+function sopac_list_confirm_delete_submit($form, &$form_state) {
+  $insurge = sopac_get_insurge();
+  if ($items = $insurge->get_list_items($form['#list_id'])) {
+    // Delete all tags with the list id from insurge
+    foreach($items as $item) {
+      $insurge->delete_user_tag($item['uid'], $item['tag'], $item['bnum']);
+    }
+  }
+  db_query("DELETE FROM sopac_lists WHERE list_id = %d", $form['#list_id']);
+  drupal_set_message(t('The list has been deleted.'));
+  drupal_goto('user/lists');
+}
+
+function sopac_list_confirm_item_delete(&$form_state, $list_id, $bnum) {
+  $insurge = sopac_get_insurge();
+  $items = $insurge->get_list_items($list_id);
+  $item = array();
+
+  foreach($items as $i) {
+    if ($i['bnum'] == $bnum) {
+      $item = $i;
+      break;
+    }
+  }
+  if ($item['bnum']) {
+    $form = array('#list_id' => $list_id, '#item' => $item);
+    return confirm_form(
+      $form,
+      t('Delete Item'),
+      "user/lists/$list_id",
+      t('Are you sure you want to delete this item from the list? This action cannot be undone.'),
+      t('Delete'),
+      t('Cancel'),
+      'sopac_list_confirm_item_delete');
+  }
+  else {
+    drupal_set_message('Cannot find the specified item on this list', 'error');
+    drupal_goto("user/lists/$list_id");
+  }
+}
+
+function sopac_list_confirm_item_delete_submit($form, &$form_state) {
+  $insurge = sopac_get_insurge();
+  $insurge->delete_list_item($form['#list_id'], $form['#item']['value']);
+
+  drupal_set_message(t('The item has been removed from the list.'));
+  drupal_goto('user/lists/' . $form['#list_id']);
+}
+
+function theme_sopac_list($list, $expanded = FALSE) {
+  global $user;
+  $title = ($header ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
+  $top .= '<div class="sopac-list">';
+
+  if ($user->uid == $list['uid'] || user_access('administer sopac')) {
+    $top .= '<ul class="sopac-list-actions">';
+    $top .= '<li class="button green">' . l('Edit List Details', 'user/lists/edit/' . $list['list_id']) . '</li>';
+    $top .= '<li class="button red">' . l('Delete List', 'user/lists/delete/' . $list['list_id']) . '</li>';
+    $top .= '</ul>';
+  }
+
+  $top .= "<h2>$title</h2>";
+  $top .= '<p class="sopac-list-details">';
+  $top .= '<strong>Description</strong>: ' . $list['description'] . '<br />';
+  $top .= ($list['public'] ? 'This list is <strong>publicly viewable</strong>' : 'This list is <strong>private</strong>') . '<br />';
+
+  if ($expanded) {
+    $locum = sopac_get_locum();
+    $formats = $locum->locum_config['formats'];
+    $no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
+
+    if ($list_count = count($list['items'])) {
+      include_once('sopac_catalog.php');
+
+      $output .= '<table class="hitlist-content">';
+      foreach($list['items'] as $item) {
+        // Grab item status
+        $item['status'] = $locum->get_item_status($item['bnum']);
+        if ($item['status']['avail']) {
+          $avail_count++;
+        }
+        // Grab Syndetics reviews, etc..
+        $review_links = $locum->get_syndetics($item['stdnum']);
+        if (count($review_links)) {
+          $item['review_links'] = $review_links;
+        }
+        $output .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
+      }
+      $output .= '</table>';
+
+      $sortopts = array(
+        'value' => t('Default Order'),
+        'title' => t('Title'),
+        'author' => t('Author'),
+        'date' => t('Date Added'),
+        'type' => t('Material Type'),
+      );
+      $top .= '<div class="hitlist-range">';
+      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items (<strong>$avail_count</strong> currently available)</span>";
+      $top .= '<span class="hitlist-sorter">';
+      $top .= '<script>';
+      $top .= 'jQuery(document).ready(function() {$(\'#sortlist\').change(function(){ location.href = $(this).val();});});';
+      $top .= '</script>';
+      $top .= 'Sort by: <select name="sort" id="sortlist">';
+      foreach($sortopts as $key => $value) {
+        $top .=  '<option value="' . url($_GET['q'], array('query' => '')) . '" ';
+        if ($sorted_by == $key) {
+          $top .=  'selected';
+        }
+        $top .= '>' . $value . '</option>';
+      }
+      $top .= '</select>';
+      $top .= '</span>';
+      $top .= '</div>';
+    }
+    else {
+      $output .= '<p>This list is currently empty</p>';
+    }
+    $output .= '<ul><li class="button green">' . l('back to lists overview', 'user/lists') . '</li></ul>';
+  }
+  else {
+    // overview
+    if ($list_count = count($list['items'])) {
+      $top .= "<strong>$list_count</strong> items listed</p>";
+    }
+    else {
+      $top .= 'This list is currently <strong>empty</strong></p>';
+    }
+  }
+  $top .= '<div style="clear: both"></div>';
+  $output .= '</div><div style="clear:both"></div>';
+  return $top . $output;
+}
+
+function sopac_put_list_links($bnum, $list_display = FALSE) {
+  global $user;
+  $insurge = sopac_get_insurge();
+  $bnum = intval($bnum);
+  $lists = array();
+  $action_text = ($list_display ? "Copy to" : "Add to");
+
+  $output .= "<li class=\"button hassub\" onclick='$(\"#moreact_$bnum\").slideToggle();'>$action_text other list";
+  $output .= '<span></span>';
+  $output .= "<ul class=\"submenu\" id=\"moreact_$bnum\">";
+  $output .= '<li>Add to:</li>';
+
+  $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d", $user->uid);
+  while ($list = db_fetch_array($res)) {
+    // Check if item is already in the list
+    $in_list = FALSE;
+    foreach($insurge->get_list_items($list['list_id']) as $list_item) {
+      if ($list_item['bnum'] == $bnum) {
+        $in_list = TRUE;
+        break;
+      }
+    }
+
+    if ($list['title'] == 'Wishlist') {
+      if ($in_list) {
+        $wishlist = '<li class="button">Already on Wishlist</li>';
+      }
+      else {
+        $wishlist = '<li class="button green">' . l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/' . $list['list_id']) . '</li>';
+      }
+    }
+    else {
+      $output .= '<li';
+      if ($in_list) {
+        $output .= ' class="disabled">' . $list['title'];
+      }
+      else {
+        $output .= '>' . l($list['title'], 'user/listadd/' . $bnum . '/' . $list['list_id']);
+      }
+      $output .= '</li>';
+    }
+  }
+  if (empty($wishlist)) {
+    $wishlist = '<li class="button green">' . l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/wish') . '</li>';
+  }
+
+  $output .= '<li>' . l('» Add to new list...', 'user/lists/edit', array('query' => array('bnum' => $bnum))) . '</li>';
+  $output .= '</ul>';
+  $output .= '</li>';
+
+  return $wishlist . $output;
+}
+
+function sopac_import_cc($list_id, $uid) {
+  $insurge = sopac_get_insurge();
+  $res = db_query("SELECT DISTINCT bnum FROM sopac_cc_savedcards WHERE uid = '%d' ORDER BY id ASC", $uid);
+  while ($item = db_fetch_object($res)) {
+    $insurge->add_list_item($uid, $list_id, $item->bnum);
+    drupal_set_message("Added $item->bnum to list $list_id");
+  }
 }
