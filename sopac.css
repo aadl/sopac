@@ -755,6 +755,15 @@ input.tagsubmit {
   margin-left: 15px;
 }
 
+.availablehilight {
+  background-color: #ECF1E5;
+}
+
+#showavailable {
+  cursor: pointer;
+  color: #E25A10;
+}
+
 /*
 html.js fieldset.collapsible {
   position: absolute;

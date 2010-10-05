@@ -24,7 +24,7 @@ if (!module_exists('covercache')) {
 }
 $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
 ?>
-  <tr class="hitlist-item">
+  <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
     <td class="hitlist-cover">
       <?php print $cover_img; ?>
