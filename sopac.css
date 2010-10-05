@@ -349,13 +349,13 @@ table.availtable {
 .req_error_msg {
   color: #E87119;
   margin-bottom: 1em;
-  font-size: 1.5em;
+  font-size: 1em;
 }
 
 .req_result_msg {
   color: #5C5D5F;
   margin-bottom: 1em;
-  font-size: 1.5em;
+  font-size: 1em;
 }
 
 .req_return_link {
@@ -365,6 +365,12 @@ table.availtable {
 
 .req_return_link strong {
   color: #E25A10;
+}
+
+.close {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }
 
 /* Search form stuff */
