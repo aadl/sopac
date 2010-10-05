@@ -1815,6 +1815,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
     $locum = sopac_get_locum();
     $formats = $locum->locum_config['formats'];
     $no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
+    $avail_count = 0;
 
     if ($list_count = count($list['items'])) {
       include_once('sopac_catalog.php');
