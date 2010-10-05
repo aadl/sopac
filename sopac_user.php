@@ -1431,41 +1431,47 @@ function sopac_lists_page($list_id = 0) {
   if ($list_id) {
     // display list contents
     $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
-    if ($user->uid == $list['uid'] || $list['public'] || user_access('administer sopac')) {
-      // set up header for sorting
-      $header = array(
-        array(
-          'data' => 'Place',
-          'field' => 'value',
-          'sort' => 'ASC',
-        ),
-        array(
-          'data' => 'Cover',
-        ),
-        array(
-          'data' => 'Title',
-          'field' => 'title',
-        ),
-        array(
-          'data' => 'Rating',
-        ),
-        array(
-          'data' => 'Actions',
-        ),
-        array(
-          'data' => 'Material',
-          'field' => 'mat_code',
-        ),
-      );
-      $ts = tablesort_init($header);
-      $list['items']= $insurge->get_list_items($list_id, $ts['sql'], $ts['sort']);
-      $output .= theme('sopac_list', $list, TRUE);
+    if ($list['list_id']) {
+      if ($user->uid == $list['uid'] || $list['public'] || user_access('administer sopac')) {
+        // set up header for sorting
+        $header = array(
+          array(
+            'data' => 'Place',
+            'field' => 'value',
+            'sort' => 'ASC',
+          ),
+          array(
+            'data' => 'Cover',
+          ),
+          array(
+            'data' => 'Title',
+            'field' => 'title',
+          ),
+          array(
+            'data' => 'Rating',
+          ),
+          array(
+            'data' => 'Actions',
+          ),
+          array(
+            'data' => 'Material',
+            'field' => 'mat_code',
+          ),
+        );
+        $ts = tablesort_init($header);
+        $list['items']= $insurge->get_list_items($list_id, $ts['sql'], $ts['sort']);
+        $output .= theme('sopac_list', $list, TRUE);
+      }
+      else {
+        $output .= '<p>You do not have permission to view this list.</p>';
+        $output .= '<ul><li class="button green">';
+        $output .= ($user->uid ? l('View your lists', 'user/lists') : l('Log in to create lists', 'user', array('query' => 'destination=user/lists')));
+        $output .= '</li></ul>';
+      }
     }
     else {
-      $output .= '<p>You do not have permission to view this list.</p>';
-      $output .= '<ul><li class="button green">';
-      $output .= ($user->uid ? l('View your lists', 'user/lists') : l('Log in to create lists', 'user', array('query' => 'destination=user/lists')));
-      $output .= '</li></ul>';
+      drupal_set_message("No list with list id #$list_id exists");
+      drupal_goto('user/lists');
     }
   }
   else {
