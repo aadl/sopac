@@ -1680,36 +1680,49 @@ function sopac_list_edit_form_submit($form, &$form_state) {
 function sopac_list_add($bnum, $list_id = 0) {
   global $user;
   $insurge = sopac_get_insurge();
-  $bnum = intval($bnum);
+  $locum = sopac_get_locum();
+  $bib = $locum->get_bib_item(intval($bnum));
 
-  if ($list_id == 'wish') {
-    // Find the user's wishlist
-    $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE title = 'Wishlist' AND uid = %d", $user->uid));
-    if ($list->list_id) {
-      $list_id = $list->list_id;
+  if ($bib['bnum']) {
+    // Valid bib record
+    if ($list_id == 'wish') {
+      // Find the user's wishlist
+      $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE title = 'Wishlist' AND uid = %d", $user->uid));
+      if ($list->list_id) {
+        $list_id = $list->list_id;
+      }
+      else {
+        // Create a new list named "Wishlist" and add the item
+        db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
+                 $user->uid, 'Wishlist', '', 0);
+        drupal_set_message('New Wishlist created');
+        $list_id = db_last_insert_id('sopac_lists', 'list_id');
+      }
     }
     else {
-      // Create a new list named "Wishlist" and add the item
-      db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
-               $user->uid, 'Wishlist', '', 0);
-      drupal_set_message('New Wishlist created');
-      $list_id = db_last_insert_id('sopac_lists', 'list_id');
+      $list_id = intval($list_id);
+      // Check to see if $user owns the list
+      if (user_access('administer sopac')) {
+        $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d'", $list_id));
+      }
+      else {
+        $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d' AND uid = %d", $list_id, $user->uid));
+      }
+      if (!$list->list_id) {
+        drupal_set_message('Error: Unable to add item to list, you do not own this list');
+        drupal_goto('user/lists');
+      }
     }
+
+    // add to list and redirect to that list
+    $insurge->add_list_item($user->uid, $list_id, $bnum);
+    drupal_set_message("Item added to your list");
+    drupal_goto("user/lists/$list_id");
   }
   else {
-    $list_id = intval($list_id);
-    // Check to see if $user owns the list
-    $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d' AND uid = %d", $list_id, $user->uid));
-    if (!$list->list_id && !user_access('administer sopac')) {
-      drupal_set_message('Error: Unable to add item to list, you do not own this list');
-      drupal_goto('user/lists');
-    }
+    drupal_set_message('No catalog record found with id #' . intval($bnum), 'error');
+    drupal_goto('user/lists');
   }
-
-  // add to list and redirect to that list
-  $insurge->add_list_item($user->uid, $list_id, $bnum);
-  drupal_set_message("Item added to your list");
-  drupal_goto("user/lists/$list_id");
 }
 
 function sopac_list_move_top($list_id, $cur_pos) {
