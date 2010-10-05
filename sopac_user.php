@@ -226,6 +226,16 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
           $duedate = date('m-d-Y', $co['duedate']);
         }
       }
+      $today = strtotime(date('Y-m-d'));
+      $moddue = strtotime(date('Y-m-d', $co['duedate']));
+      $days = ($moddue - $today) / 86400;
+      $dayspan = '';
+      if ($days == 0) {
+        $dayspan = ' <span style="color: red; font-weight:bold;">(Today)</span>';
+      }
+      if ($days < 7 && $days > 0) {
+        $dayspan = ' <span style="color: red;">(this '.date('l',$co[duedate]).')</span>';
+      }
 
       // Use Author formatting from the catalog
       include_once('sopac_catalog.php');
@@ -266,7 +276,7 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
         $locum_cfg['formats'][$co['bib']['mat_code']],
         $author,
         $co['numrenews'],
-        $duedate,
+        $duedate . $dayspan,
       );
     }
     $submit_buttons = '<input type="submit" name="sub_type" value="' . t('Renew Selected') . '"> <input type="submit" name="sub_type" value="' . t('Renew All') . '">';
