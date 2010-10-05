@@ -749,6 +749,12 @@ input.tagsubmit {
 .list-overview-actions {
   padding-left: 0;
 }
+
+.resultswitch {
+  color: red;
+  margin-left: 15px;
+}
+
 /*
 html.js fieldset.collapsible {
   position: absolute;

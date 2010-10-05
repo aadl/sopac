@@ -45,7 +45,10 @@ else {
 
 <?php if ($result_info['num_results'] > 0) { ?>
 <div class="hitlist-top-bar">
-
+<?php echo $rss_link; ?>
+<?php if ($locum_result['changed'] == "yes") { ?>
+  <p class="resultswitch">No results found for <strong>ALL</strong> your keywords. Found <?php echo $result_info[num_results]; ?> results that match <strong>ANY</strong> terms.</p>
+<?php } ?>
 <?php if ($locum_result['suggestion']) { ?>
 <div class="hitlist-suggestions">
   Did you mean <i><?php print suggestion_link($locum_result); ?></i> ?
