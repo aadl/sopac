@@ -76,7 +76,7 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         </ul>
     <?php
       if ($locum_result['review_links']) {
-        print '<li class="button hassub" onclick=\'$("#rev_' . $locum_result['bnum'] . '").slideToggle();\'>Reviews &amp; Summaries (' .
+        print '<li class="button hassub">Reviews &amp; Summaries (' .
               count($locum_result['review_links']) . ')<ul class="submenu" id="rev_' . $locum_result['bnum'] . '">';
         foreach ($locum_result['review_links'] as $rev_title => $rev_link) {
           print '<li>' . l($rev_title, $rev_link, array('attributes' => array('html' => TRUE, 'target' => "_new"))) . '</li>';

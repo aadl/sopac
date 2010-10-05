@@ -357,9 +357,8 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $branches = $locum->locum_config['branches'];
 
           $class .= ' hassub';
-          $extra .= " onclick='$(\"#request_$bnum\").slideToggle();'";
 
-          $text .= "<ul class=\"submenu\" id=\"request_$bnum\"><li>for pickup at</li>";
+          $text .= "<ul class=\"submenu\"><li>for pickup at</li>";
           $text .= '<li>' .
                    l($user->profile_pref_home_branch,
                      variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
@@ -394,7 +393,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
                                                             'attributes' => array('rel' => 'lightframe')));
     }
 
-    return "<li class=\"$class\"$extra>$text</li>";
+    return "<li class=\"$class\">$text</li>";
   }
 }
 

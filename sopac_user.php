@@ -1873,7 +1873,7 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   $lists = array();
   $action_text = ($list_display ? "Copy to" : "Add to");
 
-  $output .= "<li class=\"button hassub\" onclick='$(\"#moreact_$bnum\").slideToggle();'>$action_text other list";
+  $output .= "<li class=\"button hassub\">$action_text other list";
   $output .= '<span></span>';
   $output .= "<ul class=\"submenu\" id=\"moreact_$bnum\">";
   $output .= '<li>Add to:</li>';
