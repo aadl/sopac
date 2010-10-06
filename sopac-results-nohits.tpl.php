@@ -27,6 +27,7 @@ else {
   <?php } ?>
   » Sorry, your search produced no results.
   <?php if ($show_mel_link) {
-    echo '<p class="mel">' , l("Try this search at other Michigan libraries", 'http://elibrary.mel.org/search/X' .  $locum_result['term']) , '</p>';
+    echo '<p class="mel">' . l("Try this search at other Michigan libraries", 'http://elibrary.mel.org/search/X'. $locum_result['term']) . '</p>';
+   }
   ?>
 </div>

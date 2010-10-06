@@ -1436,6 +1436,7 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 
 function sopac_lists_page($list_id = 0) {
   global $user;
+  require_once('sopac_social.php');
   $insurge = sopac_get_insurge();
 
   if ($list_id) {
@@ -1860,7 +1861,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
         'type' => t('Material Type'),
       );
       $top .= '<div class="hitlist-range">';
-      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items ( <strong>$avail_count</strong> currently available - <span id=\"showavailable\">hilight</span> )</span>";
+      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items ( <strong>$avail_count</strong> currently available - <span id=\"showavailable\">Show Me</span> )</span>";
       $top .= '<span class="hitlist-sorter">';
       $top .= '<script>';
       $top .= 'jQuery(document).ready(function() {$(\'#sortlist\').change(function(){ location.href = $(this).val();});});';
