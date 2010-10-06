@@ -42,14 +42,10 @@ else {
 if (count($item_status['items'])) {
   foreach ($item_status['items'] as $copy_status) {
     if ($copy_status['avail'] > 0) {
-      $copy_tag = ($copy_status['avail'] == 1) ? t('copy available') : t('copies available');
-      $status_msg = $copy_status['avail'] . ' ' . $copy_tag;
-    }
-    elseif ($copy_status['due']) {
-      $status_msg = t('Next copy due') . ' ' . date('n-j-Y', $copy_status['due']);
+      $status_msg = 'Available';
     }
     else {
-      $status_msg = $copy_status['statusmsg'];
+      $status_msg = ucwords(strtolower($copy_status['statusmsg']));
     }
     if (variable_get('sopac_multi_branch_enable', 0)) {
       $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $locum_config['branches'][$copy_status['branch']], $status_msg);
@@ -216,7 +212,7 @@ if (sopac_prev_search_url(TRUE)) {
     print '<p class="item-request ' . $avail_class . '">' . $reqtext . '</p>';
     ?>
     </div>
-    
+
     <!-- Where to find it -->
     <div class="item-avail-disp">
       <h2>Where To Find It</h2>
