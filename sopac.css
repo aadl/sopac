@@ -18,6 +18,10 @@
   vertical-align: top;
 }
 
+.hitlist-rating td {
+  padding: 0px;
+}
+
 .hitlist-range {
   border: 1px solid #E0D9CA;
   background-color: #FFF7E5;

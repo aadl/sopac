@@ -74,6 +74,12 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
             ?>
           </li>
         </ul>
+        <li class="hitlist-rating">
+        <?php
+    if (variable_get('sopac_social_enable', 1)) {
+      print theme_sopac_get_rating_stars($locum_result['bnum']);
+    }
+    ?></li>
     <?php
       if ($locum_result['review_links']) {
         print '<li class="button hassub">Reviews &amp; Summaries (' .

@@ -24,7 +24,7 @@ function sopac_catalog_search() {
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.treeview.js');
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.rating.js');
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/facet-browser.js');
-
+  require_once('sopac_social.php');
   $getvars = sopac_parse_get_vars();
   $actions = sopac_parse_uri();
   $locum = sopac_get_locum();
