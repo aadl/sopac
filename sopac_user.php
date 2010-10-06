@@ -1436,6 +1436,7 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 
 function sopac_lists_page($list_id = 0) {
   global $user;
+  require_once('sopac_social.php');
   $insurge = sopac_get_insurge();
 
   if ($list_id) {
