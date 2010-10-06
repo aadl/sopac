@@ -355,21 +355,23 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         if (variable_get('sopac_multi_branch_enable', 0)) {
           $locum = sopac_get_locum();
           $branches = $locum->locum_config['branches'];
-
           $class .= ' hassub';
 
           $text .= "<ul class=\"submenu\"><li>for pickup at</li>";
-          $text .= '<li>' .
-                   l($user->profile_pref_home_branch,
-                     variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $user->profile_pref_home_branch,
-                     array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
-                   '</li>';
-          $text .= '<li>Other Location...</li>';
-          foreach ($branches as $branch) {
-            if ($branch != $user->profile_pref_home_branch) {
+          if ($user->profile_pref_home_branch) {
+            $home_branch_code = array_search($user->profile_pref_home_branch, $branches);
+            $text .= '<li>' .
+                     l($user->profile_pref_home_branch,
+                       variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
+                       array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                     '</li>';
+            $text .= '<li>Other Location...</li>';
+          }
+          foreach ($branches as $branch_code => $branch_name) {
+            if ($branch_name != $user->profile_pref_home_branch) {
               $text .= '<li>' .
-                       l($branch,
-                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch,
+                       l($branch_name,
+                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
                          array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
                        '</li>';
             }
@@ -505,13 +507,20 @@ function sopac_request_item() {
   profile_load_profile(&$user);
   if ($user->uid && sopac_bcode_isverified(&$user)) {
     // support multi-branch & user home branch
+    $locum = sopac_get_locum();
     $actions = sopac_parse_uri();
     $bnum = $actions[1];
     $pickup_arg = $actions[2] ? $actions[2] : NULL;
-    $pickup_name = $actions[3] ? $actions[3] : NULL;
-    $locum = sopac_get_locum();
+    $pickup_name = $actions[3] ? $actions[3] : ($pickup_arg ? $locum->locum_config['branches'][$pickup_arg] : NULL);
     $bib_item = $locum->get_bib_item($bnum);
     $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
+
+    // Set home branch if none set
+    if ($pickup_name && !$user->profile_pref_home_branch) {
+      user_save($user, array('profile_pref_home_branch' => $pickup_name));
+      drupal_set_message("Your home branch has been set to $pickup_name.<br />" . l('Adjust your home branch preference', "user/$user->uid/edit/Preferences"));
+    }
+
     if ($hold_result['success']) {
       // handling multi-branch scenario
       $request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item['title'] . '</span>';
