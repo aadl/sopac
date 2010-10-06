@@ -390,8 +390,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
       }
     }
     else {
-      $text = l(t('Log in to request'), 'user/login', array('query' => drupal_get_destination() . '&lightbox=1',
-                                                            'attributes' => array('rel' => 'lightframe')));
+      $text = l(t('Log in to request'), 'user/login', array('query' => drupal_get_destination()));
     }
 
     return "<li class=\"$class\">$text</li>";
