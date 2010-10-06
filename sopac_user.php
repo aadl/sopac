@@ -1691,8 +1691,7 @@ function sopac_list_add($bnum, $list_id = 0) {
   global $user;
   $insurge = sopac_get_insurge();
   $locum = sopac_get_locum();
-  $bib = $locum->get_bib_item(intval($bnum));
-
+  $bib = $locum->get_bib_item(intval($bnum),1);
   if ($bib['bnum']) {
     // Valid bib record
     if ($list_id == 'wish') {
@@ -1719,20 +1718,27 @@ function sopac_list_add($bnum, $list_id = 0) {
         $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d' AND uid = %d", $list_id, $user->uid));
       }
       if (!$list->list_id) {
-        drupal_set_message('Error: Unable to add item to list, you do not own this list');
-        drupal_goto('user/lists');
+        $output .= '<h2>Error: Unable to add item to list, you do not own this list</h2>';
       }
     }
-
     // add to list and redirect to that list
-    $insurge->add_list_item($user->uid, $list_id, $bnum);
-    drupal_set_message("Item added to your list");
-    drupal_goto("user/lists/$list_id");
+    if ($insurge->add_list_item($user->uid, $list_id, $bnum)) {
+      $output .= '<h2>"' . $bib['title'] . '" has been added to your list</h2>';
+    }
+    else {
+      $output .= '<h2>"' . $bib['title'] . '" has not been added, already on list</h2>';
+    }
   }
   else {
-    drupal_set_message('No catalog record found with id #' . intval($bnum), 'error');
-    drupal_goto('user/lists');
+    $output .= '<h2>' . 'No catalog record found with id #' . intval($bnum) . '</h2>';
   }
+
+  $output .= '<ul>';
+  $output .= '<li class="button green"><a href="#" onclick="parent.document.location=(\'' . url('user/lists/' . $list_id) . '\')">Go to List</a></li>';
+  $output .= '<li class="button red"><a href="#" onclick="parent.Lightbox.end(\'forceClose\')">Close this window</a></li>';
+  $output .= '</ul>';
+
+  return $output;
 }
 
 function sopac_list_move_top($list_id, $cur_pos) {
@@ -1918,7 +1924,10 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
         $wishlist = '<li class="button">Already on Wishlist</li>';
       }
       else {
-        $wishlist = '<li class="button green">' . l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/' . $list['list_id']) . '</li>';
+        $wishlist = '<li class="button green">' .
+                    l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/' . $list['list_id'],
+                      array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                    '</li>';
       }
     }
     else {
@@ -1927,7 +1936,8 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
         $output .= ' class="disabled">' . $list['title'];
       }
       else {
-        $output .= '>' . l($list['title'], 'user/listadd/' . $bnum . '/' . $list['list_id']);
+        $output .= '>' . l($list['title'], 'user/listadd/' . $bnum . '/' . $list['list_id'],
+                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
       }
       $output .= '</li>';
     }

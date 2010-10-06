@@ -12,7 +12,6 @@ if ($item_form) {
   print $item_form;
 }
 
-$myaccount_link = "https://www.aadl.org/myaccount";
 /*
 print '<div class="req_return_link"><strong>»</strong> ' .
       l(t('Return to the record display'), variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum) .
@@ -28,6 +27,6 @@ print '<br />';
 */
 ?>
 <ul>
-<li class="button"><a href="#" onclick="parent.document.location=('<?php print $myaccount_link; ?>')">Go to My Account</a></li>
-<li class="button"><a href="#" onclick="parent.Lightbox.end('forceClose')">Close this window</a></li>
+<li class="button green"><a href="#" onclick="parent.document.location=('<?php print url('user') ?>')">Go to My Account</a></li>
+<li class="button red"><a href="#" onclick="parent.Lightbox.end('forceClose')">Close this window</a></li>
 </ul>

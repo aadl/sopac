@@ -369,7 +369,8 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
             if ($branch != $user->profile_pref_home_branch) {
               $text .= '<li>' .
                        l($branch,
-                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch) .
+                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch,
+                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
                        '</li>';
             }
           }
