@@ -85,7 +85,8 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         print '<li class="button hassub">Reviews &amp; Summaries (' .
               count($locum_result['review_links']) . ')<ul class="submenu" id="rev_' . $locum_result['bnum'] . '">';
         foreach ($locum_result['review_links'] as $rev_title => $rev_link) {
-          print '<li>' . l($rev_title, $rev_link, array('attributes' => array('html' => TRUE, 'target' => "_new"))) . '</li>';
+          $rev_link = explode('?', $rev_link);
+          print '<li>' . l($rev_title, $rev_link[0], array('query' => $rev_link[1], 'attributes' => array('html' => TRUE, 'target' => "_new"))) . '</li>';
         }
         print '</ul><span></span></li>';
       }

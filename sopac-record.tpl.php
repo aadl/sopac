@@ -279,7 +279,8 @@ if (sopac_prev_search_url(TRUE)) {
       print '<h2>Reviews &amp; Summaries</h2>';
       print '<ul>';
       foreach ($item['review_links'] as $rev_title => $rev_link) {
-        print '<li>' . l($rev_title, $rev_link, array('attributes' => array('target' => '_new'))) . '</li>';
+        $rev_link = explode('?', $rev_link);
+        print '<li>' . l($rev_title, $rev_link[0], array('query' => $rev_link[1], 'attributes' => array('target' => '_new'))) . '</li>';
       }
       print '</ul></div>';
     }
