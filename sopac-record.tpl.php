@@ -229,9 +229,9 @@ if (sopac_prev_search_url(TRUE)) {
         if ($item_status['avail']) {
           // Build list of locations
           $locations = array();
-          foreach ($item_status['items'] as $item) {
-            if ($item['avail']) {
-              $locations[$item['loc_code']] = $item['location'];
+          foreach ($item_status['items'] as $itemstat) {
+            if ($itemstat['avail']) {
+              $locations[$itemstat['loc_code']] = $itemstat['location'];
             }
           }
           $locations = implode(', ', $locations);
