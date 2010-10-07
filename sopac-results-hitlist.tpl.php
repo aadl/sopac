@@ -96,7 +96,10 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
     <td class="hitlist-actions">
       <ul>
         <?php
-          if (!in_array($locum_result['loc_code'], $no_circ)) {
+          if ($locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
+            <li class="button">Library Use Only</li>
+        <?php }
+          else if (!in_array($locum_result['loc_code'], $no_circ)) {
             print sopac_put_request_link($locum_result['bnum'],
                                          $locum_result['status']['avail'],
                                          $locum_result['status']['holds'],
