@@ -182,7 +182,10 @@ if (sopac_prev_search_url(TRUE)) {
     <!-- Actions -->
     <ul class="item-actions">
       <?php
-      if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
+      if ($item_status['libuse'] == $item_status['total']) { ?>
+        <li class="button">Library Use Only</li>
+      <?php }
+      else if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
         print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
       }
       if ($user->uid) {
