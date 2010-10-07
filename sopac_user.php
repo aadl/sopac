@@ -1447,33 +1447,24 @@ function sopac_lists_page($list_id = 0) {
     $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
     if ($list['list_id']) {
       if ($user->uid == $list['uid'] || $list['public'] || user_access('administer sopac')) {
-        // set up header for sorting
-        $header = array(
-          array(
-            'data' => 'Place',
-            'field' => 'value',
-            'sort' => 'ASC',
-          ),
-          array(
-            'data' => 'Cover',
-          ),
-          array(
-            'data' => 'Title',
-            'field' => 'title',
-          ),
-          array(
-            'data' => 'Rating',
-          ),
-          array(
-            'data' => 'Actions',
-          ),
-          array(
-            'data' => 'Material',
-            'field' => 'mat_code',
-          ),
+        $sortopts = array(
+          'value',
+          'title',
+          'author',
+          'mat_code',
         );
-        $ts = tablesort_init($header);
-        $list['items']= $insurge->get_list_items($list_id, $ts['sql'], $ts['sort']);
+        if (array_search($_GET['sort'], $sortopts)) {
+          $list['items']= $insurge->get_list_items($list_id, $_GET['sort'], 'ASC');
+        }
+        else if ($_GET['sort'] == 'date') {
+          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'ASC');
+        }
+        else if ($_GET['sort'] == 'date_newest') {
+          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'DESC');
+        }
+        else {
+          $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC');
+        }
         $output .= theme('sopac_list', $list, TRUE);
       }
       else {
@@ -1816,7 +1807,7 @@ function sopac_list_confirm_item_delete_submit($form, &$form_state) {
 
 function theme_sopac_list($list, $expanded = FALSE) {
   global $user;
-  $title = ($header ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
+  $title = ($expanded ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
   $top .= '<div class="sopac-list">';
 
   if ($user->uid == $list['uid'] || user_access('administer sopac')) {
@@ -1839,7 +1830,6 @@ function theme_sopac_list($list, $expanded = FALSE) {
 
     if ($list_count = count($list['items'])) {
       include_once('sopac_catalog.php');
-
       $output .= '<table class="hitlist-content">';
       foreach($list['items'] as $item) {
         // Grab item status
@@ -1860,8 +1850,9 @@ function theme_sopac_list($list, $expanded = FALSE) {
         'value' => t('Default Order'),
         'title' => t('Title'),
         'author' => t('Author'),
-        'date' => t('Date Added'),
-        'type' => t('Material Type'),
+        'date' => t('Date Added - Oldest'),
+        'date_newest' => t('Date Added - Newest'),
+        'mat_code' => t('Material Type'),
       );
       $top .= '<div class="hitlist-range">';
       $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items ( <strong>$avail_count</strong> currently available" ;
@@ -1875,8 +1866,8 @@ function theme_sopac_list($list, $expanded = FALSE) {
       $top .= '</script>';
       $top .= 'Sort by: <select name="sort" id="sortlist">';
       foreach($sortopts as $key => $value) {
-        $top .=  '<option value="' . url($_GET['q'], array('query' => '')) . '" ';
-        if ($sorted_by == $key) {
+        $top .=  '<option value="' . url($_GET['q'], array('query' => array('sort' => $key))) . '" ';
+        if ($_GET['sort'] == $key) {
           $top .=  'selected';
         }
         $top .= '>' . $value . '</option>';
