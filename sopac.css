@@ -774,6 +774,15 @@ input.tagsubmit {
   color: #E25A10;
 }
 
+.suppressed {
+  background-color: #FFD7EA;
+  border: 1px solid red;
+  color: red;
+  font-size: 12px;
+  padding: 10px;
+  margin-bottom: 0.5em;
+}
+
 /*
 html.js fieldset.collapsible {
   position: absolute;

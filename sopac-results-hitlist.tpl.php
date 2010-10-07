@@ -30,6 +30,11 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
       <?php print $cover_img; ?>
     </td>
     <td class="hitlist-info">
+      <?php
+        if ($locum_result['active'] == '0') {
+          print '<div class="suppressed">This Record is Suppressed</div>';
+        }
+      ?>
       <ul>
         <li class="hitlist-title">
           <strong><?php print l(ucwords($locum_result['title']), $url_prefix . '/record/' . $locum_result['bnum']); ?></strong>

@@ -167,9 +167,9 @@ if (sopac_prev_search_url(TRUE)) {
 
     <!-- Supressed record notification -->
     <?php
-    if ($item['active'] == '0') {
-      print '<div class="suppressed">This Record is Suppressed</div>';
-    }
+      if ($item['active'] == '0') {
+        print '<div class="suppressed">This Record is Suppressed</div>';
+      }
     ?>
 
     <div class="item-main">
