@@ -101,7 +101,7 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
     <td class="hitlist-actions">
       <ul>
         <?php
-          if ($locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
+          if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
             <li class="button">Library Use Only</li>
         <?php }
           else if (!in_array($locum_result['loc_code'], $no_circ)) {
