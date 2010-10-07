@@ -182,7 +182,7 @@ if (sopac_prev_search_url(TRUE)) {
     <!-- Actions -->
     <ul class="item-actions">
       <?php
-      if ($item_status['libuse'] == $item_status['total']) { ?>
+      if ($item_status['libuse'] > 0 && $item_status['libuse'] == $item_status['total']) { ?>
         <li class="button">Library Use Only</li>
       <?php }
       else if (!in_array($item['loc_code'], $no_circ) && !$item['download_link']) {
