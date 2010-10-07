@@ -136,8 +136,11 @@ function sopac_user_info_table(&$account, &$locum) {
                              number_format($userinfo['balance'], 2, '.', '') .
                              ' exceeds the limit. You will not be able to request or renew items.');
         }
-        $amount_link = l('$' . number_format($userinfo['balance'], 2, '.', ''), 'user/fines');
-        $rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $amount_link);
+        $balance = '$' . number_format($userinfo['balance'], 2, '.', '');
+        if ($userinfo['balance'] > 0) {
+          $balance = l($balance, 'user/fines');
+        }
+        $rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $balance);
       }
       if (variable_get('sopac_cardexp_enable', 1)) {
         $rows[] = array(array('data' => t('Card Expiration Date'), 'class' => 'attr_name'), date('m-d-Y', $userinfo['expires']));
@@ -1861,7 +1864,11 @@ function theme_sopac_list($list, $expanded = FALSE) {
         'type' => t('Material Type'),
       );
       $top .= '<div class="hitlist-range">';
-      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items ( <strong>$avail_count</strong> currently available - <span id=\"showavailable\">Show Me</span> )</span>";
+      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items ( <strong>$avail_count</strong> currently available" ;
+      if ($avail_count > 0) {
+        $top .= ' - <span id="showavailable">Show Me</span> ';
+      }
+      $top .= ' )</span>';
       $top .= '<span class="hitlist-sorter">';
       $top .= '<script>';
       $top .= 'jQuery(document).ready(function() {$(\'#sortlist\').change(function(){ location.href = $(this).val();});});';
