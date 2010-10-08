@@ -380,8 +380,8 @@ table.availtable {
 /* Search form stuff */
 
 .basic-search-inline {
-  padding-top: 10px;
-  padding-left: 10px;
+  padding-top: 5px;
+  padding-left: 50px;
 }
 
 .adv-search-inline {
