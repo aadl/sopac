@@ -1721,7 +1721,7 @@ function sopac_list_add($bnum, $list_id = 0) {
       $output .= '<h2>"' . $bib['title'] . '" has been added to your list</h2>';
     }
     else {
-      $output .= '<h2>"' . $bib['title'] . '" has not been added, already on list</h2>';
+      drupal_set_message('"' . $bib['title'] . '" has not been added, already on list', 'error');
     }
   }
   else {

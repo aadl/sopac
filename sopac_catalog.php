@@ -104,8 +104,11 @@ function sopac_catalog_search() {
       $facet_args['facet_subject'] = $getvars['facet_subject'];
     }
 
+    // Hide suppressed records unless permission
+    $show_inactive = user_access('show suppressed records');
+
     // Get the search results from Locum
-    $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args, FALSE, $limit_avail);
+    $locum_results_all = $locum->search($search_type, $search_term, $limit, $page_offset, $sort, $format, $location, $facet_args, FALSE, $limit_avail, $show_inactive);
     $num_results = $locum_results_all['num_hits'];
     $result_info['limit'] = $limit;
     $result_info['num_results'] = $num_results;
