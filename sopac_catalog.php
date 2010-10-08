@@ -515,7 +515,7 @@ function sopac_request_item() {
     $bnum = $actions[1];
     $pickup_arg = $actions[2] ? $actions[2] : NULL;
     $pickup_name = $actions[3] ? $actions[3] : ($pickup_arg ? $locum->locum_config['branches'][$pickup_arg] : NULL);
-    $bib_item = $locum->get_bib_item($bnum);
+    $bib_item = $locum->get_bib_item($bnum, TRUE);
     $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
 
     // Set home branch if none set
@@ -542,11 +542,11 @@ function sopac_request_item() {
       }
     }
     else {
-      $request_result_msg = t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item['title'] . '</span>';
+      drupal_set_message(t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item['title'] . '</span>', 'error');
     }
 
     if ($hold_result['error']) {
-      $request_result_msg = $hold_result['error'];
+      drupal_set_message($hold_result['error'], 'error');
     }
 
     if ($hold_result['selection']  && !$hold_result['success']) {
