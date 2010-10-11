@@ -1957,6 +1957,21 @@ function sopac_import_cc($list_id, $uid) {
   $res = db_query("SELECT DISTINCT bnum FROM sopac_cc_savedcards WHERE uid = '%d' ORDER BY id ASC", $uid);
   while ($item = db_fetch_object($res)) {
     $insurge->add_list_item($uid, $list_id, $item->bnum);
-    drupal_set_message("Added $item->bnum to list $list_id");
+    //drupal_set_message("Added $item->bnum to list $list_id");
   }
+}
+
+function sopac_create_pcc_lists() {
+	$user_count = 0;
+	$res = db_query("SELECT DISTINCT uid FROM sopac_cc_savedcards");
+	while ($pcc_user = db_fetch_object($res)) {
+		$user_count++;
+		// Create a new list for this user
+		db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
+							$pcc_user->uid, 'Personal Card Catalog List', 'Records imported from the old Personal Card Catalog function', 0);
+    $list_id = db_last_insert_id('sopac_lists', 'list_id');
+		// import all records for this user into the list
+		sopac_import_cc($list_id, $pcc_user->uid);
+	}
+	drupal_set_message("Created PCC Lists for $user_count users");
 }
