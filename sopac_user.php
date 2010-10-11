@@ -1959,7 +1959,10 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
     }
   }
   if (empty($wishlist)) {
-    $wishlist = '<li class="button green">' . l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/wish') . '</li>';
+    $wishlist = '<li class="button green">' .
+                l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/wish',
+                  array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                '</li>';
   }
 
   $output .= '<li>' . l('» Add to new list...', 'user/lists/edit', array('query' => array('bnum' => $bnum))) . '</li>';
