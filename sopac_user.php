@@ -1978,9 +1978,11 @@ function sopac_import_cc($list_id, $uid) {
   }
 }
 
-function sopac_create_pcc_lists() {
+function sopac_create_pcc_lists($batch_number = 0) {
+  $limit = 100;
+  $offset = $limit * $batch_number;
   $user_count = 0;
-  $res = db_query("SELECT DISTINCT uid FROM sopac_cc_savedcards");
+  $res = db_query("SELECT DISTINCT uid FROM sopac_cc_savedcards ORDER BY uid LIMIT %d OFFSET %d", $limit, $offset);
   while ($pcc_user = db_fetch_object($res)) {
     $user_count++;
     // Create a new list for this user
