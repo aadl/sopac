@@ -389,6 +389,21 @@ table.availtable {
   padding-left: 10px;
 }
 
+div.searchtips {
+  float: right;
+  position: absolute;
+  right: 10px;
+  text-align: right;
+  top: 0px;
+}
+
+.searchtips a {
+  display: block;
+  line-height: 1em;
+  margin: 0px;
+  padding-top: 4px;
+}
+
 /* Search Tracker Block styles */
 
 .search-block-attr {
