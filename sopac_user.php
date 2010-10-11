@@ -1442,23 +1442,23 @@ function sopac_lists_page($list_id = 0) {
   require_once('sopac_social.php');
   $insurge = sopac_get_insurge();
 
-	if ($list_id == 'public') {
-		// Display a paged list of all the public lists
-		$output = "<h1>Public Lists:</h1>";
-		$public_limit = 10;
-		$public_offset = intval($_GET['offset']);
-		$res = db_query("SELECT * FROM {sopac_lists} WHERE public = 1 ORDER BY list_id DESC LIMIT $public_limit OFFSET $public_offset");
+  if ($list_id === 'public') {
+    // Display a paged list of all the public lists
+    $output = "<h1>Public Lists:</h1>";
+    $public_limit = 10;
+    $public_offset = intval($_GET['offset']);
+    $res = db_query("SELECT * FROM {sopac_lists} WHERE public = 1 ORDER BY list_id DESC LIMIT $public_limit OFFSET $public_offset");
     while ($list = db_fetch_array($res)) {
       $list['items'] = $insurge->get_list_items($list['list_id']);
       $output .= theme('sopac_list', $list);
-			$list_count++;
+      $list_count++;
     }
-		if ($list_count == $public_limit) {
-			$output .= '<ul class="list-overview-actions"><li class="button green">' .
-								 l("Next $public_limit Lists" , 'user/lists/public', array('query' => array('offset' => $public_offset + $public_limit))) .
-								 '</li></ul>';
-		}
-	}
+    if ($list_count == $public_limit) {
+      $output .= '<ul class="list-overview-actions"><li class="button green">' .
+                 l("Next $public_limit Lists" , 'user/lists/public', array('query' => array('offset' => $public_offset + $public_limit))) .
+                 '</li></ul>';
+    }
+  }
   else if ($list_id) {
     // display list contents
     $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
@@ -1979,16 +1979,16 @@ function sopac_import_cc($list_id, $uid) {
 }
 
 function sopac_create_pcc_lists() {
-	$user_count = 0;
-	$res = db_query("SELECT DISTINCT uid FROM sopac_cc_savedcards");
-	while ($pcc_user = db_fetch_object($res)) {
-		$user_count++;
-		// Create a new list for this user
-		db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
-							$pcc_user->uid, 'Personal Card Catalog List', 'Records imported from the old Personal Card Catalog function', 0);
+  $user_count = 0;
+  $res = db_query("SELECT DISTINCT uid FROM sopac_cc_savedcards");
+  while ($pcc_user = db_fetch_object($res)) {
+    $user_count++;
+    // Create a new list for this user
+    db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
+              $pcc_user->uid, 'Personal Card Catalog List', 'Records imported from the old Personal Card Catalog function', 0);
     $list_id = db_last_insert_id('sopac_lists', 'list_id');
-		// import all records for this user into the list
-		sopac_import_cc($list_id, $pcc_user->uid);
-	}
-	drupal_set_message("Created PCC Lists for $user_count users");
+    // import all records for this user into the list
+    sopac_import_cc($list_id, $pcc_user->uid);
+  }
+  drupal_set_message("Created PCC Lists for $user_count users");
 }
