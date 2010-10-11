@@ -1442,7 +1442,24 @@ function sopac_lists_page($list_id = 0) {
   require_once('sopac_social.php');
   $insurge = sopac_get_insurge();
 
-  if ($list_id) {
+	if ($list_id == 'public') {
+		// Display a paged list of all the public lists
+		$output = "<h1>Public Lists:</h1>";
+		$public_limit = 10;
+		$public_offset = intval($_GET['offset']);
+		$res = db_query("SELECT * FROM {sopac_lists} WHERE public = 1 ORDER BY list_id DESC LIMIT $public_limit OFFSET $public_offset");
+    while ($list = db_fetch_array($res)) {
+      $list['items'] = $insurge->get_list_items($list['list_id']);
+      $output .= theme('sopac_list', $list);
+			$list_count++;
+    }
+		if ($list_count == $public_limit) {
+			$output .= '<ul class="list-overview-actions"><li class="button green">' .
+								 l("Next $public_limit Lists" , 'user/lists/public', array('query' => array('offset' => $public_offset + $public_limit))) .
+								 '</li></ul>';
+		}
+	}
+  else if ($list_id) {
     // display list contents
     $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
     if ($list['list_id']) {
@@ -1481,7 +1498,7 @@ function sopac_lists_page($list_id = 0) {
   }
   else {
     if ($user->uid) {
-      $output = "<h1>My Lists</h1>";
+      $output = "<h1>My Lists:</h1>";
       // display lists
       $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d", $user->uid);
       while ($list = db_fetch_array($res)) {
