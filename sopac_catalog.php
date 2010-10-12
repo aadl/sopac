@@ -163,7 +163,7 @@ function sopac_catalog_search() {
 
       // Get the cover image
       $cover_img_url = $locum_result['cover_img'];
-
+      $locum_result['sort'] = $sort;
       // Grab Syndetics reviews, etc..
       $review_links = $locum->get_syndetics($locum_result['stdnum']);
       if (count($review_links)) {
