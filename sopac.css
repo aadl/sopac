@@ -454,9 +454,7 @@ div.searchtips {
 }
 
 #patroninfo tbody tr.profile_button td, #patroninfo-summary tbody tr.profile_button td, #reqlist tbody tr.req_button td {
-  text-align: right;
-  padding: 10px 8px;
-  background-color: #fff;
+  background-color: #FFFFFF;
 }
 
 .profile .error {

@@ -40,7 +40,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 
   // Patron holds (bottom of the page)
   if ($account->valid_card && $account->bcode_verify) {
-    $holds_table = drupal_get_form('sopac_user_holds_form');
+    $holds_table = drupal_get_form('sopac_user_holds_form', $account);
     if ($holds_table) {
       $result['patronholds']['#title'] = t('Requested Items');
       $result['patronholds']['#weight'] = 3;
@@ -299,13 +299,15 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
  *
  * @return string
  */
-function sopac_user_holds_form() {
-  global $user;
-  profile_load_profile(&$user);
+function sopac_user_holds_form($form_state, $account = NULL) {
+  if (!$account) {
+    global $user;
+    $account = user_load($user->uid);
+  }
 
   $form = array();
-  $cardnum = $user->profile_pref_cardnum;
-  $ils_pass = $user->locum_pass;
+  $cardnum = $account->profile_pref_cardnum;
+  $ils_pass = $account->locum_pass;
   $locum = sopac_get_locum();
   $locum_cfg = $locum->locum_config;
   $holds = $locum->get_patron_holds($cardnum, $ils_pass);
@@ -842,7 +844,7 @@ function sopac_holds_page() {
   profile_load_profile(&$user);
 
   if ($account->valid_card && $bcode_verify) {
-    $content = drupal_get_form('sopac_user_holds_form');
+    $content = drupal_get_form('sopac_user_holds_form', $account);
   }
   elseif ($account->valid_card && !$bcode_verify) {
     $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
