@@ -51,11 +51,14 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         </li>
         <li><?php print $locum_result['pub_info']; ?></li>
         <?php if ($locum_result['callnum']) {
-          ?><li><?php print t('Call number: '); ?><strong><?php print $locum_result['callnum']; ?></strong></li><?php
+          ?><li><?php print t('Call number: '); ?><strong><?php print l($locum_result['callnum'], $url_prefix . '/search/callnum/"' . urlencode($locum_result['callnum']) .'"'); ?></strong></li><?php
         }
         elseif (count($locum_result['avail_details'])) {
           ?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
         } ?>
+        <?php if($locum_result['sort'] == 'catalog_newest') { ?>
+        <li><strong>Added on <?php echo date('m-d-Y', strtotime($locum_result['bib_created'])); ?></strong></li>
+        <?php } ?>
         <ul class="hitlist-avail">
           <li class="hitlist-subtitle">
             <?php
