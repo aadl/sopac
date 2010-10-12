@@ -341,7 +341,7 @@ function sopac_user_holds_form($form_state, $account = NULL) {
     '#iterable' => TRUE,
   );
   foreach ($holds as $hold) {
-    $bnum = $hold['bnum'];
+    $bnum = $hold['bnum'] ? $hold['bnum'] : $hold['varname'];
     $new_author_str = sopac_author_format($hold['bib']['author'], $hold['bib']['addl_author']);
 
     // CUSTOM ILL DISPLAY
@@ -445,6 +445,8 @@ function sopac_user_holds_form($form_state, $account = NULL) {
  */
 function sopac_user_holds_form_validate(&$form, &$form_state) {
   global $user;
+  profile_load_profile($user);
+  
   // Set defaults to avoid errors when debugging.
   $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
 
@@ -461,10 +463,12 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   $password = $user->locum_pass;
   $locum = sopac_get_locum();
   $holds = $locum->get_patron_holds($cardnum, $password);
+
   // Should be how it comes back from locum
   $holds_by_bnum = array();
   foreach ($holds as $hold) {
-    $holds_by_bnum[$hold['bnum']] = $hold;
+    $bnum = ($hold['bnum'] ? $hold['bnum'] : $hold['varname']);
+    $holds_by_bnum[$bnum] = $hold;
   }
 
   $submitted_holds = $form_state['values']['holds'];
