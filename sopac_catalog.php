@@ -19,7 +19,8 @@
  */
 function sopac_catalog_search() {
   global $pager_page_array, $pager_total, $locum_results_all, $locum_cfg;
-
+  global $user;
+  $account = user_load(array('uid' => $user->uid));
   // Load Required JS libraries
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.treeview.js');
   drupal_add_js(drupal_get_path('module', 'sopac') .'/js/jquery.rating.js');
@@ -53,19 +54,18 @@ function sopac_catalog_search() {
     if ($getvars['perpage']) {
       $limit = $getvars['perpage'];
     }
-    elseif ($user->profile_perpage) {
-      $limit = $user->profile_perpage;
+    elseif ($account->profile_perpage) {
+      $limit = $account->profile_perpage;
     }
     else {
       $limit = variable_get('sopac_results_per_page', 10);
     }
 
-    /* Not implemented yet
-    if ($user->uid && $limit != $user->profile_perpage) {
+    
+    if ($user->uid && $limit != $account->profile_perpage) {
       $field = db_fetch_object(db_query("SELECT * FROM profile_fields WHERE name = 'profile_perpage'"));
       db_query("INSERT INTO profile_values (fid, uid, value) VALUES (%d, %d, '%s') ON DUPLICATE KEY UPDATE value = '%s'", $field->fid, $user->uid, $limit, $limit);
     }
-    */
 
     //if ($addl_search_args['limit']) {
     //  $limit = $addl_search_args['limit'];
