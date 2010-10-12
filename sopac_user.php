@@ -365,6 +365,12 @@ function sopac_user_holds_form($form_state, $account = NULL) {
     }
     else {
       if ($hold['bib']['active']) { // Not suppressed
+        // Hover text for the bib
+        $hover = $hold['title'] . "\n" .
+                 $new_author_str . "\n" .
+                 $hold['bib']['callnum'] . "\n" .
+                 $hold['bib']['pub_info'] . "\n" .
+                 $hold['bib']['descr'];
         $title = l($hold['title'], $sopac_prefix . $bnum, array('attributes' => array('title' => $hover)));
       }
       else {
@@ -373,12 +379,6 @@ function sopac_user_holds_form($form_state, $account = NULL) {
       $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
     }
 
-    // Hover text for the bib
-    $hover = $hold['title'] . "\n" .
-             $new_author_str . "\n" .
-             $hold['bib']['callnum'] . "\n" .
-             $hold['bib']['pub_info'] . "\n" .
-             $hold['bib']['descr'];
     $ready = (strpos($hold['status'], 'Ready') !== FALSE || strpos($hold['status'], 'MEL RECEIVED') !== FALSE);
 
     $hold_to_theme = array();
