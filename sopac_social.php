@@ -255,7 +255,7 @@ function sopac_user_tag_delete() {
   drupal_set_message(t('You have tagged ') . $tag_total_str . t(' with "') . $tag . t('".  If you delete this tag, it will be removed completely.'), 'warning');
 
   if ($_GET['ref']) {
-    $form['#redirect'] = substr(urldecode($_GET['ref']), 1);
+    $form['#redirect'] = urldecode($_GET['ref']);
   }
   $form['tagform'] = array(
     '#type' => 'fieldset',
