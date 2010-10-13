@@ -206,7 +206,7 @@ function sopac_user_tag_edit() {
   $pathinfo = explode('/', trim($_GET['q']));
   $tag = $pathinfo[3];
   if ($_GET['ref']) {
-    $form['#redirect'] = substr(urldecode($_GET['ref']), 1);
+    $form['#redirect'] = urldecode($_GET['ref']);
   }
   $form['tagform'] = array(
     '#type' => 'fieldset',
