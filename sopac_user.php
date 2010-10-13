@@ -29,7 +29,8 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 
   // Patron checkouts (middle of the page)
   if ($account->valid_card && $account->bcode_verify) {
-    $co_table = sopac_user_chkout_table($account, $locum);
+    $max_disp = intval($account->profile_numco);
+    $co_table = sopac_user_chkout_table($account, $locum, $max_disp);
     if ($co_table) {
       $result['patronco']['#title'] = t('Checked-out Items');
       $result['patronco']['#weight'] = 2;
@@ -40,7 +41,8 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
 
   // Patron holds (bottom of the page)
   if ($account->valid_card && $account->bcode_verify) {
-    $holds_table = drupal_get_form('sopac_user_holds_form', $account);
+    $max_disp = intval($account->profile_numreq);
+    $holds_table = drupal_get_form('sopac_user_holds_form', $account, $max_disp);
     if ($holds_table) {
       $result['patronholds']['#title'] = t('Requested Items');
       $result['patronholds']['#weight'] = 3;
@@ -207,8 +209,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     $locum_pass = substr($account->pass, 0, 7);
     $cardnum = $account->profile_pref_cardnum;
     $checkouts = $locum->get_patron_checkouts($cardnum, $locum_pass);
+    $total = count($checkouts);
 
-    if (!count($checkouts)) {
+    if (!$total) {
       return t('No items checked out.');
     }
 
@@ -218,6 +221,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     $ill_bnums = array(1358991, 1356138, 1358990, 1358993, 1358992); // Make config option
 
     foreach ($checkouts as $co) {
+      if ($max_disp && $total > $max_disp && ++$checkout_num > $max_disp) {
+        break;
+      }
       if ($renew_status[$co['inum']]['error']) {
         $duedate = '<span style="color: red;">' . $renew_status[$co['inum']]['error'] . '</span>';
       }
@@ -283,6 +289,12 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
       );
     }
     $submit_buttons = '<input type="submit" name="sub_type" value="' . t('Renew Selected') . '"> <input type="submit" name="sub_type" value="' . t('Renew All') . '">';
+    if ($max_disp && $total > $max_disp) {
+      $current_pref = l("Showing $max_disp of $total Checkouts", 'user/' . $account->uid . '/edit/Preferences', array('attributes' => array('title' => "Change this setting")));
+      $rows[] = array('data' => array(array('data' => $current_pref . " [ " . l("See All Checkouts", 'user/checkouts') . " ]",
+                                            'colspan' => 6,
+                                            'style' => "text-align: right")));
+    }
     $rows[] = array('data' => array(array('data' => $submit_buttons, 'colspan' => count($rows[0]))), 'class' => 'profile_button' );
   }
   else {
@@ -299,7 +311,7 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
  *
  * @return string
  */
-function sopac_user_holds_form($form_state, $account = NULL) {
+function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
   if (!$account) {
     global $user;
     $account = user_load($user->uid);
@@ -311,8 +323,9 @@ function sopac_user_holds_form($form_state, $account = NULL) {
   $locum = sopac_get_locum();
   $locum_cfg = $locum->locum_config;
   $holds = $locum->get_patron_holds($cardnum, $ils_pass);
+  $total = count($holds);
 
-  if (!count($holds)) {
+  if (!$total) {
     $form['empty'] = array(
       '#type' => 'markup',
       '#value' => t('No items requested.'),
@@ -341,6 +354,9 @@ function sopac_user_holds_form($form_state, $account = NULL) {
     '#iterable' => TRUE,
   );
   foreach ($holds as $hold) {
+    if ($max_disp && $total > $max_disp && ++$hold_num > $max_disp) {
+      break;
+    }
     $bnum = $hold['bnum'] ? $hold['bnum'] : $hold['varname'];
     $new_author_str = sopac_author_format($hold['bib']['author'], $hold['bib']['addl_author']);
 
@@ -427,7 +443,12 @@ function sopac_user_holds_form($form_state, $account = NULL) {
     }
     $form['holds'][$bnum] = $hold_to_theme;
   }
-
+  if ($max_disp && $total > $max_disp) {
+    $current_pref = l("Showing $max_disp of $total requests", 'user/' . $account->uid . '/edit/Preferences', array('attributes' => array('title' => "Change this setting")));
+    $form['see_all'] = array(
+      '#value' => $current_pref . " [ " . l("See All Requests", 'user/requests') . " ]",
+    );
+  }
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'op',
@@ -446,7 +467,7 @@ function sopac_user_holds_form($form_state, $account = NULL) {
 function sopac_user_holds_form_validate(&$form, &$form_state) {
   global $user;
   //profile_load_profile($user);
-  
+
   // Set defaults to avoid errors when debugging.
   $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
 
@@ -845,7 +866,6 @@ function sopac_holds_page() {
   else {
     $account->valid_card = FALSE;
   }
-  //profile_load_profile(&$user);
 
   if ($account->valid_card && $bcode_verify) {
     $content = drupal_get_form('sopac_user_holds_form', $account);

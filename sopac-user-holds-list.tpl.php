@@ -32,6 +32,19 @@
     </tr>
 <?php
   }
+  if ($see_all) {
+?>
+  <tr class="odd">
+    <?php if ($freezes_enabled) { ?>
+      <td colspan="7" align="right">
+    <?php } else { ?>
+      <td colspan="6" align="right">
+    <?php } ?>
+    <?php print $see_all['#value']; ?>
+      </td>
+    </tr>
+<?php
+  }
 ?>
     <tr class="profile_button <?php print $zebra ?>">
     <?php if ($freezes_enabled) { ?>
