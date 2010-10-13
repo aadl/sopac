@@ -445,7 +445,7 @@ function sopac_user_holds_form($form_state, $account = NULL) {
  */
 function sopac_user_holds_form_validate(&$form, &$form_state) {
   global $user;
-  profile_load_profile($user);
+  //profile_load_profile($user);
   
   // Set defaults to avoid errors when debugging.
   $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
@@ -677,7 +677,7 @@ function sopac_checkouts_page() {
   else {
     $account->valid_card = FALSE;
   }
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
 
   if ($account->valid_card && $bcode_verify) {
     $content = sopac_user_chkout_table(&$user, &$locum);
@@ -703,7 +703,7 @@ function sopac_checkouts_page() {
  */
 function sopac_checkout_history_page() {
   global $user;
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
 
     // Get the time since the last update
@@ -794,7 +794,7 @@ function sopac_checkout_history_toggle($action) {
   global $user;
   if ($action != 'in' && $action != 'out') { drupal_goto('user/checkouts/history'); }
   $adjective = $action == 'in' ? t('on') : t('off');
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
     if (!$_GET['confirm']) {
       $confirm_link = l(t('confirm'), $_GET['q'], array('query' => 'confirm=true'));
@@ -845,7 +845,7 @@ function sopac_holds_page() {
   else {
     $account->valid_card = FALSE;
   }
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
 
   if ($account->valid_card && $bcode_verify) {
     $content = drupal_get_form('sopac_user_holds_form', $account);
@@ -873,7 +873,7 @@ function sopac_fines_page() {
   global $user;
 
   $locum = sopac_get_locum();
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
 
   if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
     $locum_pass = substr($user->pass, 0, 7);
@@ -952,7 +952,7 @@ function sopac_makepayment_page() {
   global $user;
 
   $locum = sopac_get_locum();
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
 
   if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
     if ($_POST['varname'] && is_array($_POST['varname'])) {
@@ -1115,7 +1115,7 @@ function sopac_fine_payment_form() {
 function sopac_fine_payment_form_submit($form, &$form_state) {
   global $user;
   $locum = sopac_get_locum();
-  profile_load_profile(&$user);
+  //profile_load_profile(&$user);
   $locum_pass = substr($user->pass, 0, 7);
 
   if ($user->profile_pref_cardnum && sopac_bcode_isverified(&$user)) {
@@ -1948,7 +1948,7 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
       else {
         $wishlist = '<li class="button green">' .
                     l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/' . $list['list_id'],
-                      array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                      array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
                     '</li>';
       }
     }
@@ -1959,7 +1959,7 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
       }
       else {
         $output .= '>' . l($list['title'], 'user/listadd/' . $bnum . '/' . $list['list_id'],
-                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
+                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE));
       }
       $output .= '</li>';
     }
@@ -1967,11 +1967,11 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   if (empty($wishlist)) {
     $wishlist = '<li class="button green">' .
                 l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/wish',
-                  array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                  array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
                 '</li>';
   }
 
-  $output .= '<li>' . l('» Add to new list...', 'user/lists/edit', array('query' => array('bnum' => $bnum))) . '</li>';
+  $output .= '<li>' . l('» Add to new list...', 'user/lists/edit', array('query' => array('bnum' => $bnum), 'alias' => TRUE)) . '</li>';
   $output .= '</ul>';
   $output .= '</li>';
 

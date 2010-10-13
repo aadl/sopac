@@ -349,10 +349,10 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
   } else {
     global $user;
     $class = 'button green';
-    profile_load_profile(&$user);
+    //profile_load_profile(&$user);
 
     if ($user->uid) {
-      if (sopac_bcode_isverified(&$user)) {
+      if ($user->bcode_verified) {
         // User is logged in and has a verified card number
         $text = "Request this";
         if (variable_get('sopac_multi_branch_enable', 0)) {
@@ -366,7 +366,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
             $text .= '<li>' .
                      l($user->profile_pref_home_branch,
                        variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
-                       array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                       array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
                      '</li>';
             $text .= '<li>Other Location...</li>';
           }
@@ -375,14 +375,14 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
               $text .= '<li>' .
                        l($branch_name,
                          variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
-                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'))) .
+                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
                        '</li>';
             }
           }
           $text .= "</ul><span></span>";
         }
         else {
-          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum);
+          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,array('alias' => TRUE));
         }
       }
       elseif ($user->profile_pref_cardnum) {
@@ -450,11 +450,11 @@ function sopac_multibranch_hold_request(&$form_state, $bnum = null) {
  */
 function sopac_multibranch_hold_request_validate($form, &$form_state) {
   global $user;
-  profile_load_profile($user);
-  profile_load_profile(&$user);
+  //profile_load_profile($user);
+  //profile_load_profile(&$user);
 
   if ($user->uid) {
-    if (sopac_bcode_isverified(&$user)) {
+    if ($user->bcode_verified) {
       return;
     }
     else {
@@ -507,8 +507,8 @@ function sopac_request_item() {
   $varname = $request_result_msg = $request_error_msg = $item_form = $bnum = NULL;
 
   $button_txt = t('Request Selected Item');
-  profile_load_profile(&$user);
-  if ($user->uid && sopac_bcode_isverified(&$user)) {
+  //profile_load_profile(&$user);
+  if ($user->uid && $user->bcode_verified) {
     // support multi-branch & user home branch
     $locum = sopac_get_locum();
     $actions = sopac_parse_uri();

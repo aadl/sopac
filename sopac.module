@@ -35,6 +35,8 @@ function sopac_init() {
   // Set up some user-specific values
   if ($user->uid) {
     $user->locum_pass = substr($user->pass, 0, 7);
+    profile_load_profile($user);
+    $user->bcode_verified = sopac_bcode_isverified(&$user);
   }
 
   // Assign the various CSS Files

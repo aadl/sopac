@@ -8,7 +8,6 @@
 $new_author_str = sopac_author_format($locum_result['author'], $locum_result['addl_author']);
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 global $user;
-profile_load_profile($user);
 
 if (!module_exists('covercache')) {
   if (strpos($locum_result['cover_img'], 'http://') !== FALSE) {
@@ -20,7 +19,7 @@ if (!module_exists('covercache')) {
   $cover_img = '<img width="100" src="' . $cover_img . '">';
   $cover_img = l($cover_img,
                  variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['bnum'],
-                 array('html' => TRUE));
+                 array('html' => TRUE, 'alias' => TRUE));
 }
 $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
 ?>
@@ -37,7 +36,7 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
       ?>
       <ul>
         <li class="hitlist-title">
-          <strong><?php print l(ucwords($locum_result['title']), $url_prefix . '/record/' . $locum_result['bnum']); ?></strong>
+          <strong><?php print l(ucwords($locum_result['title']), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); ?></strong>
           <?php
           if ($locum_result['title_medium']) {
             print "[$locum_result[title_medium]]";
@@ -46,12 +45,12 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         </li>
         <li>
         <?php
-          print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str));
+          print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE));
         ?>
         </li>
         <li><?php print $locum_result['pub_info']; ?></li>
         <?php if ($locum_result['callnum']) {
-          ?><li><?php print t('Call number: '); ?><strong><?php print l($locum_result['callnum'], $url_prefix . '/search/callnum/"' . urlencode($locum_result['callnum']) .'"'); ?></strong></li><?php
+          ?><li><?php print t('Call number: '); ?><strong><?php print l($locum_result['callnum'], $url_prefix . '/search/callnum/"' . urlencode($locum_result['callnum']) .'"',array('alias' => TRUE)); ?></strong></li><?php
         }
         elseif (count($locum_result['avail_details'])) {
           ?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
@@ -88,7 +87,7 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
               count($locum_result['review_links']) . ')<ul class="submenu" id="rev_' . $locum_result['bnum'] . '">';
         foreach ($locum_result['review_links'] as $rev_title => $rev_link) {
           $rev_link = explode('?', $rev_link);
-          print '<li>' . l($rev_title, $rev_link[0], array('query' => $rev_link[1], 'attributes' => array('html' => TRUE, 'target' => "_new"))) . '</li>';
+          print '<li>' . l($rev_title, $rev_link[0], array('query' => $rev_link[1], 'attributes' => array('html' => TRUE, 'target' => "_new", 'alias' => TRUE))) . '</li>';
         }
         print '</ul><span></span></li>';
       }
@@ -116,8 +115,8 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
             $list_id = intval(str_replace('list', '', $locum_result['namespace']));
             $value = $locum_result['value'];
             $bnum = $locum_result['bnum'];
-            print '<li class="button green">' . l('Move to Top of List', "user/listmovetop/$list_id/$value") . '</li>';
-            print '<li class="button red">' . l('Remove from List', "user/listdelete/$list_id/$bnum") . '</li>';
+            print '<li class="button green">' . l('Move to Top of List', "user/listmovetop/$list_id/$value",array('alias' => TRUE)) . '</li>';
+            print '<li class="button red">' . l('Remove from List', "user/listdelete/$list_id/$bnum",array('alias' => TRUE)) . '</li>';
           }
         ?>
       </ul>
