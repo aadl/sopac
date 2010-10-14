@@ -304,11 +304,18 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
   // Wrap it together inside a form
   $content = '<form method="post">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . '</form>';
   $token = $locum->get_token($account->uid);
-  if(!$token){
+  if (!$token) {
    $token = $locum->set_token($account->uid);
   }
-  if($token){
-    $content .= '<p><a href="http://api.aadl.org/user/checkouts?token='.$token.'"><img src="https://www.aadl.org/sites/default/themes/zen/aadl/images/feed.png" alt = "Syndicate Your Checkouts" /> <a href="webcal://api.aadl.org/user/ical?token='.$token.'"><img src="https://www.aadl.org/sites/default/themes/zen/aadl/images/ical.png" alt = "iCal feed for Checkouts" /></a></p>';
+  if ($token) {
+    $image_path = path_to_theme() . '/images';
+    $content .= '<p>';
+    $content .= l('<img src="' . $image_path . '/feed.png" alt="Syndicate your Checkouts" />',
+                  "http://api.aadl.org/user/checkouts?token=$token", array('html' => TRUE));
+    $content .= '&nbsp;';
+    $content .= l('<img src="' . $image_path . '/ical.png" alt="iCal feed for Checkouts" />',
+                  "webcal://api.aadl.org/user/ical?token=$token", array('html' => TRUE));
+    $content .= '</p>';
   }
 
   return $content;
