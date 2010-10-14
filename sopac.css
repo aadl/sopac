@@ -391,10 +391,9 @@ table.availtable {
 
 div.searchtips {
   float: right;
-  position: absolute;
   right: 10px;
   text-align: right;
-  top: 0px;
+  margin-top: -1.5em;
 }
 
 .searchtips a {
