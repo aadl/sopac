@@ -308,7 +308,7 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
    $token = $locum->set_token($account->uid);
   }
   if ($token) {
-    $image_path = path_to_theme() . '/images';
+    $image_path = base_path() . path_to_theme() . '/images';
     $content .= '<p>';
     $content .= l('<img src="' . $image_path . '/feed.png" alt="Syndicate your Checkouts" />',
                   "http://api.aadl.org/user/checkouts?token=$token", array('html' => TRUE));
