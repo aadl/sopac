@@ -291,6 +291,14 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
 
   // Wrap it together inside a form
   $content = '<form method="post">' . theme('table', $header, $rows, array('id' => 'patroninfo', 'cellspacing' => '0')) . '</form>';
+  $token = $locum->get_token($account->uid);
+  if(!$token){
+   $token = $locum->set_token($account->uid);
+  }
+  if($token){
+    $content .= '<p><a href="http://api.aadl.org/user/checkouts?token='.$token.'"><img src="https://www.aadl.org/sites/default/themes/zen/aadl/images/feed.png" alt = "Syndicate Your Checkouts" /> <a href="ical://api.aadl.org/user/ical?token='.$token.'"><img src="https://www.aadl.org/sites/default/themes/zen/aadl/images/ical.png" alt = "iCal feed for Checkouts" /></a></p>';
+  }
+
   return $content;
 }
 
