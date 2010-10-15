@@ -499,12 +499,20 @@ function sopac_theme() {
       'template' => 'sopac-results-rss',
       'arguments' => array('result_info' => NULL, 'search_term' => NULL, 'search_type' => NULL, 'hitlist_content' => NULL, 'locum_result' => NULL, 'locum_config' => NULL),
     ),
+    'sopac_results_xml' => array(
+      'template' => 'sopac-results-xml',
+      'arguments' => array('result_info' => NULL, 'hitlist_pager' => NULL, 'hitlist_content' => NULL, 'locum_result' => NULL, 'locum_config' => NULL),
+    ),
     'sopac_results_hitlist' => array(
       'template' => 'sopac-results-hitlist',
       'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL),
     ),
     'sopac_results_hitlist_rss' => array(
       'template' => 'sopac-results-hitlist-rss',
+      'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL),
+    ),
+    'sopac_results_hitlist_xml' => array(
+      'template' => 'sopac-results-hitlist-xml',
       'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL),
     ),
     'sopac_results_nohits' => array(
