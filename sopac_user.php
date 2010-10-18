@@ -165,7 +165,8 @@ function sopac_user_info_table(&$account, &$locum) {
   }
 
   if ($account->mail && variable_get('sopac_email_enable', 1)) {
-    $rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $account->mail);
+    $email_link = l(t($account->mail), 'user/' . $account->uid . '/edit');
+    $rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $email_link);
   }
 
   // Begin creating the user information display content
