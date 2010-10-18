@@ -404,7 +404,13 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
     }
 
     $ready = (strpos($hold['status'], 'Ready') !== FALSE || strpos($hold['status'], 'MEL RECEIVED') !== FALSE);
-
+    if (module_exists('sopac_lockers')) {
+        if (sopac_lockers_available($hold)) {
+          $hold['status'] .= '*';
+          $locker_message = "<br />*We're testing out a new service. You can " .
+          l("request a locker for outdoor or after hours pickup of this item", "user/locker") . ".<br />";
+        }
+    }
     $hold_to_theme = array();
 
     $hold_to_theme['cancel'] = array(
@@ -456,6 +462,9 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
     $form['see_all'] = array(
       '#value' => $current_pref . " [ " . l("See All Requests", 'user/requests') . " ]",
     );
+  }
+  if($locker_message) {
+    $form['lockers'] = array('#value' => $locker_message);
   }
   $form['submit'] = array(
     '#type' => 'submit',

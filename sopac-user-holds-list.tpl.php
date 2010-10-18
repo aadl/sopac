@@ -46,14 +46,15 @@
 <?php
   }
 ?>
-    <tr class="profile_button <?php print $zebra ?>">
+    <tr class="profile_button <?php print $zebra; ?>">
     <?php if ($freezes_enabled) { ?>
       <td colspan="7">
     <?php } else { ?>
       <td colspan="6">
     <?php } ?>
-        <?php print $submit ?>
+        <?php print $submit; ?>
       </td>
     </tr>
   </tbody>
 </table>
+<p><?php print $lockers['#value']; ?></p>
