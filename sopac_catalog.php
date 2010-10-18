@@ -33,6 +33,7 @@ function sopac_catalog_search() {
   $no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
   $valid_search_types = array('title', 'author', 'keyword', 'subject', 'series', 'callnum', 'tags', 'reviews'); // TODO handle this more dynamically
 
+  $output = $getvars['output'];
   $sort = $getvars['sort'];
   $format = $getvars['search_format'];
   $location = $getvars['location'];
@@ -40,9 +41,6 @@ function sopac_catalog_search() {
   $pager_page_array = explode(',', $getvars['page']);
   $search_type = $actions[1];
   $search_term = utf8_urldecode($actions[2]);
-
-  // Begin thinking about RSS
-  $hitlist_template = ($getvars['output'] == 'rss') ? 'sopac_results_hitlist_rss' : 'sopac_results_hitlist';
 
   // If there is a proper search query, we get that data here.
   if (in_array($actions[1], $valid_search_types)) {
@@ -61,7 +59,7 @@ function sopac_catalog_search() {
       $limit = variable_get('sopac_results_per_page', 10);
     }
 
-    
+
     if ($user->uid && $limit != $account->profile_perpage) {
       $field = db_fetch_object(db_query("SELECT * FROM profile_fields WHERE name = 'profile_perpage'"));
       db_query("INSERT INTO profile_values (fid, uid, value) VALUES (%d, %d, '%s') ON DUPLICATE KEY UPDATE value = '%s'", $field->fid, $user->uid, $limit, $limit);
@@ -171,7 +169,13 @@ function sopac_catalog_search() {
       }
 
       // Send it all off to the template
-      $result_body .= theme($hitlist_template, $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
+      if ($output == "rss") {
+        $result_body .= theme('sopac_results_hitlist_rss', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
+      } else if ($output == "xml") {
+        $result_body .= theme('sopac_results_hitlist_xml', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
+      } else {
+        $result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
+      }
       $hitnum++;
     }
 
@@ -185,11 +189,13 @@ function sopac_catalog_search() {
   $result_page = $search_form . theme($output_template, $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
 
   // Check to see if we're doing RSS
-  if ($getvars['output'] == 'rss') {
+  if ($output == "rss") {
     print theme('sopac_results_rss', $result_info, $search_term, $search_type, $result_body, $locum_results_all, $locum->locum_config);
     exit(0);
-  }
-  else {
+  } else if ($output == "xml") {
+    print theme('sopac_results_xml', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
+    exit(0);
+  } else {
     $result_page = $search_form . theme('sopac_results', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
   }
 
@@ -981,4 +987,16 @@ function sopac_search_catalog_submit($form, &$form_state) {
   }
 
   drupal_goto($search_url, $uris);
+}
+
+function array2xml($array) {
+  $xml="";
+  foreach ($array as $key => $value) {
+    if (is_array($value)) {
+      $xml .= "<$key>" . array2xml($value) . "</$key>\n";
+    } else {
+      $xml .= "<$key>" . htmlspecialchars($value) . "</$key>\n";
+    }
+  }
+  return $xml;
 }
