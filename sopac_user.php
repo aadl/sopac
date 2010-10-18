@@ -1697,7 +1697,7 @@ function sopac_list_edit_form($form_state, $list_id = 0) {
       '#default_value' => $list['title'],
       '#size' => 64,
       '#maxlength' => 128,
-      '#description' => t('Name your new list (e.g. My Wishlist, Vacation Reading, Favorites'),
+      '#description' => t('Name your new list (e.g. My Wishlist, Vacation Reading, Favorites)'),
     );
   }
   $form['description'] = array(
