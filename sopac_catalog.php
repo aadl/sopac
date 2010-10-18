@@ -310,16 +310,18 @@ function sopac_search_block($locum_results_all, $locum_cfg) {
 function sopac_author_format($author, $addl_author_ser) {
 
   if ($author) {
-    $author_arr = explode(',', $author);
+    $author_arr = explode(',', trim($author, '.'));
     $new_author_str = trim($author_arr[1]) . ' ' . trim($author_arr[0]);
   }
+/*
   elseif ($addl_author_ser) {
     $addl_author = unserialize($addl_author_ser);
     if ($addl_author[0]) {
-      $author_arr = explode(',', $addl_author[0]);
+      $author_arr = explode(',', trim($addl_author[0], '.'));
       $new_author_str = trim($author_arr[1]) . ' ' . trim($author_arr[0]);
     }
   }
+*/
   if ($new_author_str) {
     //$new_author_str = ereg_replace("[^A-Za-z\x20-\x7F '.-]", '', $new_author_str );
     $new_author_str = preg_replace('/ - /', ' ', $new_author_str);
