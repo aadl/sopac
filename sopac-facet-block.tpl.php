@@ -108,9 +108,7 @@ if (count($locum_result['facets']['series'])) {
   foreach ($locum_result['facets']['series'] as $series => $series_count) {
     $ser_arr = explode(';', $series);
     $ser_clean = trim($ser_arr[0]);
-    $series_result_unweeded[$ser_clean]++;
-  }
-  foreach ($series_result_unweeded as $series => $series_count) {
+    //$series_result_unweeded[$ser_clean]++;
     if ($series_count > 1) {
       $series_result[$series] = $series_count;
     }
