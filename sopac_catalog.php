@@ -982,8 +982,8 @@ function sopac_search_catalog_submit($form, &$form_state) {
     }
 
     // Age Group variable
-    if ($form_state['values']['age']) {
-      $uris['age'] = $form_state['values']['age'];
+    if ($form_state['values']['age_group']) {
+      $uris['age'] = $form_state['values']['age_group'];
     }
 
     // Limit to Available
