@@ -184,7 +184,7 @@ if (sopac_prev_search_url(TRUE)) {
       <?php
       if ($item_status['libuse'] > 0 && $item_status['libuse'] == $item_status['total']) { ?>
         <li class="button">Library Use Only</li>
-      <?php } else if (in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
+      <?php } else if (in_array($item['loc_code'], $no_circ) || in_array($item['mat_code'], $no_circ)) { ?>
             <li class="button">Not Requestable</li>
       <?php }
       else {
