@@ -100,7 +100,7 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
           if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
             <li class="button">Library Use Only</li>
         <?php } else if (in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
-            <li class="button">Not Requestable</li>
+            <li class="button red">Not Requestable</li>
         <?php }
           else {
             print sopac_put_request_link($locum_result['bnum'],
