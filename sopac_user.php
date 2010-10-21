@@ -2031,6 +2031,17 @@ function theme_sopac_list($list, $expanded = FALSE) {
   return $top . $output;
 }
 
+function theme_sopac_list_block($block_type = 'public') {
+  $insurge = sopac_get_insurge();
+  $limit = 5;
+  $res = db_query("SELECT * FROM {sopac_lists} WHERE public = 1 ORDER BY list_id DESC LIMIT %d", $limit);
+  while ($list = db_fetch_array($res)) {
+    //$list['items'] = $insurge->get_list_items($list['list_id']);
+    $output .= '<pre>'.print_r($list,1).'</pre>';
+  }
+  return $output;
+}
+
 function sopac_put_list_links($bnum, $list_display = FALSE) {
   global $user;
   $insurge = sopac_get_insurge();

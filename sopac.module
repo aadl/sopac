@@ -87,38 +87,43 @@ function sopac_block($op = 'list', $delta = 0) {
 
     case 'list':
       $block[0] = array(
-         'info' => t('Catalog Facets'),
+        'info' => t('Catalog Facets'),
         'pages' => $sopac_prefix . '/search/*',
       );
       $block[1] = array(
-         'info' => t('Search Tracker'),
+        'info' => t('Search Tracker'),
         'pages' => $sopac_prefix . '/search/*',
       );
       $block[2] = array(
-         'info' => t('Catalog Tags'),
+        'info' => t('Catalog Tags'),
         'pages' => $sopac_prefix . '/*',
       );
       $block[3] = array(
-         'info' => t('Catalog Reviews'),
+        'info' => t('Catalog Reviews'),
         'pages' => $sopac_prefix . '/*',
         'weight' => 1,
       );
       $block[4] = array(
-         'info' => t('Item Tags'),
+        'info' => t('Item Tags'),
         'pages' => $sopac_prefix . '/record/*',
       );
       $block[5] = array(
-         'info' => t('Item Reviews'),
+        'info' => t('Item Reviews'),
         'pages' => $sopac_prefix . '/record/*',
         'weight' => 1,
       );
       $block[6] = array(
-         'info' => t('Personal Tags'),
+        'info' => t('Personal Tags'),
         'pages' => 'user/*',
       );
       $block[7] = array(
-         'info' => t('Personal Reviews'),
+        'info' => t('Personal Reviews'),
         'pages' => 'user/*',
+        'weight' => 1,
+      );
+      $block[8] = array(
+        'info' => t('Public Lists'),
+        'pages' => $sopac_prefix . '/*',
         'weight' => 1,
       );
       return $block;
@@ -173,6 +178,11 @@ function sopac_block($op = 'list', $delta = 0) {
           $block['subject'] = t('My Reviews');
           $block['content'] = theme('sopac_review_block', 'personal');
           break;
+        case 8:
+          require_once('sopac_user.php');
+          $block['subject'] = t('Public Lists');
+          $block['content'] = theme('sopac_list_block', 'public');
+          break;
       }
 
       return $block;
@@ -226,7 +236,7 @@ function sopac_menu() {
     'file' => 'sopac_catalog.php',
     'type' => MENU_CALLBACK,
   );
-  
+
   $items[variable_get('sopac_url_prefix', 'cat/seek') . '/record/%/reharvest'] = array(
     'title' => 'Item Record',
     'page callback' => 'sopac_bib_record_reharvest',
@@ -592,6 +602,9 @@ function sopac_theme() {
     ),
     'sopac_list_form' => array(
       'arguments' => array('form' => NULL),
+    ),
+    'sopac_list_block' => array(
+      'arguments' => array('block_type' => NULL),
     ),
   );
 }
