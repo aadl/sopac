@@ -241,7 +241,7 @@ function sopac_bib_record() {
 
   $no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
   $item = $locum->get_bib_item($bnum, TRUE);
-  $item_status = $locum->get_item_status($bnum);
+  $item_status = $locum->get_item_status($bnum, TRUE);
   if ($item['bnum']) {
     // Load javascript collapsible code
     drupal_add_js('misc/collapse.js');
@@ -269,6 +269,28 @@ function sopac_bib_record() {
 
   return '<p>'. t($result_page) .'</p>';
 }
+
+/**
+ * Reharvest Bib record from ILS and redirect to the record page.
+ * 
+ * @access public
+ * @return void
+ */
+function sopac_bib_record_reharvest($bnum = NULL) {
+  error_reporting(E_ALL ^ E_NOTICE);
+  ini_set('display_errors', 1);
+  require_once('/usr/local/lib/locum/locum-server.php');
+  $locum = new locum_server;
+  $actions = sopac_parse_uri();
+  if(!$bnum){
+    $actions = sopac_parse_uri();
+    $bnum = $actions[1];
+  }
+  $reharvest = $locum->import_bibs($bnum,$bnum);
+  $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum;
+  drupal_goto($path);
+}
+
 
 /**
  * Formulates and returns the search tracker block HTML.
@@ -960,8 +982,8 @@ function sopac_search_catalog_submit($form, &$form_state) {
     }
 
     // Age Group variable
-    if ($form_state['values']['age']) {
-      $uris['age'] = $form_state['values']['age'];
+    if ($form_state['values']['age_group']) {
+      $uris['age'] = $form_state['values']['age_group'];
     }
 
     // Limit to Available

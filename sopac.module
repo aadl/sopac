@@ -226,6 +226,14 @@ function sopac_menu() {
     'file' => 'sopac_catalog.php',
     'type' => MENU_CALLBACK,
   );
+  
+  $items[variable_get('sopac_url_prefix', 'cat/seek') . '/record/%/reharvest'] = array(
+    'title' => 'Item Record',
+    'page callback' => 'sopac_bib_record_reharvest',
+    'access arguments' => array('access content'),
+    'file' => 'sopac_catalog.php',
+    'type' => MENU_CALLBACK,
+  );
 
   $items[$sopac_prefix . '/request'] = array(
     'title' => 'Request an Item',
