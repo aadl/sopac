@@ -305,6 +305,7 @@ function sopac_user_tag_hitlist($tag) {
   $pager_body = theme('pager', NULL, $page_limit, 0, NULL, 6);
   $hitnum = $page_offset + 1;
   $result_body = '';
+  $result_body .= '<table class="hitlist-content">';
   foreach ($bnum_arr['bnums'] as $bnum) {
     $locum_result = $locum->get_bib_item($bnum);
 
@@ -323,6 +324,7 @@ function sopac_user_tag_hitlist($tag) {
     $result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum->locum_config, $no_circ);
     $hitnum++;
   }
+  $result_body .= "</table>";
   $result_body = theme('sopac_user_tag_hitlist', $tag, $pager_body, $result_body);
 
   return $result_body;
