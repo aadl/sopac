@@ -238,6 +238,14 @@ function sopac_admin() {
     ),
   );
 
+  $form['sopac_social_features']['sopac_lists_staff_roles'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Lists Staff Roles'),
+    '#default_value' => variable_get('sopac_lists_staff_roles', array()),
+    '#options' => user_roles(TRUE),
+    '#description' => "Select which roles will be marked as STAFF on public list display",
+  );
+
   $form['sopac_account'] = array(
     '#type' => 'fieldset',
     '#title' => t('Account Page Settings'),

@@ -1481,22 +1481,34 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 
 }
 
-function sopac_lists_page($list_id = 0) {
+function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
   global $user;
   require_once('sopac_social.php');
   $insurge = sopac_get_insurge();
 
   if ($list_id === 'public') {
     // Display a paged list of all the public lists
-    $output = "<h1>Public Lists:</h1>";
-    $public_limit = 10;
-    $public_offset = intval($_GET['offset']);
-    $res = db_query("SELECT * FROM {sopac_lists} WHERE public = 1 ORDER BY list_id DESC LIMIT $public_limit OFFSET $public_offset");
+    $count = 5;
+
+    if ($op == "search") {
+      $output .= drupal_get_form('sopac_list_search_form', $term);
+      $search_sql = "AND (title LIKE '%%%s%%' OR description LIKE '%%%s%%')";
+    } else {
+      $output .= drupal_get_form('sopac_list_search_form');
+    }
+
+    $output .= "<h1>Public Lists:</h1>";
+    $sql = "SELECT * FROM {sopac_lists} WHERE public = 1 $search_sql ORDER BY list_id DESC";
+    $countsql = "SELECT COUNT(*) FROM {sopac_lists} WHERE public = 1 $search_sql ORDER BY list_id DESC";
+    $res = pager_query($sql, $count, 0, $countsql, $term, $term);
+
+    $output .= theme('pager', NULL, $count);
     while ($list = db_fetch_array($res)) {
       $list['items'] = $insurge->get_list_items($list['list_id']);
       $output .= theme('sopac_list', $list);
       $list_count++;
     }
+    $output .= theme('pager', NULL, $count);
     if ($list_count == $public_limit) {
       $output .= '<ul class="list-overview-actions"><li class="button green">' .
                  l("Next $public_limit Lists" , 'user/lists/public', array('query' => array('offset' => $public_offset + $public_limit))) .
@@ -1559,6 +1571,40 @@ function sopac_lists_page($list_id = 0) {
   }
 
   return $output;
+}
+
+function sopac_list_search_form(&$form_state, $search_query = NULL) {
+  $form['inline'] = array(
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
+  $form['inline']['search_query'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Search Public Lists',
+    '#default_value' => $search_query,
+    '#size' => 25,
+    '#maxlength' => 255,
+  );
+  $form['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Search'),
+  );
+  if ($search_query) {
+    $form['inline']['reset'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reset to Full List'),
+      '#submit' => array('sopac_list_search_reset'),
+    );
+  }
+  return $form;
+}
+
+function sopac_list_search_form_submit($form, &$form_state) {
+  drupal_goto('user/lists/public/search/' . $form_state['values']['search_query']);
+}
+
+function sopac_list_search_reset($form, &$form_state) {
+  drupal_goto('user/lists/public');
 }
 
 function sopac_list_form($form_state, $list, $header) {
@@ -1869,6 +1915,7 @@ function sopac_list_confirm_item_delete_submit($form, &$form_state) {
 function theme_sopac_list($list, $expanded = FALSE) {
   global $user;
   $title = ($expanded ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
+
   $top .= '<div class="sopac-list">';
 
   if ($user->uid == $list['uid'] || user_access('administer sopac')) {
@@ -1878,7 +1925,21 @@ function theme_sopac_list($list, $expanded = FALSE) {
     $top .= '</ul>';
   }
 
+  $top .= "<div class=\"sopac-list-title\">";
   $top .= "<h2>$title</h2>";
+  if ($user->uid != $list['uid']) {
+    $list_user = user_load($list['uid']);
+    $list_username = $list_user->name;
+    $staff_roles = variable_get('sopac_lists_staff_roles', array());
+    foreach(array_keys($list_user->roles) as $role_id) {
+      if (in_array($role_id, $staff_roles)) {
+        $list_username = "Staff Member " . $list_username;
+        break;
+      }
+    }
+    $top .= "<span> by $list_username</span>";
+  }
+  $top .= "</div>";
   $top .= '<p class="sopac-list-details">';
   $top .= '<strong>Description</strong>: ' . $list['description'] . '<br />';
   $top .= ($list['public'] ? 'This list is <strong>publicly viewable</strong>' : 'This list is <strong>private</strong>') . '<br />';
@@ -1891,8 +1952,14 @@ function theme_sopac_list($list, $expanded = FALSE) {
 
     if ($list_count = count($list['items'])) {
       include_once('sopac_catalog.php');
+      $last_updated = 0;
       $output .= '<table class="hitlist-content">';
       foreach($list['items'] as $item) {
+        // Check updated date
+        if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
+          $last_updated = $tag_date;
+        }
+
         // Grab item status
         $item['status'] = $locum->get_item_status($item['bnum']);
         if ($item['status']['avail']) {
@@ -1906,6 +1973,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
         $output .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
       }
       $output .= '</table>';
+      $top .= '<strong>Last updated:</strong> ' . date("F j, Y, g:i a", $last_updated) . '<br />';
 
       $sortopts = array(
         'value' => t('Default Order'),
@@ -1945,6 +2013,13 @@ function theme_sopac_list($list, $expanded = FALSE) {
   else {
     // overview
     if ($list_count = count($list['items'])) {
+      $last_updated = 0;
+      foreach($list['items'] as $item) {
+        if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
+          $last_updated = $tag_date;
+        }
+      }
+      $top .= '<strong>Last updated:</strong> ' . date("F j, Y, g:i a", $last_updated) . '<br />';
       $top .= "<strong>$list_count</strong> items listed</p>";
     }
     else {

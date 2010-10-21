@@ -761,6 +761,15 @@ input.tagsubmit {
   padding-bottom: 1em;
 }
 
+.sopac-list-title {
+  margin-top: 1em;
+}
+
+.sopac-list-title h2 {
+  display: inline;
+  margin-right: 5px;
+}
+
 .sopac-list-actions {
   float: right;
   width: 200px;
@@ -770,6 +779,10 @@ input.tagsubmit {
 
 .list-overview-actions {
   padding-left: 0;
+}
+
+#sopac-list-search-form {
+  float: right;
 }
 
 .resultswitch {

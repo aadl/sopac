@@ -55,8 +55,11 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         elseif (count($locum_result['avail_details'])) {
           ?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
         } ?>
-        <?php if($locum_result['sort'] == 'catalog_newest') { ?>
+        <?php if ($locum_result['sort'] == 'catalog_newest') { ?>
         <li><strong>Added on <?php echo date('m-d-Y', strtotime($locum_result['bib_created'])); ?></strong></li>
+        <?php } ?>
+        <?php if ($list_display) { ?>
+        <li><strong>Added to list</strong> on <?php echo date("F j, Y, g:i a", strtotime($locum_result['tag_date'])); ?></li>
         <?php } ?>
         <ul class="hitlist-avail">
           <li class="hitlist-subtitle">
