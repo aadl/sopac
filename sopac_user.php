@@ -1488,7 +1488,7 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
 
   if ($list_id === 'public') {
     // Display a paged list of all the public lists
-    $count = 5;
+    $count = 10;
 
     if ($op == "search") {
       $output .= drupal_get_form('sopac_list_search_form', $term);
@@ -2045,7 +2045,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
 
 function theme_sopac_list_block($block_type = 'public') {
   $insurge = sopac_get_insurge();
-  $limit = 5;
+  $limit = 10;
   $sql = "SELECT sopac_lists.list_id AS list_id, " .
          "sopac_lists.title AS title, " .
          "sopac_lists.description AS description, " .
