@@ -152,8 +152,8 @@ function theme_sopac_tag_block($block_type) {
       $bnum = $uri_arr[1];
       $bnum_arr[] = $bnum;
       if ($_GET['deltag'] && $bnum && $user->uid) {
-        $insurge->delete_user_tag($user->uid, $_GET['deltag'], $bnum);
-        drupal_set_message('Tag "' . $_GET['deltag'] . '" Deleted');
+        $insurge->delete_user_tag($user->uid, urldecode($_GET['deltag']), $bnum);
+        drupal_set_message('Tag "' . urldecode($_GET['deltag']) . '" Deleted');
         drupal_goto($_GET[q]);
       }
       $tag_arr = $insurge->get_tag_totals(NULL, $bnum_arr);
@@ -247,7 +247,7 @@ function sopac_user_tag_delete() {
 
   $insurge = sopac_get_insurge();
   $pathinfo = explode('/', trim($_GET['q']));
-  $tag = $pathinfo[3];
+  $tag = urldecode($pathinfo[3]);
   $tag_total_arr = $insurge->get_tag_totals($user->uid, NULL, $tag);
   $tag_total = $tag_total_arr[0]['count'];
   $tag_total_str = ($tag_total > 1) ? $tag_total . t(' things') : $tag_total . t(' thing');
@@ -537,7 +537,7 @@ function sopac_review_form() {
     $collapsed = FALSE;
     $form_type = 'edit';
     $bnum = $review['bnum'];
-    $form['#redirect'] = substr(urldecode($_GET['ref']), 1);
+    $form['#redirect'] = urldecode($_GET['ref']);
   }
   else {
     $title = t('Write a Review!');
