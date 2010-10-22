@@ -1915,14 +1915,13 @@ function sopac_list_confirm_item_delete_submit($form, &$form_state) {
 function theme_sopac_list($list, $expanded = FALSE) {
   global $user;
   $title = ($expanded ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
-
-  $top .= '<div class="sopac-list">';
+  $list_class = "sopac-list";
 
   if ($user->uid == $list['uid'] || user_access('administer sopac')) {
-    $top .= '<ul class="sopac-list-actions">';
-    $top .= '<li class="button green">' . l('Edit List Details', 'user/lists/edit/' . $list['list_id']) . '</li>';
-    $top .= '<li class="button red">' . l('Delete List', 'user/lists/delete/' . $list['list_id']) . '</li>';
-    $top .= '</ul>';
+    $actions .= '<ul class="sopac-list-actions">';
+    $actions .= '<li class="button green">' . l('Edit List Details', 'user/lists/edit/' . $list['list_id']) . '</li>';
+    $actions .= '<li class="button red">' . l('Delete List', 'user/lists/delete/' . $list['list_id']) . '</li>';
+    $actions .= '</ul>';
   }
 
   $top .= "<div class=\"sopac-list-title\">";
@@ -1945,6 +1944,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
   $top .= ($list['public'] ? 'This list is <strong>publicly viewable</strong>' : 'This list is <strong>private</strong>') . '<br />';
 
   if ($expanded) {
+    $list_class = "sopac-list-expanded";
     $locum = sopac_get_locum();
     $formats = $locum->locum_config['formats'];
     $no_circ = $locum->csv_parser($locum_cfg['location_limits']['no_request']);
@@ -1953,7 +1953,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
     if ($list_count = count($list['items'])) {
       include_once('sopac_catalog.php');
       $last_updated = 0;
-      $output .= '<table class="hitlist-content">';
+      $content .= '<table class="hitlist-content">';
       foreach($list['items'] as $item) {
         // Check updated date
         if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
@@ -1970,9 +1970,9 @@ function theme_sopac_list($list, $expanded = FALSE) {
         if (count($review_links)) {
           $item['review_links'] = $review_links;
         }
-        $output .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
+        $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
       }
-      $output .= '</table>';
+      $content .= '</table>';
       $top .= '<strong>Last updated:</strong> ' . date("F j, Y, g:i a", $last_updated) . '<br />';
 
       $sortopts = array(
@@ -2006,15 +2006,20 @@ function theme_sopac_list($list, $expanded = FALSE) {
       $top .= '</div>';
     }
     else {
-      $output .= '<p>This list is currently empty</p>';
+      $content .= '<p>This list is currently empty</p>';
     }
-    $output .= '<ul><li class="button green">' . l('back to lists overview', 'user/lists') . '</li></ul>';
+    $content .= '<ul><li class="button green">' . l('back to lists overview', 'user/lists') . '</li></ul>';
   }
   else {
     // overview
     if ($list_count = count($list['items'])) {
       $last_updated = 0;
       foreach($list['items'] as $item) {
+        if (empty($cover)) {
+          if ($item['cover_img'] == 'CACHE') {
+            $cover = '<img class="sopac-list-cover" src="http://media.aadl.org/covers/' . $item['bnum'] . '_50.jpg">';
+          }
+        }
         if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
           $last_updated = $tag_date;
         }
@@ -2027,18 +2032,44 @@ function theme_sopac_list($list, $expanded = FALSE) {
     }
   }
   $top .= '<div style="clear: both"></div>';
-  $output .= '</div><div style="clear:both"></div>';
-  return $top . $output;
+
+  $output = "<div class=\"$list_class\">" .
+            $actions .
+            $cover .
+            $top .
+            $content .
+            '</div><div style="clear:both"></div>';
+  return $output;
 }
 
 function theme_sopac_list_block($block_type = 'public') {
   $insurge = sopac_get_insurge();
   $limit = 5;
-  $res = db_query("SELECT * FROM {sopac_lists} WHERE public = 1 ORDER BY list_id DESC LIMIT %d", $limit);
+  $sql = "SELECT sopac_lists.list_id AS list_id, " .
+         "sopac_lists.title AS title, " .
+         "sopac_lists.description AS description, " .
+         "users.name AS name " .
+         "FROM sopac_lists, users " .
+         "WHERE sopac_lists.uid = users.uid " .
+         "AND public = 1 " .
+         "ORDER BY list_id DESC LIMIT %d";
+  $res = db_query($sql, $limit);
+
   while ($list = db_fetch_array($res)) {
-    //$list['items'] = $insurge->get_list_items($list['list_id']);
-    $output .= '<pre>'.print_r($list,1).'</pre>';
+    $output .= '<div class="sopac-list-block-item">';
+    $output .= '<div class="sopac-list-block-title">';
+    $output .= '<strong>' . l($list['title'], 'user/lists/' . $list['list_id']) . '</strong>' ;
+    $output .= ' by ' . $list['name'];
+    $output .= '</div>';
+    if ($list['description']) {
+      $output .= '<div class="sopac-list-block-description">' . $list['description'] . '</div>';
+    }
+    $output .= '</div>';
   }
+  $output .= '<div class="sopac-list-block-item">';
+  $output .= '<div class="sopac-list-block-title">' . l('» View all public lists...', 'user/lists/public') . '</div>';
+  $output .= '</div>';
+
   return $output;
 }
 

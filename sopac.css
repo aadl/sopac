@@ -777,12 +777,30 @@ input.tagsubmit {
   padding: 0;
 }
 
+.sopac-list .sopac-list-details, .sopac-list .sopac-list-title {
+  margin-left: 60px;
+}
 .list-overview-actions {
   padding-left: 0;
 }
 
 #sopac-list-search-form {
   float: right;
+}
+
+.sopac-list-block-item {
+  padding: 0.75em 0;
+}
+.sopac-list-block-title strong {
+  font-size: 1.5em;
+  margin-right: 5px;
+}
+.sopac-list-block-description {
+  font-style: italic;
+}
+.sopac-list-cover {
+  float: left;
+  margin-right: 10px;
 }
 
 .resultswitch {
