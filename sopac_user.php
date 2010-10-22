@@ -1554,7 +1554,8 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
   }
   else {
     if ($user->uid) {
-      $output = "<h1>My Lists:</h1>";
+      $output .= "<p style=\"float: right\">" . l('See all Public Lists...', 'user/lists/public') . '</p>';
+      $output .= "<h1>My Lists:</h1>";
       // display lists
       $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d", $user->uid);
       while ($list = db_fetch_array($res)) {
