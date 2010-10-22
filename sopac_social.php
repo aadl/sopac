@@ -537,7 +537,7 @@ function sopac_review_form() {
     $collapsed = FALSE;
     $form_type = 'edit';
     $bnum = $review['bnum'];
-    $form['#redirect'] = substr(urldecode($_GET['ref']), 1);
+    $form['#redirect'] = urldecode($_GET['ref']);
   }
   else {
     $title = t('Write a Review!');
