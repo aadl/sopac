@@ -279,7 +279,6 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
           $checkbox = '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">';
         }
       }
-
       $rows[] = array(
         $checkbox,
         $title,
@@ -366,12 +365,13 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
     if ($max_disp && $total > $max_disp && ++$hold_num > $max_disp) {
       break;
     }
-    $bnum = $hold['bnum'] ? $hold['bnum'] : $hold['varname'];
+    $bnum = $hold['bnum'];
+    $varname = $hold['varname'];
     $new_author_str = sopac_author_format($hold['bib']['author'], $hold['bib']['addl_author']);
 
     // CUSTOM ILL DISPLAY
-    if (in_array($hold['bnum'], $ill_bnums)) {
-      if (preg_match('/canceli([\d]{7})/', $hold['varname'], $matches)) {
+    if (in_array($bnum, $ill_bnums)) {
+      if (preg_match('/canceli([\d]{7})/', $varname, $matches)) {
         // If item is ready, grab the item record info
         $item_url = 'http://' . $locum_cfg['ils_config']['ils_server'] . '/xrecord=i' . $matches[1];
         $xrecord = simplexml_load_file($item_url);
@@ -387,6 +387,7 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
         $title = $hold['bib']['callnum'];
       }
       $author = 'Interlibrary Loan';
+      $hold['bib']['mat_code'] = ''; // leave material type blank
     }
     else {
       if ($hold['bib']['active']) { // Not suppressed
@@ -456,7 +457,7 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
         );
       }
     }
-    $form['holds'][$bnum] = $hold_to_theme;
+    $form['holds'][$varname] = $hold_to_theme;
   }
   if ($max_disp && $total > $max_disp) {
     $current_pref = l("Showing $max_disp of $total requests", 'user/' . $account->uid . '/edit/Preferences', array('attributes' => array('title' => "Change this setting")));
@@ -504,10 +505,9 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   $holds = $locum->get_patron_holds($cardnum, $password);
 
   // Should be how it comes back from locum
-  $holds_by_bnum = array();
+  $holds_by_varname = array();
   foreach ($holds as $hold) {
-    $bnum = ($hold['bnum'] ? $hold['bnum'] : $hold['varname']);
-    $holds_by_bnum[$bnum] = $hold;
+    $holds_by_varname[$hold['varname']] = $hold;
   }
 
   $submitted_holds = $form_state['values']['holds'];
@@ -521,21 +521,21 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
     $date_object = new DateTime(now, new DateTimeZone($sClosedByTimezone));
   }
 
-  foreach ($submitted_holds as $bnum => $hold_data) {
+  foreach ($submitted_holds as $varname => $hold_data) {
     if ($hold_data['cancel']) {
-      $cancellations[$bnum] = $cancel_requested;
+      $cancellations[$varname] = $cancel_requested;
       $update_holds = TRUE;
       continue;
     }
     $freeze_requested = $hold_data['freeze'];
-    if ($freeze_requested != $holds_by_bnum[$bnum]['is_frozen']) {
-      $freeze_changes[$bnum] = $freeze_requested;
+    if ($freeze_requested != $holds_by_varname[$varname]['is_frozen']) {
+      $freeze_changes[$varname] = $freeze_requested;
       $update_holds = TRUE;
     }
     if ($change_pickup) {
       $pickup_location = $hold_data['pickup'];
-      if ($pickup_location != $holds_by_bnum[$bnum]['pickuploc']['selected']) {
-        $pickup_changes[$bnum] = $pickup_location;
+      if ($pickup_location != $holds_by_varname[$varname]['pickuploc']['selected']) {
+        $pickup_changes[$varname] = $pickup_location;
         $update_holds = TRUE;
       }
     }
@@ -547,10 +547,10 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
       }
       // Make sure it's a date (allow 2-digit years, but ask for 4).
       elseif (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_from)) {
-        form_set_error("holds[$bnum][suspend_from", t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
+        form_set_error("holds[$varname][suspend_from", t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
       }
-      elseif ($suspend_from != $holds_by_bnum[$bnum]['start_suspend']) {
-        $suspend_from_changes[$bnum] = $suspend_from;
+      elseif ($suspend_from != $holds_by_varname[$varname]['start_suspend']) {
+        $suspend_from_changes[$varname] = $suspend_from;
         $update_holds = TRUE;
       }
 
@@ -561,14 +561,14 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
       }
       // Make sure it's a date (allow 2-digit years, but ask for 4).
       elseif (!preg_match('/^([1-9]|1[012])\/([1-9]|[12][0-9]|3[01])\/(20[1-9][0-9]|[1-9][0-9])$/', $suspend_to)) {
-        form_set_error("holds[$bnum][suspend_to", t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
+        form_set_error("holds[$varname][suspend_to", t('Please enter suspend dates in the form 4/15/1980 (mm/dd/yyyy).'));
       }
-      elseif ($suspend_to != $holds_by_bnum[$bnum]['end_suspend']) {
-        $suspend_to_changes[$bnum] = $suspend_to;
+      elseif ($suspend_to != $holds_by_varname[$varname]['end_suspend']) {
+        $suspend_to_changes[$varname] = $suspend_to;
         $update_holds = TRUE;
       }
       if ($suspend_to && !$suspend_from) {
-        form_set_error("holds][$bnum][suspend_to", t('You cannot set a suspend to date without a corresponding suspend from date.'));
+        form_set_error("holds][$varname][suspend_to", t('You cannot set a suspend to date without a corresponding suspend from date.'));
       }
       elseif ($suspend_to && $suspend_from) {
         $date_parts = explode('/', $suspend_from);
@@ -578,7 +578,7 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
         $date_object->setDate($date_parts[2], $date_parts[0], $date_parts[1]);
         $to_date = $date_object->format('Ymd');
         if ($to_date < $from_date) {
-          form_set_error("holds[$bnum][suspend_to", t('A suspend to date cannot be before the corresponding suspend from date.'));
+          form_set_error("holds[$varname][suspend_to", t('A suspend to date cannot be before the corresponding suspend from date.'));
         }
       }
     }
