@@ -109,8 +109,8 @@ if (count($locum_result['facets']['series'])) {
     $ser_arr = explode(';', $series);
     $ser_clean = trim($ser_arr[0]);
     //$series_result_unweeded[$ser_clean]++;
-    if ($series_count > 1) {
-      $series_result[$series] = $series_count;
+    if ($series_count >= 1) {
+      $series_result[$ser_clean] += $series_count;
     }
   }
   $series_count = count($series_result);
