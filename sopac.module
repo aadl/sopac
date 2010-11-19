@@ -636,7 +636,7 @@ function sopac_user($op, &$edit, &$account, $category = NULL) {
   require_once('sopac_user.php');
   switch ($op) {
     case 'submit':
-      sopac_update_locum_acct($op, $edit, $account);
+      sopac_update_locum_acct($op, $edit, $account, $category);
       break;
 
     case 'view':

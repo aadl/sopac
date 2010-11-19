@@ -1284,7 +1284,7 @@ function sopac_savesearch_form_submit($form, &$form_state) {
 }
 
 
-function sopac_update_locum_acct($op, &$edit, &$account) {
+function sopac_update_locum_acct($op, &$edit, &$account, $category) {
 
   $locum = sopac_get_locum();
 
@@ -1313,6 +1313,33 @@ function sopac_update_locum_acct($op, &$edit, &$account) {
 
   if ($edit['mail'] && $pnum) {
     // TODO update email. etc.
+  }
+
+  if ($op == 'submit' && $category == 'Preferences') {
+    // Update Reading History optIn on iiipfile
+    if ($userinfo['pnum']) {
+      $optIn = ($edit['profile_cohist'] ? 1 : 0);
+      db_set_active('iiipfile');
+      db_query("REPLACE INTO patron (patronNum, noticeType, optIn) VALUES (%d, '', '%d')", $userinfo['pnum'], $optIn);
+      db_set_active('default');
+      if ($optIn) {
+        // check if user has a checkout history list
+        $ch = db_fetch_array(db_query("SELECT list_id FROM {sopac_lists} WHERE uid = %d AND title = 'Checkout History' LIMIT 1", $account->uid));
+        if (empty($ch)) {
+          // Create a new Checkout History list
+          db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
+                   $account->uid, 'Checkout History', '', 0);
+          drupal_set_message('New Checkout History list created, visit it on your My Lists page');
+        }
+        drupal_set_message("Future checkout history will be recorded");
+      }
+    } else {
+      if ($account->profile_pref_cardnum) {
+        drupal_set_message("Unable to record checkout history, please update Library Card Number", 'warning');
+      } else {
+        drupal_set_message("Please enter a Library Card Number to record checkouts", 'warning');
+      }
+    }
   }
 }
 
@@ -1483,6 +1510,7 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 
 function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
   global $user;
+  profile_load_profile(&$user);
   require_once('sopac_social.php');
   $insurge = sopac_get_insurge();
 
@@ -1520,25 +1548,66 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
     $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
     if ($list['list_id']) {
       if ($user->uid == $list['uid'] || $list['public'] || user_access('administer sopac')) {
+        global $pager_page_array, $pager_total;
+
+        drupal_set_title($list['title']);
+        drupal_set_breadcrumb(array(l('Home', '<front>'),
+                                    l('Lists', 'user/lists'),
+                                    l($list['title'], $_GET['q'])));
+
+        // Update Checkout History?
+        if ($list['title'] == 'Checkout History' && $user->profile_cohist) {
+          sopac_update_history($list);
+          if (empty($_GET['sort'])) {
+            $_GET['sort'] = 'date_newest';
+          }
+        }
+
+        if ($_GET['perpage']) {
+          $limit = $_GET['perpage'];
+        }
+        elseif ($account->profile_perpage) {
+          $limit = $account->profile_perpage;
+        }
+        else {
+          $limit = variable_get('sopac_results_per_page', 10);
+        }
+
+        $pager_page_array = explode(',', $_GET['page']);
+        // Initialize the pager if need be
+        if ($pager_page_array[0]) {
+          $page = $pager_page_array[0] + 1;
+        }
+        else {
+          $page = 1;
+        }
+        $page_offset = $limit * ($page - 1);
+
         $sortopts = array(
           'value',
           'title',
           'author',
           'mat_code',
         );
+
         if (array_search($_GET['sort'], $sortopts)) {
-          $list['items']= $insurge->get_list_items($list_id, $_GET['sort'], 'ASC');
+          $list['items']= $insurge->get_list_items($list_id, $_GET['sort'], 'ASC', $limit);
         }
         else if ($_GET['sort'] == 'date') {
-          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'ASC');
+          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'ASC', $limit);
         }
         else if ($_GET['sort'] == 'date_newest') {
-          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'DESC');
+          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'DESC', $limit);
         }
         else {
-          $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC');
+          $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC', $limit);
         }
+        $list['total_items'] = count($list['items']);
+        $pager_total[0] = ceil($list['total_items'] / $limit);
+        // Trim list items to display
+        $list['items'] = array_slice($list['items'], $page_offset, $limit, TRUE);
         $output .= theme('sopac_list', $list, TRUE);
+        $output .= theme('pager', NULL, $limit, 0, NULL, 6);
       }
       else {
         $output .= '<p>You do not have permission to view this list.</p>';
@@ -1728,13 +1797,13 @@ function sopac_list_edit_form($form_state, $list_id = 0) {
       '#value' => "<h1>Add " . $bib['title'] . ' to a new list:</h1>',
     );
   }
-  if ($list['title'] == 'Wishlist') {
-    $form['title'] = array(
+  if ($list['title'] == 'Wishlist' || $list['title'] == 'Checkout History') {
+    $form['reserved_title'] = array(
       '#type' => 'value',
-      '#value' => 'Wishlist',
+      '#value' => $list['title'],
     );
     $form['title_markup'] = array(
-      '#value' => "<h1>Wishlist</h1>",
+      '#value' => '<h1>' . $list['title']. '</h1>',
     );
   }
   else {
@@ -1765,8 +1834,18 @@ function sopac_list_edit_form($form_state, $list_id = 0) {
   return $form;
 }
 
+function sopac_list_edit_form_validate($form, &$form_state) {
+  if ($form_state['values']['title'] == 'Wishlist' || $form_state['values']['title'] == 'Checkout History') {
+    form_set_error('title', 'Cannot use reserved list title for a custom list, please choose another');
+  }
+}
+
 function sopac_list_edit_form_submit($form, &$form_state) {
   $values = $form_state['values'];
+  if ($values['reserved_title']) {
+    $values['title'] = $values['reserved_title'];
+  }
+  
   if ($values['list_id']) {
     // Update existing list
     db_query("UPDATE {sopac_lists} SET title = '%s', description = '%s', public = '%d' WHERE list_id = '%d'",
@@ -1954,6 +2033,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
     if ($list_count = count($list['items'])) {
       include_once('sopac_catalog.php');
       $last_updated = 0;
+      $total_count = $list['total_items'];
       $content .= '<table class="hitlist-content">';
       foreach($list['items'] as $item) {
         // Check updated date
@@ -1971,6 +2051,11 @@ function theme_sopac_list($list, $expanded = FALSE) {
         if (count($review_links)) {
           $item['review_links'] = $review_links;
         }
+        // Check if list display order should be frozen
+        if ($list['title'] == "Checkout History") {
+          $item['freeze'] = TRUE;
+        }
+
         $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
       }
       $content .= '</table>';
@@ -1985,7 +2070,7 @@ function theme_sopac_list($list, $expanded = FALSE) {
         'mat_code' => t('Material Type'),
       );
       $top .= '<div class="hitlist-range">';
-      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> items ( <strong>$avail_count</strong> currently available" ;
+      $top .= "<span class=\"range\">Showing <strong>$list_count</strong> of <strong>$total_count</strong> items ( <strong>$avail_count</strong> currently available" ;
       if ($avail_count > 0) {
         $top .= ' - <span id="showavailable">Show Me</span> ';
       }
@@ -2134,6 +2219,32 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   return $wishlist . $output;
 }
 
+function sopac_update_history($list) {
+  $account = user_load($list['uid']);
+  $locum = sopac_get_locum();
+  $insurge = sopac_get_insurge();
+  $userinfo = $locum->get_patron_info($account->profile_pref_cardnum);
+  $total = 0;
+
+  db_set_active('iiipfile');
+  $res = db_query("SELECT * FROM circhistory WHERE patronNum = %d ORDER BY checkout DESC", $userinfo['pnum']);
+  db_set_active('default');
+
+  while ($checkout = db_fetch_array($res)) {
+    if ($insurge->add_list_item($account->uid, $list['list_id'], $checkout['bibNum'], strtotime($checkout['checkOut']))) {
+      $total++;
+    }
+  }
+
+  if ($total) {
+    // remove rows from the iiipfile table
+    db_set_active('iiipfile');
+    db_query("DELETE FROM circhistory WHERE patronNum = %d", $userinfo['pnum']);
+    db_set_active('default');
+    drupal_set_message("Updated Checkout History with $total new checkouts");
+  }
+}
+
 function sopac_import_cc($list_id, $uid) {
   $insurge = sopac_get_insurge();
   $res = db_query("SELECT DISTINCT bnum FROM sopac_cc_savedcards WHERE uid = '%d' ORDER BY id ASC", $uid);
@@ -2158,4 +2269,17 @@ function sopac_create_pcc_lists($batch_number = 0) {
     sopac_import_cc($list_id, $pcc_user->uid);
   }
   drupal_set_message("Created PCC Lists for $user_count users");
+}
+
+function sopac_import_history($list_id, $uid) {
+  $account = user_load($uid);
+  $locum = sopac_get_locum();
+  $insurge = sopac_get_insurge();
+  $userinfo = $locum->get_patron_info($account->profile_pref_cardnum);
+  $pnum = $userinfo['pnum'];
+
+  $res = db_query("SELECT * FROM sopac_history WHERE pnum = %d ORDER BY codate ASC", $pnum);
+  while($history_item = db_fetch_object($res)) {
+    $insurge->add_list_item($uid, $list_id, $history_item->bnum, strtotime($history_item->codate));
+  }
 }

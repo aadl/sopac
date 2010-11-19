@@ -8,7 +8,6 @@
 $new_author_str = sopac_author_format($locum_result['author'], $locum_result['addl_author']);
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 global $user;
-
 if (!module_exists('covercache')) {
   if (strpos($locum_result['cover_img'], 'http://') !== FALSE) {
     $cover_img = $locum_result['cover_img'];
@@ -59,7 +58,12 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         <li><strong>Added on <?php echo date('m-d-Y', strtotime($locum_result['bib_created'])); ?></strong></li>
         <?php } ?>
         <?php if ($list_display) { ?>
-        <li><strong>Added to list</strong> on <?php echo date("F j, Y, g:i a", strtotime($locum_result['tag_date'])); ?></li>
+        <li><strong>Added to list</strong> on
+        <?php
+          // Don't display timestamp if it's exactly midnight (Checkout History)
+          echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date'])));
+        ?>
+        </li>
         <?php } ?>
         <ul class="hitlist-avail">
           <li class="hitlist-subtitle">
@@ -120,8 +124,10 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
             $list_id = intval(str_replace('list', '', $locum_result['namespace']));
             $value = $locum_result['value'];
             $bnum = $locum_result['bnum'];
-            print '<li class="button green">' . l('Move to Top of List', "user/listmovetop/$list_id/$value",array('alias' => TRUE)) . '</li>';
-            print '<li class="button red">' . l('Remove from List', "user/listdelete/$list_id/$bnum",array('alias' => TRUE)) . '</li>';
+            if (!$locum_result['freeze']) {
+              print '<li class="button green">' . l('Move to Top of List', "user/listmovetop/$list_id/$value", array('alias' => TRUE)) . '</li>';
+            }
+            print '<li class="button red">' . l('Remove from List', "user/listdelete/$list_id/$bnum", array('alias' => TRUE)) . '</li>';
           }
         ?>
       </ul>
