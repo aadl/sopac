@@ -1323,6 +1323,7 @@ function sopac_update_locum_acct($op, &$edit, &$account, $category) {
       db_query("REPLACE INTO patron (patronNum, noticeType, optIn) VALUES (%d, '', '%d')", $userinfo['pnum'], $optIn);
       db_set_active('default');
       if ($optIn) {
+/*
         // check if user has a checkout history list
         $ch = db_fetch_array(db_query("SELECT list_id FROM {sopac_lists} WHERE uid = %d AND title = 'Checkout History' LIMIT 1", $account->uid));
         if (empty($ch)) {
@@ -1331,6 +1332,7 @@ function sopac_update_locum_acct($op, &$edit, &$account, $category) {
                    $account->uid, 'Checkout History', '', 0);
           drupal_set_message('New Checkout History list created, visit it on your My Lists page');
         }
+*/
         drupal_set_message("Future checkout history will be recorded");
       }
     } else {
@@ -1845,7 +1847,7 @@ function sopac_list_edit_form_submit($form, &$form_state) {
   if ($values['reserved_title']) {
     $values['title'] = $values['reserved_title'];
   }
-  
+
   if ($values['list_id']) {
     // Update existing list
     db_query("UPDATE {sopac_lists} SET title = '%s', description = '%s', public = '%d' WHERE list_id = '%d'",
