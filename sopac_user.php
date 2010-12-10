@@ -1183,6 +1183,10 @@ function sopac_fine_payment_form_submit($form, &$form_state) {
       if ($payment_result['error']) {
         drupal_set_message(t('<span class="fine-notice">' . $payment_result['error'] . '</span>'));
       }
+      // record failure to text file
+      $payment_result['uid'] = $user->uid;
+      $payment_result['timestamp'] = date('F j, Y, g:i a');
+      file_put_contents('/tmp/sopac_fine_fail.log', print_r($payment_result, 1));
     }
     else {
       foreach ($_POST['fine_summary'] as $fine_var => $fine_var_arr) {
