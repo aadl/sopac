@@ -218,7 +218,11 @@ dpm($item_status);
       <h2>Where To Find It</h2>
       <?php
       if ($item_status['callnums']) {
-        print '<p>Call number: <strong>' . implode(", ", array_keys($item_status['callnums'])) . '</strong></p>';
+        if (count($item_status['callnums']) > 10) {
+          print '<p>Call number: <strong>' . $item['callnum'] . '</strong> (see all copies below for individual call numbers)</p>';
+        } else {
+          print '<p>Call number: <strong>' . implode(", ", $item_status['callnums']) . '</strong></p>';
+        }
       }
 
       if (count($item_status['items']) && !$no_avail_mat_codes) {
