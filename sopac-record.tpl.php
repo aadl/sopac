@@ -19,23 +19,22 @@ if ($split_pos = max(strpos($series, ";"), strpos($series, ":"), strpos($series,
   $series = trim(substr($series, 0, $split_pos));
 }
 
-// Construct the availabilty summary.
-if ($item_status['avail'] == 0 && $item_status['holds'] > 0) {
-  $class = "holds";
-  $reqtext = "There are no copies available. " . $item_status['holds'] . " request" .
-  ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ($item_status['total'] == 1 ? ' copy' : ' copies') . '.';
-}
-elseif ($item_status['avail'] == 0) {
-  $class = "first";
-  $reqtext = "There are no copies available.";
-}
-elseif($item_status['holds'] > 0) {
-  $class = "holds";
-  $reqtext = "There " . ($item_status['avail'] == 1 ? 'is' : 'are') . " currently $item_status[avail] available and " . $item_status['holds'] . " request" . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
+// Get Zoom Lends copies
+$zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
+$avail = $item_status['avail'] - $zooms_avail;
+
+if ($avail > 0) {
+  $reqtext = 'There ' . ($avail == 1 ? 'is' : 'are') . " currently $avail available";
 }
 else {
-  $class = "avail";
-  $reqtext = "There " . ($item_status['avail'] == 1 ? 'is' : 'are') . " currently $item_status[avail] available.";
+  $reqtext = 'There are no copies available';
+}
+if ($zooms_avail > 0) {
+  $zoom_link = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
+  $reqtext .= " ($zooms_avail $zoom_link " . ($zooms_avail == 1 ? 'copy' : 'copies') . ' available)';
+}
+if ($item_status['holds'] > 0) {
+  $reqtext .= ' and ' . $item_status['holds'] . ' request' . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
 }
 
 // Build the item availability array
@@ -55,7 +54,7 @@ if (count($item_status['items'])) {
     }
   }
 }
-
+dpm($item_status);
 ?>
 
 <!-- begin item record -->
@@ -219,7 +218,7 @@ if (count($item_status['items'])) {
       <h2>Where To Find It</h2>
       <?php
       if ($item_status['callnums']) {
-        print '<p>Call number: <strong>' . implode(", ", $item_status['callnums']) . '</strong></p>';
+        print '<p>Call number: <strong>' . implode(", ", array_keys($item_status['callnums'])) . '</strong></p>';
       }
 
       if (count($item_status['items']) && !$no_avail_mat_codes) {

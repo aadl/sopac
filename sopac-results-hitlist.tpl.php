@@ -21,6 +21,28 @@ if (!module_exists('covercache')) {
                  array('html' => TRUE, 'alias' => TRUE));
 }
 $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
+
+// Get Zoom Lends copies
+$zooms_avail = $locum_result['status']['callnums']['Zoom Lends DVD']['avail'] + $locum_result['status']['callnums']['Zoom Lends Book']['avail'];
+$avail = $locum_result['status']['avail'] - $zooms_avail;
+
+if ($avail > 0) {
+  $availtext = 'There ' . ($avail == 1 ? 'is' : 'are') . " currently $avail available";
+}
+else {
+  $availtext = 'There are no copies available';
+}
+if ($zooms_avail > 0) {
+  $zoom_text = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
+  $availtext .= " ($zooms_avail $zoom_text " . ($zooms_avail == 1 ? 'copy' : 'copies') . ' available)';
+}
+if ($locum_result['status']['avail']) {
+  $availtext .= ":";
+}
+if ($locum_result['status']['holds'] > 0) {
+  $reqtext = $locum_result['status']['holds'] . ' request' . ($locum_result['status']['holds'] == 1 ? '' : 's') . " on " . $locum_result['status']['total'] . ' ' . ($locum_result['status']['total'] == 1 ? 'copy' : 'copies');
+}
+
 ?>
   <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
@@ -66,8 +88,8 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
         </li>
         <?php } ?>
         <ul class="hitlist-avail">
-          <li class="hitlist-subtitle">
-            <?php
+          <li class="hitlist-subtitle"><?php print $availtext; ?></li>
+          <?php
             if ($locum_result['status']['avail']) {
               // Build list of locations
               $locations = array();
@@ -76,17 +98,12 @@ $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
                   $locations[$item['loc_code']] = $item['location'];
                 }
               }
-              $locations = implode(', ', $locations);
-
-              print $locum_result['status']['avail'] . t(' of ') . $locum_result['status']['total'] . ' ';
-              print ($locum_result['status']['total'] == 1 ? t('copy') : t('copies')) . ' ';
-              print t('available:') . '</li><li>' . $locations;
+              print '<li>' . implode(', ', $locations) . '</li>';
             }
-            else {
-              print t('No copies available');
+            if ($reqtext) {
+              print '<li class="hitlist-subtitle">' . $reqtext . '</li>';
             }
-            ?>
-          </li>
+          ?>
         </ul>
     <?php
       if ($locum_result['review_links']) {

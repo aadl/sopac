@@ -273,7 +273,7 @@ function sopac_bib_record() {
 
 /**
  * Reharvest Bib record from ILS and redirect to the record page.
- * 
+ *
  * @access public
  * @return void
  */
@@ -423,7 +423,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $text .= "</ul><span></span>";
         }
         else {
-          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum,array('alias' => TRUE));
+          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
         }
       }
       elseif ($user->profile_pref_cardnum) {
@@ -573,14 +573,14 @@ function sopac_request_item() {
       }
     }
     else if (count($hold_result['choose_location'])) {
-      $request_result_msg = t('Please select a pickup location for your request:');
       $locum = sopac_get_locum();
-      foreach ($locum->locum_config['branches'] as $branch) {
-        $link = l('<span>' . t('Request this item for pickup at ') . $branch . '</span>',
-                  variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch,
-                  array('html' => TRUE, 'attributes' => array('class' => 'button')));
-        $request_result_msg .= '<div class="item-request">' . $link . '</div>';
+      $request_result_msg = '<h2 class="title">' . t('Please select a pickup location for your request:') . '</h2><div class="item-request"><ul>';
+
+      foreach ($locum->locum_config['branches'] as $branch_code => $branch_name) {
+        $link = l($branch_name, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code);
+        $request_result_msg .= '<li class="button green">' . $link . '</li>';
       }
+      $request_result_msg .= '</ul></div>';
     }
     else {
       drupal_set_message(t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item['title'] . '</span>', 'error');
