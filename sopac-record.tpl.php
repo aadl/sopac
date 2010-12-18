@@ -54,7 +54,6 @@ if (count($item_status['items'])) {
     }
   }
 }
-dpm($item_status);
 ?>
 
 <!-- begin item record -->
