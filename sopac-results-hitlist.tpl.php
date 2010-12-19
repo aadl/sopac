@@ -33,8 +33,9 @@ else {
   $availtext = 'There are no copies available';
 }
 if ($zooms_avail > 0) {
-  $zoom_text = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
-  $availtext .= " ($zooms_avail $zoom_text " . ($zooms_avail == 1 ? 'copy' : 'copies') . ' available)';
+//  $zoom_text = l('Zoom Lends', 'catalog/browse/unusual', array('alias' => TRUE, 'fragment' => 'ZOOM', 'query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
+  $zoom_text = 'Zoom Lends';
+  $availtext .= " ($zooms_avail $zoom_text " . ' available)';
 }
 if ($locum_result['status']['avail']) {
   $availtext .= ":";
