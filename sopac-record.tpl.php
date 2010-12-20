@@ -30,8 +30,9 @@ else {
   $reqtext = 'There are no copies available';
 }
 if ($zooms_avail > 0) {
-  $zoom_link = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
-  $reqtext .= " ($zooms_avail $zoom_link " . ($zooms_avail == 1 ? 'copy' : 'copies') . ' available)';
+  //$zoom_link = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
+  $zoom_link = 'Zoom Lends';
+  $reqtext .= " ($zooms_avail $zoom_link available)";
 }
 if ($item_status['holds'] > 0) {
   $reqtext .= ' and ' . $item_status['holds'] . ' request' . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
@@ -220,7 +221,7 @@ if (count($item_status['items'])) {
         if (count($item_status['callnums']) > 10) {
           print '<p>Call number: <strong>' . $item['callnum'] . '</strong> (see all copies below for individual call numbers)</p>';
         } else {
-          print '<p>Call number: <strong>' . implode(", ", $item_status['callnums']) . '</strong></p>';
+          print '<p>Call number: <strong>' . implode(", ", array_keys($item_status['callnums'])) . '</strong></p>';
         }
       }
 
