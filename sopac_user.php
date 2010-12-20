@@ -2042,27 +2042,29 @@ function theme_sopac_list($list, $expanded = FALSE) {
       $total_count = $list['total_items'];
       $content .= '<table class="hitlist-content">';
       foreach($list['items'] as $item) {
-        // Check updated date
-        if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
-          $last_updated = $tag_date;
-        }
+        if ($item['active'] || user_access('show suppressed records')) {
+          // Check updated date
+          if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
+            $last_updated = $tag_date;
+          }
 
-        // Grab item status
-        $item['status'] = $locum->get_item_status($item['bnum']);
-        if ($item['status']['avail']) {
-          $avail_count++;
-        }
-        // Grab Syndetics reviews, etc..
-        $review_links = $locum->get_syndetics($item['stdnum']);
-        if (count($review_links)) {
-          $item['review_links'] = $review_links;
-        }
-        // Check if list display order should be frozen
-        if ($list['title'] == "Checkout History") {
-          $item['freeze'] = TRUE;
-        }
+          // Grab item status
+          $item['status'] = $locum->get_item_status($item['bnum']);
+          if ($item['status']['avail']) {
+            $avail_count++;
+          }
+          // Grab Syndetics reviews, etc..
+          $review_links = $locum->get_syndetics($item['stdnum']);
+          if (count($review_links)) {
+            $item['review_links'] = $review_links;
+          }
+          // Check if list display order should be frozen
+          if ($list['title'] == "Checkout History") {
+            $item['freeze'] = TRUE;
+          }
 
-        $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
+          $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
+        }
       }
       $content .= '</table>';
       $top .= '<strong>Last updated:</strong> ' . date("F j, Y, g:i a", $last_updated) . '<br />';
