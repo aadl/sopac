@@ -263,7 +263,7 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
       if (in_array($co['bnum'], $ill_bnums)) {
         // Display call number as the title
         $title = $co['callnum'];
-        $author = 'Interlibrary Loan';
+        $author = l('Interlibrary Loan', 'node/37575'); // ILL FAQ page
       }
       else {
         if ($co['bib']['active']) { // Not suppressed
@@ -386,7 +386,7 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
         // Item isn't in yet, use the bib call number at the title
         $title = $hold['bib']['callnum'];
       }
-      $author = 'Interlibrary Loan';
+      $author = l('Interlibrary Loan', 'node/37575'); // ILL FAQ page
       $hold['bib']['mat_code'] = ''; // leave material type blank
     }
     else {
