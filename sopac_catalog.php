@@ -553,9 +553,11 @@ function sopac_request_item() {
     // support multi-branch & user home branch
     $locum = sopac_get_locum();
     $actions = sopac_parse_uri();
+
     $bnum = $actions[1];
     $pickup_arg = $actions[2] ? $actions[2] : NULL;
-    $pickup_name = $actions[3] ? $actions[3] : ($pickup_arg ? $locum->locum_config['branches'][$pickup_arg] : NULL);
+    $pickup_name = $locum->locum_config['branches'][$pickup_arg];
+    $varname = $actions[3] ? $actions[3] : NULL;
     $bib_item = $locum->get_bib_item($bnum, TRUE);
     $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
 
@@ -582,6 +584,42 @@ function sopac_request_item() {
       }
       $request_result_msg .= '</ul></div>';
     }
+    else if ($hold_result['selection']) {
+      $rows = array();
+      $link_options = array();
+
+      if ($_GET['lightbox']) {
+        $link_options['query'] = array('lightbox' => 1);
+      }
+      foreach ($hold_result['selection'] as $selection) {
+        $status = $selection['status'];
+        if ($selection['varname']) {
+          $request = l('Request this',
+                       variable_get('sopac_url_prefix', 'cat/seek') . "/request/$bnum/$pickup_arg/" . $selection['varname'],
+                       $link_options);
+          $requestable++;
+        }
+        else {
+          $request = '';
+          $status = '<span class="non_circ_msg">' . $status . '</span>';
+        }
+        $rows[] = array(
+          $selection['location'],
+          $selection['callnum'],
+          $status,
+          $request,
+        );
+      }
+
+      if (count($rows)) {
+        $header = array(t('Location'), t('Call Number'), t('Status'), t('Request'));
+        $item_form = theme('table', $header, $rows);
+      }
+      else {
+        $request_result_msg = '';
+        $item_form = t('There are no copies of this item available for circulation.');
+      }
+    }
     else {
       drupal_set_message(t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item['title'] . '</span>', 'error');
     }
@@ -589,43 +627,6 @@ function sopac_request_item() {
     if ($hold_result['error']) {
       drupal_set_message($hold_result['error'], 'error');
     }
-
-    if ($hold_result['selection']  && !$hold_result['success']) {
-      $requestable = 0;
-      $header = array('', t('Location'), t('Call Number'), t('Status'));
-      foreach ($hold_result['selection'] as $selection) {
-        $status = $selection['status'];
-        if ($selection['varname']) {
-          $radio = '<input type="radio" name="varname" value="' . $selection['varname'] . '">';
-          $non_circ = NULL;
-          $requestable++;
-        }
-        else {
-          $radio = '';
-          $status = '<span class="non_circ_msg">' . $status . '</span>';
-        }
-        $rows[] = array(
-          $radio,
-          $selection['location'],
-          $selection['callnum'],
-          $status,
-        );
-      }
-      if ($requestable) {
-        $submit_button = '<input type="submit" name="sub_type" value="' . $button_txt . '">';
-        $request_result_msg = t('Please select the item you would like to request.');
-      }
-      else {
-        $submit_button = NULL;
-        $request_result_msg = '';
-        $request_error_msg = t('There are no copies of this item available for circulation.');
-      }
-      if ($submit_button){
-        $rows[] = array( 'data' => array(array('data' => $submit_button, 'colspan' => 4)), 'class' => 'req_button' );
-      }
-      $item_form = '<form method="post">' . theme('table', $header, $rows, array('id' => 'reqlist', 'cellspacing' => '0')) . '</form>';
-    }
-
     // TODO - add a tally for top items data recovery
   }
   else {
