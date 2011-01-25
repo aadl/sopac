@@ -387,7 +387,16 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
     if ($user->uid) {
       if ($user->bcode_verified) {
         // User is logged in and has a verified card number
-        $text = "Request this";
+
+        if ($mattype == 'Magazine') {
+          $text = 'Request an Issue';
+          $options = array('alias' => TRUE); // no lightbox on links
+        }
+        else {
+          $text = 'Request this';
+          $options = array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
+        }
+
         if (variable_get('sopac_multi_branch_enable', 0)) {
           $locum = sopac_get_locum();
           $branches = $locum->locum_config['branches'];
@@ -395,28 +404,28 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
 
           $text .= "<ul class=\"submenu\"><li>for pickup at</li>";
           if ($mattype == 'Art Print') {
-            $text .= '<li>' . l("Downtown",
-                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/d',
-                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
-                       '</li>';
-            $text .= "<li>Art Prints are only available for pickup at the Downtown Library";
-          } else {
+            $text .= '<li>' .
+                     l("Downtown", variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/d', $options) .
+                     '</li>';
+            $text .= '<li>Art Prints are only available for pickup at the Downtown Library</li>';
+          }
+          else {
             if ($user->profile_pref_home_branch) {
               $home_branch_code = array_search($user->profile_pref_home_branch, $branches);
               $text .= '<li>' .
-                     l($user->profile_pref_home_branch,
-                       variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
-                       array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
-                     '</li>';
+                       l($user->profile_pref_home_branch,
+                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
+                         $options) .
+                       '</li>';
               $text .= '<li>Other Location...</li>';
             }
             foreach ($branches as $branch_code => $branch_name) {
               if ($branch_name != $user->profile_pref_home_branch) {
                 $text .= '<li>' .
-                       l($branch_name,
-                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
-                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
-                       '</li>';
+                         l($branch_name,
+                           variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
+                           $options) .
+                         '</li>';
               }
             }
           }
