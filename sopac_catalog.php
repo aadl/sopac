@@ -594,16 +594,131 @@ function sopac_request_item() {
       $request_result_msg .= '</ul></div>';
     }
     else if ($hold_result['selection']) {
-      $rows = array();
+      $request_result_msg = '<h2 class="title">' . t('Please select an item for your request:') . '</h2>';
+
+      $issues = array();
       $link_options = array();
 
       if ($_GET['lightbox']) {
         $link_options['query'] = array('lightbox' => 1);
       }
+
+      // Group items by callnumber
       foreach ($hold_result['selection'] as $selection) {
+        $selection['branch_code'] = strtolower($selection['location'][0]);
+        // Get issue number info
+        preg_match('/v.([\d]+) /', $selection['callnum'], $vol_match);
+        preg_match('/no.([\d]+) /', $selection['callnum'], $no_match);
+        if ($vol_match[1] || $no_match[1]) {
+          // volume and/or number found
+          $issue_id = intval($vol_match[1] . str_pad($no_match[1], 3, '0', STR_PAD_LEFT));
+        }
+        else {
+          // search for year
+          if (preg_match('/([\d]{4})/', $selection['callnum'], $year_match)) {
+            $issue_id = $year_match[1];
+            // translate seasons/months into corresponding issue values
+            if (stripos($selection['callnum'], 'jan') !== FALSE) {
+              $issue_id .= '01';
+            }
+            else if (stripos($selection['callnum'], 'feb') !== FALSE) {
+              $issue_id .= '02';
+            }
+            else if (stripos($selection['callnum'], 'mar') !== FALSE) {
+              $issue_id .= '03';
+            }
+            else if (stripos($selection['callnum'], 'apr') !== FALSE) {
+              $issue_id .= '04';
+            }
+            else if (stripos($selection['callnum'], 'may') !== FALSE) {
+              $issue_id .= '05';
+            }
+            else if (stripos($selection['callnum'], 'jun') !== FALSE) {
+              $issue_id .= '06';
+            }
+            else if (stripos($selection['callnum'], 'jul') !== FALSE) {
+              $issue_id .= '07';
+            }
+            else if (stripos($selection['callnum'], 'aug') !== FALSE) {
+              $issue_id .= '08';
+            }
+            else if (stripos($selection['callnum'], 'sep') !== FALSE) {
+              $issue_id .= '09';
+            }
+            else if (stripos($selection['callnum'], 'oct') !== FALSE) {
+              $issue_id .= '10';
+            }
+            else if (stripos($selection['callnum'], 'nov') !== FALSE) {
+              $issue_id .= '11';
+            }
+            else if (stripos($selection['callnum'], 'dec') !== FALSE) {
+              $issue_id .= '12';
+            }
+            else if (stripos($selection['callnum'], 'spr') !== FALSE) {
+              $issue_id .= '01';
+            }
+            else if (stripos($selection['callnum'], 'sum') !== FALSE) {
+              $issue_id .= '02';
+            }
+            else if (stripos($selection['callnum'], 'fal') !== FALSE) {
+              $issue_id .= '03';
+            }
+            else if (stripos($selection['callnum'], 'win') !== FALSE) {
+              $issue_id .= '04';
+            }
+
+            // check for date
+            if (preg_match('/[A-Za-z]{3} ([\d]+) /', $selection['callnum'], $date_match)) {
+              $issue_id .= str_pad($date_match[1], 2, '0', STR_PAD_LEFT);
+            }
+          }
+          else {
+            // no year found, just use the call number to sort A-Z
+            $issue_id = $selection['callnum'];
+          }
+        }
+        $issues[$issue_id][] = $selection;
+      }
+      // reverse to show latest issues first
+      krsort($issues);
+
+      foreach ($issues as $issue) {
+        $selection = array();
+
+        if (!$first_issue_found) {
+          // First issue isn't requestable
+          $selection = $issue[0];
+          $selection['location'] = 'N/A';
+          $selection['varname'] = '';
+          $selection['status'] = 'Latest copy is unrequestable';
+          $first_issue_found = TRUE;
+        }
+        else {
+          // select the best availble item to be the link for this callnum
+          shuffle($issue);
+          foreach($issue as $issue_item) {
+            if ($issue_item['status'] == 'AVAILABLE') {
+              $selection = $issue_item;
+              if ($issue_item['branch_code'] == $pickup_arg) {
+                // Availble at the itended branch, use it
+                break;
+              }
+            }
+            else {
+              if ($issue_item['varname']) {
+                $selection = $issue_item;
+              }
+            }
+          }
+          // if nothing was requestable, just use the first item
+          if (empty($selection)) {
+            $selection = $issue[0];
+          }
+        }
+
         $status = $selection['status'];
         if ($selection['varname']) {
-          $request = l('Request this',
+          $request = l('Request this item',
                        variable_get('sopac_url_prefix', 'cat/seek') . "/request/$bnum/$pickup_arg/" . $selection['varname'],
                        $link_options);
           $requestable++;
@@ -628,6 +743,9 @@ function sopac_request_item() {
         $request_result_msg = '';
         $item_form = t('There are no copies of this item available for circulation.');
       }
+      $item_form .= '<ul><li class="button red">' .
+                    l('Return to ' . $bib_item['title'], variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum) .
+                    '</li></ul>';
     }
     else {
       drupal_set_message(t('We were unable to fulfill your request for ') . '<span class="req_bib_title">' . $bib_item['title'] . '</span>', 'error');
