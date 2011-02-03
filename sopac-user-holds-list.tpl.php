@@ -53,6 +53,7 @@
       <td colspan="6">
     <?php } ?>
         <?php print $submit; ?>
+        <?php print $towish; ?>
       </td>
     </tr>
   </tbody>
