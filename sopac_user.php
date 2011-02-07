@@ -1106,6 +1106,7 @@ function sopac_fine_payment_form() {
   $form['sopac_payment_cc_info']['ccnum'] = array(
     '#type' => 'textfield',
     '#title' => t('Credit Card Number'),
+    '#description' => t('Your Visa or MasterCard Number (Discover and Amex not accepted)'),
     '#size' => 24,
     '#maxlength' => 20,
     '#required' => TRUE,
