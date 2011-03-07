@@ -415,6 +415,14 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
     }
     $hold_to_theme = array();
 
+    $hold_to_theme['bnum'] = array(
+      '#type' => 'value',
+      '#value' => $bnum,
+    );
+    $hold_to_theme['title'] = array(
+      '#type' => 'value',
+      '#value' => $hold['title'],
+    );
     $hold_to_theme['cancel'] = array(
       '#type' => 'checkbox',
       '#default_value' => FALSE,
@@ -470,10 +478,13 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
   }
   $form['submit'] = array(
     '#type' => 'submit',
-    '#name' => 'op',
     '#value' => $freezes_enabled ? t('Update Requests') : t('Cancel Selected Requests'),
   );
-
+  $form['towish'] = array(
+    '#type' => 'submit',
+    '#name' => 'towish',
+    '#value' => t('Cancel and Move to Wishlist'),
+  );
   return $form;
 }
 
@@ -622,6 +633,17 @@ function sopac_user_holds_form_submit(&$form, &$form_state) {
   );
   $locum = sopac_get_locum();
   $locum->update_holds($cardnum, $password, $cancellations, $freeze_changes, $pickup_changes, $suspend_changes);
+
+  // Check if cancelled holds should be added to wishlist
+  if ($form_state['clicked_button']['#name'] == 'towish') {
+    // Grab the bnums of the cancelled items
+    $wish_titles = array();
+    foreach ($cancellations as $cancel_id => $item) {
+      sopac_list_add($form_state['values']['holds'][$cancel_id]['bnum'], 'wish');
+      $wish_titles[] = $form_state['values']['holds'][$cancel_id]['title'];
+    }
+    drupal_set_message('Added ' . implode(', ', $wish_titles) . ' to your wishlist');
+  }
 }
 
 /**
@@ -2180,7 +2202,7 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   $output .= "<ul class=\"submenu\" id=\"moreact_$bnum\">";
   $output .= '<li>Add to:</li>';
 
-  $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d", $user->uid);
+  $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d ORDER BY list_id DESC", $user->uid); // Latest lists first
   while ($list = db_fetch_array($res)) {
     // Check if item is already in the list
     $in_list = FALSE;
@@ -2202,7 +2224,7 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
                     '</li>';
       }
     }
-    else {
+    else if ($list['title'] != 'Checkout History') { // don't show checkout history in list links
       $output .= '<li';
       if ($in_list) {
         $output .= ' class="disabled">' . $list['title'];
