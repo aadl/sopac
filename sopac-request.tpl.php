@@ -1,5 +1,4 @@
 <?php
-
 if ($request_result_msg) {
   print '<div class="req_result_msg">' . $request_result_msg . '</div>';
 }
@@ -24,9 +23,7 @@ else {
   else {
     print '<ul>';
     print '<li class="button green">' . l('Go to My Account', 'user') . '</li>';
-    if (sopac_prev_search_url(TRUE)) {
-      print '<li class="button green">' . l('Return to your search', sopac_prev_search_url(TRUE)) . '</li>';
-    }
+    print '<li class="button green">' . l('Return to catalog record', variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum) . '</li>';
     print '</ul>';
   }
 }

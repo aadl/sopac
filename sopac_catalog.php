@@ -582,6 +582,7 @@ function sopac_request_item() {
       if ($pickup_name) {
         $request_result_msg .= t(' for pickup at ') . $pickup_name;
       }
+      $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
     }
     else if (count($hold_result['choose_location'])) {
       $locum = sopac_get_locum();
