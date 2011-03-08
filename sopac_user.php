@@ -251,6 +251,11 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
       include_once('sopac_catalog.php');
       $new_author_str = sopac_author_format($co['bib']['author'], $co['bib']['addl_author']);
 
+      // Magazine display should show scraped title
+      if ($co['bib']['mat_code'] == 's' && $co['scraped_title']) {
+        $co['title'] = $co['scraped_title'];
+      }
+
       // Hover text for the bib
       $hover = $co['title'] . "\n" .
                $new_author_str . "\n" .
@@ -390,6 +395,10 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
       $hold['bib']['mat_code'] = ''; // leave material type blank
     }
     else {
+      // Magazine display should show scraped title
+      if ($hold['bib']['mat_code'] == 's' && $hold['scraped_title']) {
+        $hold['title'] = $hold['scraped_title'];
+      }
       if ($hold['bib']['active']) { // Not suppressed
         // Hover text for the bib
         $hover = $hold['title'] . "\n" .
