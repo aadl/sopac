@@ -279,7 +279,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
         }
         $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
         if ($co['avail']['holds'] == 0 &&
-            $co['bib']['mat_code'] != 's' && $co['bib']['mat_code'] != 'p' &&
+            strpos($co['callnum'], 'Zoom Lends') === FALSE &&
+            $co['bib']['mat_code'] != 's' &&
+            $co['bib']['mat_code'] != 'p' &&
             !($co['ill'] == 1 && $co['numrenews'] > 0)) {
           $checkbox = '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">';
         }
