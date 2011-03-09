@@ -263,7 +263,16 @@ if (count($item_status['items'])) {
       }
       ?>
     </div>
-
+    <?php if($item['tracks']) { ?>
+    <div id="item-samples">
+      <h2>Tracks</h2>
+      <ul class="samples">
+      <?php foreach($item['tracks'] as $track => $info) { ?>
+        <li><a href="http://media.aadl.org/cdsamples/<?php echo $item['trackupc']['upc']; ?>/<?php echo $item['trackupc']['upc']; ?>.<?php echo ltrim($info['track'],"0"); ?>.mp3"><?php echo $info['track']; ?>. <?php echo $info['name']; ?></a></li>
+      <?php } ?>
+      </ul>
+    </div>
+    <?php } ?>
     <!-- Notes / Additional Details -->
     <?php
     if (is_array($note_arr)) {
