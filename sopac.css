@@ -835,3 +835,76 @@ html.js fieldset.collapsed {
   background-color: transparent;
 }
 */
+ul.samples {
+ list-style-type:none;
+ padding:0px;
+ margin: 0px 15px 0px 15px;
+}
+
+ul.samples li {
+ margin-bottom:2px;
+ width: 100%;
+ min-height:16px;
+ border:3px solid #eee;
+ background-color:#eee;
+ -moz-border-radius:3px;
+ -webkit-border-radius:3px;
+ border-radius:3px;
+ min-width:19em;
+
+}
+
+ul.samples li a.sm2_link {
+ /* assume all items will be sounds rather than wait for onload etc. in this example.. may differ for your uses. */
+ text-decoration:none;
+ color:#333;
+ padding:0px 3px 0px 20px;
+ padding-left:22px;
+}
+ 
+ul.samples li a.sm2_link {
+ /* safari 3.1+ fun (or, proprietary crap. TBD.) */
+ -webkit-transition-property: hover;
+ -webkit-transition: all 0.15s ease-in-out;
+}
+ul.samples li a.sm2_link,
+ul.samples li a.sm2_paused:hover,
+ul.samples li a.sm2_link:hover {
+ background:#eee url(images/icon_play.png) no-repeat 0px 50%;
+ _background-image:url(images/icon_play.gif); /* IE 6 */
+ border-color:#eee;
+}
+
+ul.samples li a.sm2_paused {
+ background-color:#999;
+ border-color:#999;
+ color: #fff;
+}
+
+ul.samples li a.sm2_paused:hover {
+ background:#999 url(images/icon_play.png) no-repeat 0px 50%;
+ _background-image:url(images/icon_play.gif);
+ border-color:#999;
+ color: #fff;
+}
+ul.samples li a.sm2_playing,
+ul.samples li a.sm2_playing:hover {
+ background:#4A4830 url(images/icon_pause.png) no-repeat 0px 50%;
+ _background-image:url(images/icon_pause.gif);
+ border-color:#4A4830;
+ text-decoration:none;
+ color: #fff;
+ width: 100%;
+}
+.right {
+  float: right;
+}
+#item-samples {
+  clear:right;
+  border:1px solid #CCCCCC;
+  margin-bottom:20px;
+  padding-bottom: 5px;
+}
+#item-samples p {
+  margin: 10px 15px 5px 15px;
+}

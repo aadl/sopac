@@ -242,6 +242,8 @@ function sopac_bib_record() {
   $no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
   $show_inactive = user_access('show suppressed records');
   $item = $locum->get_bib_item($bnum, $show_inactive);
+  $item['tracks'] = $locum->get_cd_tracks($bnum);
+  $item['trackupc'] = $locum->get_upc($bnum);
   $item_status = $locum->get_item_status($bnum, TRUE);
   if ($item['bnum']) {
     // Load javascript collapsible code
