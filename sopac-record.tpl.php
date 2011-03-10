@@ -12,7 +12,7 @@ $new_author_str = sopac_author_format($item['author'], $item['addl_author']);
 $dl_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['download']));
 $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_config['format_special']['skip_avail']));
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
-$note_arr = unserialize($item['notes']);
+$note_arr = $item['notes'];
 
 $series = trim($item['series']);
 if ($split_pos = max(strpos($series, ";"), strpos($series, ":"), strpos($series, "."), 0)) {
@@ -120,7 +120,7 @@ if (count($item_status['items'])) {
     <?php
     if ($item['addl_author']) {
       print '<h3>Additional Credits</h3><ul>';
-      $addl_author_arr = unserialize($item['addl_author']);
+      $addl_author_arr = $item['addl_author'];
       foreach ($addl_author_arr as $addl_author) {
         $addl_author_link = $url_prefix . '/search/author/%22' . urlencode($addl_author) .'%22';
         print '<li>' . l($addl_author, $addl_author_link) . '</li>';
@@ -133,7 +133,7 @@ if (count($item_status['items'])) {
     <?php
     if ($item['subjects']) {
       print '<h3>Subjects</h3><ul>';
-      $subj_arr = unserialize($item['subjects']);
+      $subj_arr = $item['subjects'];
       if (is_array($subj_arr)) {
         foreach ($subj_arr as $subj) {
           $subjurl = $url_prefix . '/search/subject/%22' . urlencode($subj) . '%22';
@@ -201,13 +201,16 @@ if (count($item_status['items'])) {
       }
       ?>
     </h1>
-
+    <?php if($item['non_romanized_title']) { ?>
+        <h1><?php echo $item['non_romanized_title']; ?></h1>
+    <?php } ?>
     <!-- Item Author -->
     <?php
     if ($item['author']) {
       $authorurl = $url_prefix . '/search/author/' . $new_author_str;
-      print '<h3>by ' . l($new_author_str, $authorurl) . '</h3>';
-    }
+    ?> 
+      <h3>by <?php echo l($new_author_str, $authorurl); ?><?php if($item['non_romanized_author']){ echo " (". $item['non_romanized_author'] .")";}?></h3>
+    <?php }
     $avail_class = ($item_status['avail'] ? "request-avail" : "request-unavail");
     print '<p class="item-request ' . $avail_class . '">' . $reqtext . '</p>';
     ?>
