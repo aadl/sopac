@@ -610,8 +610,8 @@ function sopac_request_item() {
       foreach ($hold_result['selection'] as $selection) {
         $selection['branch_code'] = strtolower($selection['location'][0]);
         // Get issue number info
-        preg_match('/v.([\d]+) /', $selection['callnum'], $vol_match);
-        preg_match('/no.([\d]+) /', $selection['callnum'], $no_match);
+        preg_match('/v\.([\d]+)[^\d]/', $selection['callnum'], $vol_match);
+        preg_match('/no\.([\d]+)[^\d]/', $selection['callnum'], $no_match);
         if ($vol_match[1] || $no_match[1]) {
           // volume and/or number found
           $issue_id = intval($vol_match[1] . str_pad($no_match[1], 6, '0', STR_PAD_LEFT));
