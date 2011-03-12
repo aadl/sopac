@@ -14,10 +14,6 @@ $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_conf
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
 $note_arr = $item['notes'];
 
-$series = trim($item['series']);
-if ($split_pos = max(strpos($series, ";"), strpos($series, ":"), strpos($series, "."), 0)) {
-  $series = trim(substr($series, 0, $split_pos));
-}
 
 // Get Zoom Lends copies
 $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
@@ -95,9 +91,6 @@ if (count($item_status['items'])) {
       if ($item['pub_year']) {
         print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';
       }
-      if ($item['series']) {
-        print '<li><b>Series:</b> ' . l($item['series'], $url_prefix . '/search/series/' . urlencode($series)) . '</li>';
-      }
       if ($item['edition']) {
         print '<li><b>Edition:</b> ' . $item['edition'] . '</li>';
       }
@@ -115,7 +108,17 @@ if (count($item_status['items'])) {
       }
       ?>
     </ul>
-
+     <?php if ($item['series']) { ?>
+     <h3>Series</h3>
+     <ul>
+     <?php
+        foreach($item['series'] as $series) {
+          print '<li>' . l($series, $url_prefix . '/search/series/' . urlencode($series)) . '</li>';
+        }
+      ?>
+      </ul>
+      <?php } ?>
+    
     <!-- Additional Credits -->
     <?php
     if ($item['addl_author']) {
