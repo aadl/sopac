@@ -4,7 +4,7 @@
  */
 
 // Set the page title
-drupal_set_title(ucwords($item->title));
+drupal_set_title(ucwords($item['title']));
 // Set up some variables.
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 function sec2hms ($sec, $padHours = false) {
@@ -31,7 +31,7 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Cover Image -->
     <?php
-      $cover_img = $item->cover_url;
+      $cover_img = "http://media.aadl.org/magnatune/".$item['_id']."/data/cover.jpg";;
       $cover_img = '<img class="item-cover" width="200" src="' . $cover_img . '">';
     print $cover_img;
     ?>
@@ -51,14 +51,14 @@ function sec2hms ($sec, $padHours = false) {
     <ul>
       <?php
       if ($item->release_date) {
-        print '<li><b>Magnatune Release:</b> ' . $item->release_date . '</li>';
+        print '<li><b>Magnatune Release:</b> ' . $item['release_date'] . '</li>';
       }
       if ($item->pub_year) {
-        print '<li><b>Year Published:</b> ' . $item->pub_year . '</li>';
+        print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';
       }
       ?>
       <li><b>Format:</b> 320Kbps MP3</li>
-      <li><b>Collection:</b> <a href="#">Magnatune</a></li>
+      <li><b>Collection:</b> Magnatune</li>
     </ul>
     <h3>Alternate Formats</h3>
     <ul>
@@ -68,8 +68,8 @@ function sec2hms ($sec, $padHours = false) {
     <?php
     if ($item->genres) {
       print '<h3>Genres</h3><ul>';
-      if (is_array($item->genres)) {
-        foreach ($item->genres as $genre) {
+      if (is_array($item['genres'])) {
+        foreach ($item['genres'] as $genre) {
           $subjurl = $url_prefix . '/search/subject/%22' . urlencode($genre) . '%22';
           print '<li>' . l($genre, $subjurl) . '</li>';
         }
@@ -80,25 +80,22 @@ function sec2hms ($sec, $padHours = false) {
 
     <h3>License</h3>
     <ul>
-    <li><a href="<?php echo $item->license; ?>">Creative Commons</a></li>
+    <li><a href="<?php echo $item['license']; ?>">Creative Commons</a></li>
     <li>This download is available for personal use only.</li>
     </ul>
     <h3>Elsewhere</h3>
     <ul>
-    <li><a href="<?php echo $item->magnatune_url; ?>">Magnatune</a></li>
+    <li><a href="<?php echo $item['magnatune_url']; ?>">Magnatune</a></li>
     </ul>
     
         <!-- Tags -->
     <?php
-    if (variable_get('sopac_social_enable', 1)) {
-      print '<h3>Tags</h3>';
+//    if (variable_get('sopac_social_enable', 1)) {
+//      print '<h3>Tags</h3>';
       //$block = module_invoke('sopac','block','view', 4);
       //print $block['content'];
-    }
+//    }
     ?>
-    <ul>
-    <li><a href="#">library unscrewed</a></li>
-    </ul>
   <!-- end left-hand column -->
   </div>
 
@@ -115,41 +112,43 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Actions -->
     <ul class="item-actions">
-      <li class="button green">Download MP3 Album (<?php echo round(($item->zipsize / 1048576), 2); ?>MB)</li>
+      <li class="button green"><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=album'; ?>">Download MP3 Album (<?php echo round(($item['zipsize'] / 1048576), 2); ?>MB)</a></li>
       <?php
         include_once('sopac_user.php');
-        print sopac_put_list_links($item->magnatune_id);
+        //print sopac_put_list_links($item['magnatune_id']);
       ?>
     </ul>
 
     <!-- Item Title -->
     <h1>
       <?php
-      print ucwords($item->title);
+      print ucwords($item['title']);
       ?>
     </h1>
 
     <!-- Item Author -->
     <?php
-    if ($item->artist) {
-      $authorurl = $url_prefix . '/search/author/' . $item->artist;
-      print '<h3>by ' . l($item->artist, $authorurl) . '</h3>';
+    if ($item['artist']) {
+      $authorurl = $url_prefix . '/search/author/' . $item['artist'];
+      print '<h3>by ' . l($item['artist'], $authorurl) . '</h3>';
     }
     ?>
+    <p class="info">This download is only available to active library card holders.</p>
     <p class="info"><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/info.png' ?>" align="center" width="35px" /> <a href="#">How do I download and use these files?</a></p>
     </div>
-<?php if($item->tracks) { $tracks = (array)$item->tracks; sort($tracks); ?>
+<?php if($item['tracks']) { $tracks = $item['tracks']; ksort($tracks); ?>
 <div id="item-samples">
 <h2>Tracks</h2>
-<p>Play Album: <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/prev.png' ?>" align="center" height="20px" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/play.png' ?>" height="30px" align="center" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/next.png' ?>" height="20px" align="center" /></p>
+<!-- <p>Play Album: <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/prev.png' ?>" align="center" height="20px" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/play.png' ?>" height="30px" align="center" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/next.png' ?>" height="20px" align="center" /></p> -->
 <ul class="samples">
 <?php foreach($tracks as $track => $info) { ?>
-<li><a href="blah.mp3"><?php echo $track+1; ?>. <?php echo $info->title; ?> (<?php echo sec2hms($info->length); ?>)</a><span class="right">(<?php echo round(($info->size / 1048576), 2); ?>MB) <a href="#">Download Track</a></span></li>
+<li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=play&tracknum='.$track; ?>" class="mp3player"><?php echo $track; ?>. <?php echo $info['title']; ?> (<?php echo sec2hms($info['length']); ?>)</a><span class="right">(<?php echo round(($info['size'] / 1048576), 2); ?>MB) <a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=track&tracknum='.$track; ?>">Download Track</a></span></li>
 <?php } ?>
 </ul>
 </div>
 <?php } ?>
     <!-- Community / SOPAC Reviews -->
+<!--
     <div id="item-reviews">
       <h2>Community Reviews</h2>
       <?php
@@ -178,6 +177,7 @@ function sec2hms ($sec, $padHours = false) {
       print $rev_form ? $rev_form : '<p>' . l(t('Login'), 'user/login', array('query' => array('destination' => $_GET['q']))) . ' to write a review of your own.</p>';
       ?>
     </div>
+-->
 
   <!-- end right-hand column -->
   </div>

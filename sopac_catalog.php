@@ -224,31 +224,33 @@ function sopac_bib_record() {
   // Load social function
   require_once('sopac_social.php');
 
-  $bnum_arr[] = $bnum;
-  $reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL);
-  $i = 0;
-  foreach ($reviews['reviews'] as $insurge_review) {
-    $rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
-    $rev_arr[$i]['bnum'] = $insurge_review['bnum'];
-    if ($insurge_review['uid']) {
-      $rev_arr[$i]['uid'] = $insurge_review['uid'];
-    }
-    $rev_arr[$i]['timestamp'] = $insurge_review['rev_create_date'];
-    $rev_arr[$i]['rev_title'] = $insurge_review['rev_title'];
-    $rev_arr[$i]['rev_body'] = $insurge_review['rev_body'];
-    $i++;
-  }
-
   $no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
   $show_inactive = user_access('show suppressed records');
   $item = $locum->get_bib_item($bnum, $show_inactive);
-  $item['tracks'] = $locum->get_cd_tracks($bnum);
-  $item['trackupc'] = $locum->get_upc($bnum);
-  $item_status = $locum->get_item_status($bnum, TRUE);
-  if ($item['bnum']) {
+  if($item['magnatune_url']){
+    $result_page = theme('sopac_record_musicdownload', $item, $locum->locum_config);
+  }
+  else if ($item['bnum']) {
+    $bnum_arr[] = $bnum;
+    $reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL);
+    $i = 0;
+    foreach ($reviews['reviews'] as $insurge_review) {
+      $rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
+      $rev_arr[$i]['bnum'] = $insurge_review['bnum'];
+      if ($insurge_review['uid']) {
+        $rev_arr[$i]['uid'] = $insurge_review['uid'];
+      }
+      $rev_arr[$i]['timestamp'] = $insurge_review['rev_create_date'];
+      $rev_arr[$i]['rev_title'] = $insurge_review['rev_title'];
+      $rev_arr[$i]['rev_body'] = $insurge_review['rev_body'];
+      $i++;
+    }
+
     // Load javascript collapsible code
     drupal_add_js('misc/collapse.js');
-
+    $item['tracks'] = $locum->get_cd_tracks($bnum);
+    $item['trackupc'] = $locum->get_upc($bnum);
+    $item_status = $locum->get_item_status($bnum, TRUE);
     // Grab Syndetics reviews, etc..
     $review_links = $locum->get_syndetics($item['stdnum']);
     if (count($review_links)) {
@@ -292,6 +294,64 @@ function sopac_bib_record_reharvest($bnum = NULL) {
   $reharvest = $locum->import_bibs($bnum,$bnum);
   $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum;
   drupal_goto($path);
+}
+
+/**
+ * Download album or tracks
+ *
+ * @access public
+ * @return void
+ */
+function sopac_bib_record_download($bnum = NULL) {
+  $locum = sopac_get_locum();
+  $actions = sopac_parse_uri();
+  if(!$bnum){
+    $actions = sopac_parse_uri();
+    $bnum = $actions[1];
+  }
+  $bib = $locum->get_bib_item($bnum);
+  $type = $_GET['type'];
+  global $user;
+  if ($user->uid && $user->bcode_verified && $type) {
+    switch($type){
+      case 'album':
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5'].".zip?$bnum.zip";
+        header("Location: $path");
+        break;
+      case 'track':
+        $tracknum = $_GET['tracknum'];
+        if(!$tracknum) {
+          $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum;
+          drupal_set_message(t("There appears to be a problem downloading the file. Please make sure you have an active library card associated with this account"),"error");
+          drupal_goto($path);
+        }
+        $paddedtrack = str_pad($tracknum, 2, "0", STR_PAD_LEFT);
+        $trackname = $bib['tracks'][$tracknum]['title'] . "-" . $bib['artist'];
+        $filename = str_replace(array(' ','(',')'),'-', $trackname).".mp3";
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['title']."/".urlencode($paddedtrack."-".$filename)."?name=".urlencode($paddedtrack."-".$filename);
+        //header('Content-Disposition: attachment; filename="'.$path.'"');
+        //readfile($path);
+        header("Location: $path");
+        break;
+      case 'play':
+        $tracknum = $_GET['tracknum'];
+        $paddedtrack = str_pad($tracknum, 2, "0", STR_PAD_LEFT);
+        $trackname = $bib['tracks'][$tracknum]['title'] . "-" . $bib['artist'];
+        $filename = str_replace(array(' ','(',')'),'-', $trackname).".mp3";
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['title']."/".urlencode($paddedtrack."-".$filename);
+        //header('Content-Disposition: attachment; filename="'.$path.'"');
+        header('Content-Type: audio/mpeg');
+        readfile($path);
+        //header("Location: $path");
+        break;
+    }
+  
+  }
+  else {
+    $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum;
+    drupal_set_message(t("There appears to be a problem downloading the file. Please make sure you have an active library card associated with this account"),"error");
+    drupal_goto($path);
+  }
 }
 
 
