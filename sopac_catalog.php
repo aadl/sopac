@@ -312,14 +312,21 @@ function sopac_bib_record_download($bnum = NULL) {
   $bib = $locum->get_bib_item($bnum);
   $type = $_GET['type'];
   global $user;
-  if ($user->uid && $user->bcode_verified && $type) {
+  if ($user->uid && $user->bcode_verified && $type && $bib['zipmd5']) {
     switch($type){
       case 'album':
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5'].".zip?$bnum.zip";
+        $locum->count_download($bnum,"album");
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5'].".zip?name=$bnum.zip";
+        header("Location: $path");        
+        break;
+      case 'flac':
+        $locum->count_download($bnum,"flac");
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5']."-flac.zip?name=$bnum-flac.zip";
         header("Location: $path");
         break;
       case 'track':
         $tracknum = $_GET['tracknum'];
+        $locum->count_download($bnum,"track",$tracknum);
         if(!$tracknum) {
           $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum;
           drupal_set_message(t("There appears to be a problem downloading the file. Please make sure you have an active library card associated with this account"),"error");
@@ -335,6 +342,7 @@ function sopac_bib_record_download($bnum = NULL) {
         break;
       case 'play':
         $tracknum = $_GET['tracknum'];
+        $locum->count_download($bnum,"play",$tracknum);
         $paddedtrack = str_pad($tracknum, 2, "0", STR_PAD_LEFT);
         $trackname = $bib['tracks'][$tracknum]['title'] . "-" . $bib['artist'];
         $filename = str_replace(array(' ','(',')'),'-', $trackname).".mp3";

@@ -62,7 +62,7 @@ function sec2hms ($sec, $padHours = false) {
     </ul>
     <h3>Alternate Formats</h3>
     <ul>
-    <li><a href="#">Download FLAC Album</a></li>
+    <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=flac'; ?>">Download FLAC Album</a></li>
     </ul>
     <!-- Subject Headings -->
     <?php
