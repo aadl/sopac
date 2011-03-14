@@ -66,8 +66,9 @@ function sec2hms ($sec, $padHours = false) {
       <li><b>Collection:</b> Magnatune</li>
     </ul>
     <?php if($verified) { ?>
-    <h3>Alternate Formats</h3>
+    <h3>All Formats</h3>
     <ul>
+    <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=album'; ?>">Download MP3 Album</a></li>
     <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=flac'; ?>">Download FLAC Album</a></li>
     </ul>
     <!-- Subject Headings -->
