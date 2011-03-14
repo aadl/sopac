@@ -134,7 +134,7 @@ function sec2hms ($sec, $padHours = false) {
     }
     ?>
     <p class="info">This download is only available to active library card holders.</p>
-    <p class="info"><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/info.png' ?>" align="center" width="35px" /> <a href="#">How do I download and use these files?</a></p>
+    <p class="info"><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/info.png' ?>" align="center" width="35px" /> <?php echo l('How do I download and use these files?','downloadhelp'); ?></p>
     </div>
 <?php if($item['tracks']) { $tracks = $item['tracks']; ksort($tracks); ?>
 <div id="item-samples">
