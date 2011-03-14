@@ -156,9 +156,6 @@ function sopac_catalog_search() {
       // Grab Stdnum
       $stdnum = $locum_result['stdnum'];
 
-      // Grab item status from Locum
-      $locum_result['status'] = $locum->get_item_status($locum_result['bnum']);
-
       // Get the cover image
       $cover_img_url = $locum_result['cover_img'];
       $locum_result['sort'] = $sort;
@@ -317,7 +314,7 @@ function sopac_bib_record_download($bnum = NULL) {
       case 'album':
         $locum->count_download($bnum,"album");
         $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5'].".zip?name=$bnum.zip";
-        header("Location: $path");        
+        header("Location: $path");
         break;
       case 'flac':
         $locum->count_download($bnum,"flac");
@@ -353,7 +350,7 @@ function sopac_bib_record_download($bnum = NULL) {
         //header("Location: $path");
         break;
     }
-  
+
   }
   else {
     $path = variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $bnum;
