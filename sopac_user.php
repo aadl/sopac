@@ -1630,17 +1630,19 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
           'mat_code',
         );
 
+        $search_term = $_GET['search'] ? $_GET['search'] : '';
+        
         if (array_search($_GET['sort'], $sortopts)) {
-          $list['items']= $insurge->get_list_items($list_id, $_GET['sort'], 'ASC', $limit);
+          $list['items']= $insurge->get_list_items($list_id, $_GET['sort'], 'ASC', $search_term);
         }
         else if ($_GET['sort'] == 'date') {
-          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'ASC', $limit);
+          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'ASC', $search_term);
         }
         else if ($_GET['sort'] == 'date_newest') {
-          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'DESC', $limit);
+          $list['items']= $insurge->get_list_items($list_id, 'tag_date', 'DESC', $search_term);
         }
         else {
-          $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC', $limit);
+          $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC', $search_term);
         }
         $list['total_items'] = count($list['items']);
         $pager_total[0] = ceil($list['total_items'] / $limit);
