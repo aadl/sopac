@@ -147,6 +147,7 @@ function sec2hms ($sec, $padHours = false) {
 <?php if($item['tracks']) { $tracks = $item['tracks']; ksort($tracks); ?>
 <div id="item-samples">
 <h2>Tracks</h2>
+<p id="global_player"></p>
 <!-- <p>Play Album: <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/prev.png' ?>" align="center" height="20px" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/play.png' ?>" height="30px" align="center" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/next.png' ?>" height="20px" align="center" /></p> -->
 <ul class="samples">
 <?php foreach($tracks as $track => $info) { ?>
