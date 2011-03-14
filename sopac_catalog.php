@@ -462,12 +462,18 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $text = 'Request an Issue';
           $options = array('alias' => TRUE); // no lightbox on links
         }
+        else if($mattype == 'magnatune') {
+          $locum = sopac_get_locum();
+          $bib = $locum->get_bib_item($bnum);
+          $size = round(($bib['zipsize'] / 1048576), 2);
+          $text = 'Download MP3 Album ('.$size.'MB)';
+        }
         else {
           $text = 'Request this';
           $options = array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
         }
 
-        if (variable_get('sopac_multi_branch_enable', 0)) {
+        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'magnatune') {
           $locum = sopac_get_locum();
           $branches = $locum->locum_config['branches'];
           $class .= ' hassub';
@@ -501,6 +507,9 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           }
           $text .= "</ul><span></span>";
         }
+        else if($mattype == 'magnatune') {
+          $text = '<a href="/'.variable_get('sopac_url_prefix', 'cat/seek').'/record/'.$bnum.'/download?type=album">'.$text.'</a>';
+        }
         else {
           $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
         }
@@ -513,6 +522,9 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         // User is logged in but does not have a card number.
         $text = l(t('Register card to request'), 'user/' . $user->uid);
       }
+    }
+    else if($mattype == 'magnatune'){
+      $text = l(t('Log in to Download'), 'user/login', array('query' => drupal_get_destination()));
     }
     else {
       $text = l(t('Log in to request'), 'user/login', array('query' => drupal_get_destination()));

@@ -5,6 +5,11 @@
 
 // Set the page title
 drupal_set_title(ucwords($item['title']));
+global $user;
+$verified = FALSE;
+if($user->uid && $user->bcode_verified){
+  $verified = TRUE;
+}
 // Set up some variables.
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 function sec2hms ($sec, $padHours = false) {
@@ -60,12 +65,14 @@ function sec2hms ($sec, $padHours = false) {
       <li><b>Format:</b> 320Kbps MP3</li>
       <li><b>Collection:</b> Magnatune</li>
     </ul>
+    <?php if($verified) { ?>
     <h3>Alternate Formats</h3>
     <ul>
     <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=flac'; ?>">Download FLAC Album</a></li>
     </ul>
     <!-- Subject Headings -->
     <?php
+    }
     if ($item->genres) {
       print '<h3>Genres</h3><ul>';
       if (is_array($item['genres'])) {
@@ -112,7 +119,7 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Actions -->
     <ul class="item-actions">
-      <li class="button green"><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=album'; ?>">Download MP3 Album (<?php echo round(($item['zipsize'] / 1048576), 2); ?>MB)</a></li>
+      <?php echo sopac_put_request_link($item['_id'],0,0,'magnatune'); ?>
       <?php
         include_once('sopac_user.php');
         //print sopac_put_list_links($item['magnatune_id']);
@@ -142,8 +149,11 @@ function sec2hms ($sec, $padHours = false) {
 <!-- <p>Play Album: <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/prev.png' ?>" align="center" height="20px" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/play.png' ?>" height="30px" align="center" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/next.png' ?>" height="20px" align="center" /></p> -->
 <ul class="samples">
 <?php foreach($tracks as $track => $info) { ?>
+<?php if($verified) { ?>
 <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=play&tracknum='.$track; ?>" class="mp3player"><?php echo $track; ?>. <?php echo $info['title']; ?> (<?php echo sec2hms($info['length']); ?>)</a><span class="right">(<?php echo round(($info['size'] / 1048576), 2); ?>MB) <a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=track&tracknum='.$track; ?>">Download Track</a></span></li>
-<?php } ?>
+<?php } else { ?>
+<li><?php echo $track; ?>. <?php echo $info['title']; ?></li>
+<?php } } ?>
 </ul>
 </div>
 <?php } ?>
