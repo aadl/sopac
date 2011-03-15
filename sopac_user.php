@@ -1631,7 +1631,7 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
         );
 
         $search_term = $_GET['search'] ? $_GET['search'] : '';
-        
+
         if (array_search($_GET['sort'], $sortopts)) {
           $list['items']= $insurge->get_list_items($list_id, $_GET['sort'], 'ASC', $search_term);
         }
@@ -1717,6 +1717,48 @@ function sopac_list_search_form_submit($form, &$form_state) {
 
 function sopac_list_search_reset($form, &$form_state) {
   drupal_goto('user/lists/public');
+}
+
+function sopac_list_item_search_form(&$form_state, $search = NULL) {
+  $form['inline'] = array(
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
+  $form['inline']['search'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Search This List',
+    '#default_value' => $search,
+    '#size' => 25,
+    '#maxlength' => 255,
+  );
+  $form['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Search'),
+  );
+  if ($search) {
+    $form['inline']['reset'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reset to Full List'),
+      '#submit' => array('sopac_list_item_search_form_reset'),
+    );
+  }
+  return $form;
+}
+
+function sopac_list_item_search_form_submit($form, &$form_state) {
+  $path = $_GET['q'];
+  unset($_GET['q']);
+  $query = $_GET;
+  $query['search'] = $form_state['values']['search'];
+  drupal_goto($path, $query);
+}
+
+function sopac_list_item_search_form_reset($form, &$form_state) {
+  $path = $_GET['q'];
+  unset($_GET['q']);
+  unset($_GET['search']);
+  $query = $_GET;
+  drupal_goto($path, $query);
 }
 
 function sopac_list_form($form_state, $list, $header) {
@@ -2134,6 +2176,9 @@ function theme_sopac_list($list, $expanded = FALSE) {
       $top .= '</select>';
       $top .= '</span>';
       $top .= '</div>';
+      if ($expanded) {
+        $top .= drupal_get_form('sopac_list_item_search_form', $_GET['search']);
+      }
     }
     else {
       $content .= '<p>This list is currently empty</p>';

@@ -783,11 +783,16 @@ input.tagsubmit {
 .list-overview-actions {
   padding-left: 0;
 }
-
 #sopac-list-search-form {
   float: right;
 }
-
+#sopac-list-item-search-form {
+  float: right;
+  margin-top: 1em;
+}
+.sopac-list-expanded .hitlist-content {
+  margin-top: 0;
+}
 .sopac-list-block-item {
   padding: 0.4em 0;
 }
@@ -861,7 +866,7 @@ ul.samples li a.sm2_link {
  padding:0px 3px 0px 20px;
  padding-left:22px;
 }
- 
+
 ul.samples li a.sm2_link {
  /* safari 3.1+ fun (or, proprietary crap. TBD.) */
  -webkit-transition-property: hover;
