@@ -14,7 +14,6 @@ $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_conf
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
 $note_arr = $item['notes'];
 
-
 // Get Zoom Lends copies
 $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
 $avail = $item_status['avail'] - $zooms_avail;
@@ -118,7 +117,7 @@ if (count($item_status['items'])) {
       ?>
       </ul>
       <?php } ?>
-    
+
     <!-- Additional Credits -->
     <?php
     if ($item['addl_author']) {
@@ -211,7 +210,7 @@ if (count($item_status['items'])) {
     <?php
     if ($item['author']) {
       $authorurl = $url_prefix . '/search/author/' . $new_author_str;
-    ?> 
+    ?>
       <h3>by <?php echo l($new_author_str, $authorurl); ?><?php if($item['non_romanized_author']){ echo " (". $item['non_romanized_author'] .")";}?></h3>
     <?php }
     $avail_class = ($item_status['avail'] ? "request-avail" : "request-unavail");
@@ -231,7 +230,7 @@ if (count($item_status['items'])) {
         }
       }
 
-      if (count($item_status['items']) && !$no_avail_mat_codes) {
+      if (count($item_status['items'])) {
         if ($item_status['avail']) {
           // Build list of locations
           $locations = array();
