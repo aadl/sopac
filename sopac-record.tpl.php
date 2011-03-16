@@ -96,7 +96,7 @@ if (count($item_status['items'])) {
       if ($item['descr']) {
         print '<li><b>Description:</b> ' . nl2br($item['descr']) . '</li>';
       }
-      if ($item['stdnum']) {
+      if ($item['stdnum'] && !is_array($item['stdnum'])) {
         print '<li><b>ISBN/Standard #:</b>' . $item['stdnum'] . '</li>';
       }
       if ($item['lang']) {
