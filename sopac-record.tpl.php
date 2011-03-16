@@ -122,7 +122,7 @@ if (count($item_status['items'])) {
      <ul>
      <?php
         foreach($item['series'] as $series) {
-          print '<li>' . l($series, $url_prefix . '/search/series/' . urlencode($series)) . '</li>';
+          print '<li>' . l($series, $url_prefix . '/search/series/"' . urlencode($series).'"') . '</li>';
         }
       ?>
       </ul>
