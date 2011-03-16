@@ -107,6 +107,16 @@ if (count($item_status['items'])) {
       }
       ?>
     </ul>
+    <?php if ($item['genres']) { ?>
+    <h3>Genres</h3>
+    <ul>
+     <?php
+        foreach($item['genres'] as $genre) {
+          print '<li>' . l($genre, $url_prefix . '/search/callnum/"' . urlencode($genre) .'"',array('query' => array('mat_type' => 'j'))) . '</li>';
+        }
+      ?>
+    </ul>
+    <?php } ?>
      <?php if ($item['series']) { ?>
      <h3>Series</h3>
      <ul>
