@@ -112,7 +112,7 @@ if (count($item_status['items'])) {
     <ul>
      <?php
         foreach($item['genres'] as $genre) {
-          print '<li>' . l($genre, $url_prefix . '/search/callnum/"' . urlencode($genre) .'"',array('query' => array('mat_type' => 'j'))) . '</li>';
+          print '<li>' . l($genre, $url_prefix . '/search/callnum/CD ' . urlencode($genre),array('query' => array('mat_type' => 'j'))) . '</li>';
         }
       ?>
     </ul>
