@@ -147,10 +147,11 @@ function sec2hms ($sec, $padHours = false) {
 <?php if($item['tracks']) { $tracks = $item['tracks']; ksort($tracks); ?>
 <div id="item-samples">
 <h2>Tracks<?php if($verified) { ?> - Full Length Streaming<?php } ?></h2>
-<?php if(!$verified) { ?>
-<p><?php echo l(t('Log in to Stream Tracks'), 'user/login', array('query' => drupal_get_destination())); ?></p>
-<?php } ?>
+<?php if(!$user->uid) { ?>
+<p><?php echo l(t('Log in to Stream or Download Tracks'), 'user/login', array('query' => drupal_get_destination())); ?></p>
+<?php } else if(!$verified) { l(t('Verify card to Stream or Download Tracks'), 'user/' . $user->uid); } else if($verified) { ?>
 <p>Play Album: <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/prev.png' ?>" align="center" height="20px" id="prev_track" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/play.png' ?>" height="30px" align="center" id="play_pause" /> <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/next.png' ?>" height="20px" align="center" id="next_track" /></p>
+<?php } ?>
 <ul class="samples">
 <?php foreach($tracks as $track => $info) { ?>
 <?php if($verified) { ?>
