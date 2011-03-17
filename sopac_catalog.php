@@ -343,7 +343,7 @@ function sopac_bib_record_download($bnum = NULL) {
         $paddedtrack = str_pad($tracknum, 2, "0", STR_PAD_LEFT);
         $trackname = $bib['tracks'][$tracknum]['title'] . "-" . $bib['artist'];
         $filename = str_replace(array(' ','(',')'),'-', $trackname).".mp3";
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['title']."/".urlencode($paddedtrack."-".$filename);
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/streaming/".urlencode($paddedtrack."-".$filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         header('Content-Type: audio/mpeg');
         readfile($path);
