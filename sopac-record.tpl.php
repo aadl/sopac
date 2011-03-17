@@ -4,7 +4,7 @@
  */
 
 // Set the page title
-drupal_set_title(ucwords($item['title']));
+drupal_set_title(mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"));
 
 // Set up some variables.
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
@@ -207,7 +207,7 @@ if (count($item_status['items'])) {
     <!-- Item Title -->
     <h1>
       <?php
-      print ucwords($item['title']);
+      print mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8");
       if ($item['title_medium']) {
         print " $item[title_medium]";
       }
