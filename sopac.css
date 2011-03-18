@@ -913,3 +913,6 @@ ul.samples li a.sm2_playing:hover {
 #item-samples p {
   margin: 10px 15px 5px 15px;
 }
+#sm2-container {
+  height: 1px;
+}

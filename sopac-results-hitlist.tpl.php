@@ -48,7 +48,7 @@ if ($locum_result['status']['holds'] > 0) {
   <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
     <?php if($minimal) { ?>
-    <td><strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
+    <td><strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); if($locum_result[title_medium]){ print ' ['.$locum_result[title_medium].']'; } ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
     <?php 
     } 
     else {

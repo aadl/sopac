@@ -155,7 +155,7 @@ function sec2hms ($sec, $padHours = false) {
 <ul class="samples">
 <?php foreach($tracks as $track => $info) { ?>
 <?php if($verified) { ?>
-<li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=play&tracknum='.$track; ?>" class="mp3player"><?php echo $track; ?>. <?php echo $info['title']; ?> (<?php echo sec2hms($info['length']); ?>)</a><span class="right">(<?php echo round(($info['size'] / 1048576), 2); ?>MB) <a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=track&tracknum='.$track; ?>">Download Track</a></span></li>
+<li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=play&tracknum='.$track; ?>" class="mp3player inline-playable"><?php echo $track; ?>. <?php echo $info['title']; ?> (<?php echo sec2hms($info['length']); ?>)</a><span class="right">(<?php echo round(($info['size'] / 1048576), 2); ?>MB) <a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=track&tracknum='.$track; ?>">Download Track</a></span></li>
 <?php } else { ?>
 <li><?php echo $track; ?>. <?php echo $info['title']; ?></li>
 <?php } } ?>
