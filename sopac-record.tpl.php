@@ -351,7 +351,7 @@ if (count($item_status['items'])) {
           <script type="text/javascript">
             var w=document.getElementById("item-google-books").offsetWidth;
             var h=(w*1.3);
-            GBS_insertEmbeddedViewer('ISBN:<?php print $item['stdnum']; ?>',w,h);
+            GBS_insertEmbeddedViewer('ISBN:<?php print $item['stdnum'][0]; ?>',w,h);
           </script>
       </div>
     </div>
