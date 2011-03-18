@@ -69,12 +69,12 @@ if ($locum_result['status']['holds'] > 0) {
           if ($locum_result['title_medium']) {
             print "[$locum_result[title_medium]]";
           }
-          ?>
+          ?><?php if($locum_result['non_romanized_title']){ echo " (". $locum_result['non_romanized_title'] .")";} ?>
         </li>
         <li>
         <?php
           print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE));
-        ?>
+        ?><?php if($locum_result['non_romanized_author']){ echo " (". $locum_result['non_romanized_author'] .")";}?>
         </li>
         <li><?php print $locum_result['pub_info']; ?></li>
         <?php if ($locum_result['callnum']) {
