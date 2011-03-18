@@ -47,6 +47,12 @@ if ($locum_result['status']['holds'] > 0) {
 ?>
   <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
+    <?php if($minimal) { ?>
+    <td><strong><?php print l(ucwords($locum_result['title']), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
+    <?php 
+    } 
+    else {
+    ?>
     <td class="hitlist-cover">
       <?php print $cover_img; ?>
     </td>
@@ -155,4 +161,5 @@ if ($locum_result['status']['holds'] > 0) {
       <br />
       <?php print wordwrap($locum_config['formats'][$locum_result['mat_code']], 8, '<br />'); ?>
     </td>
+  <?php } ?>
   </tr>

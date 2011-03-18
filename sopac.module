@@ -530,7 +530,7 @@ function sopac_theme() {
     ),
     'sopac_results_hitlist' => array(
       'template' => 'sopac-results-hitlist',
-      'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL),
+      'arguments' => array('result_num' => NULL, 'cover_img_url' => NULL, 'locum_result' => NULL, 'locum_config' => NULL, 'no_circ' => NULL, 'minimal' => NULL),
     ),
     'sopac_results_hitlist_rss' => array(
       'template' => 'sopac-results-hitlist-rss',

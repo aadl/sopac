@@ -1609,6 +1609,9 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
         elseif ($account->profile_perpage) {
           $limit = $account->profile_perpage;
         }
+        elseif ($op == 'print'){
+          $limit = NULL;
+        }
         else {
           $limit = variable_get('sopac_results_per_page', 10);
         }
@@ -1645,10 +1648,17 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
           $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC', $search_term);
         }
         $list['total_items'] = count($list['items']);
-        $pager_total[0] = ceil($list['total_items'] / $limit);
+        if($limit){
+          $pager_total[0] = ceil($list['total_items'] / $limit);
+        }
         // Trim list items to display
         $list['items'] = array_slice($list['items'], $page_offset, $limit, TRUE);
-        $output .= theme('sopac_list', $list, TRUE);
+        if($op == 'print'){
+          $output .= theme('sopac_list', $list, TRUE, 'print');
+        }
+        else {
+          $output .= theme('sopac_list', $list, TRUE);
+        }
         $output .= theme('pager', NULL, $limit, 0, NULL, 6);
       }
       else {
@@ -2076,7 +2086,7 @@ function sopac_list_confirm_item_delete_submit($form, &$form_state) {
   drupal_goto('user/lists/' . $form['#list_id']);
 }
 
-function theme_sopac_list($list, $expanded = FALSE) {
+function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
   global $user;
   $title = ($expanded ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
   $list_class = "sopac-list";
@@ -2125,23 +2135,24 @@ function theme_sopac_list($list, $expanded = FALSE) {
           if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
             $last_updated = $tag_date;
           }
-
-          // Grab item status
-          $item['status'] = $locum->get_item_status($item['bnum']);
-          if ($item['status']['avail']) {
-            $avail_count++;
-          }
-          // Grab Syndetics reviews, etc..
-          $review_links = $locum->get_syndetics($item['stdnum']);
-          if (count($review_links)) {
-            $item['review_links'] = $review_links;
+          if(!$minimal){
+            // Grab item status
+            $item['status'] = $locum->get_item_status($item['bnum']);
+            if ($item['status']['avail']) {
+              $avail_count++;
+            }
+            // Grab Syndetics reviews, etc..
+            $review_links = $locum->get_syndetics($item['stdnum']);
+            if (count($review_links)) {
+              $item['review_links'] = $review_links;
+            }
           }
           // Check if list display order should be frozen
           if ($list['title'] == "Checkout History") {
             $item['freeze'] = TRUE;
           }
 
-          $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ);
+          $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ, $minimal);
         }
       }
       $content .= '</table>';
