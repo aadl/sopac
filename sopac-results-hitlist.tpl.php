@@ -64,7 +64,7 @@ if ($locum_result['status']['holds'] > 0) {
       ?>
       <ul>
         <li class="hitlist-title">
-          <strong><?php print l(ucwords($locum_result['title']), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); ?></strong>
+          <strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); ?></strong>
           <?php
           if ($locum_result['title_medium']) {
             print "[$locum_result[title_medium]]";
