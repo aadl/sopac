@@ -298,7 +298,7 @@ if (count($item_status['items'])) {
       <param name='allowfullscreen' value='true'>
       <param name='allowscriptaccess' value='always'>
       <param name='wmode' value='transparent'>
-      <param name='flashvars' value='provider=video&file=<?php echo rawurlencode($item['trailer_url']); ?>'>
+      <param name='flashvars' value='provider=video&file=<?php echo rawurlencode($item['trailer_url']); if($item['trailer_image']) { echo '&image='.$item['trailer_image']; } ?>'>
       <embed
       type='application/x-shockwave-flash'
       id='single2'
@@ -310,7 +310,7 @@ if (count($item_status['items'])) {
       allowscriptaccess='always'
       allowfullscreen='true'
       wmode='transparent'
-      flashvars='provider=video&file=<?php echo rawurlencode($item['trailer_url']); ?>' />
+      flashvars='provider=video&file=<?php echo rawurlencode($item['trailer_url']); if($item['trailer_image']) { echo '&image='.$item['trailer_image']; } ?>' />
       </object>
       </p>
     </div>
