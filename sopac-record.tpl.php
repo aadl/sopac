@@ -107,6 +107,17 @@ if (count($item_status['items'])) {
       }
       ?>
     </ul>
+    <?php if ($item['stdnum'] && is_array($item['stdnum'])) { ?>
+    <h3>ISBN/Standard Number</h3>
+    <ul>
+    <?php
+        foreach($item['stdnum'] as $stdnum) {
+          print '<li>' . $stdnum . '</li>';
+        }
+      ?>
+
+    </ul>
+    <?php } ?>
     <?php if ($item['genres']) { ?>
     <h3>Genres</h3>
     <ul>
