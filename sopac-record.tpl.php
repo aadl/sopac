@@ -289,6 +289,32 @@ if (count($item_status['items'])) {
       }
       ?>
     </div>
+    <?php if($item['trailer_url']){ ?>
+    <div id="item-trailer">
+      <h2>Watch the Trailer</h2>
+      <p>
+      <object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' width='470' height='320' id='single1' name='single1'>
+      <param name='movie' value='http://media.aadl.org/jw52/player.swf'>
+      <param name='allowfullscreen' value='true'>
+      <param name='allowscriptaccess' value='always'>
+      <param name='wmode' value='transparent'>
+      <param name='flashvars' value='provider=video&file=<?php echo rawurlencode($item['trailer_url']); ?>'>
+      <embed
+      type='application/x-shockwave-flash'
+      id='single2'
+      name='single2'
+      src='http://media.aadl.org/jw52/player.swf'
+      width='470'
+      height='320'
+      bgcolor='undefined'
+      allowscriptaccess='always'
+      allowfullscreen='true'
+      wmode='transparent'
+      flashvars='provider=video&file=<?php echo rawurlencode($item['trailer_url']); ?>' />
+      </object>
+      </p>
+    </div>
+    <?php } ?>
     <?php if($item['tracks']) { ?>
     <div id="item-samples">
       <h2>Tracks</h2>

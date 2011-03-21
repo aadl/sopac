@@ -904,13 +904,14 @@ ul.samples li a.sm2_playing:hover {
 .right {
   float: right;
 }
-#item-samples {
+#item-samples, #item-trailer {
   clear:right;
   border:1px solid #CCCCCC;
   margin-bottom:20px;
   padding-bottom: 5px;
 }
-#item-samples p {
+
+#item-samples p, #item-trailer p {
   margin: 10px 15px 5px 15px;
 }
 #sm2-container {
