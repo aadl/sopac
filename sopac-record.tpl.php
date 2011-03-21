@@ -293,7 +293,7 @@ if (count($item_status['items'])) {
     <div id="item-trailer">
       <h2>Watch the Trailer</h2>
       <p>
-      <object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' width='470' height='320' id='single1' name='single1'>
+      <object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' width='480' height='308' id='single1' name='single1'>
       <param name='movie' value='http://media.aadl.org/jw52/player.swf'>
       <param name='allowfullscreen' value='true'>
       <param name='allowscriptaccess' value='always'>
@@ -304,8 +304,8 @@ if (count($item_status['items'])) {
       id='single2'
       name='single2'
       src='http://media.aadl.org/jw52/player.swf'
-      width='470'
-      height='320'
+      width='480'
+      height='308'
       bgcolor='undefined'
       allowscriptaccess='always'
       allowfullscreen='true'
