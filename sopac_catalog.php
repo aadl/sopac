@@ -331,8 +331,13 @@ function sopac_bib_record_download($bnum = NULL) {
         }
         $paddedtrack = str_pad($tracknum, 2, "0", STR_PAD_LEFT);
         $trackname = $bib['tracks'][$tracknum]['title'] . "-" . $bib['artist'];
-        $filename = str_replace(array(' ','(',')'),'-', $trackname).".mp3";
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['title']."/".urlencode($paddedtrack."-".$filename)."?name=".urlencode($paddedtrack."-".$filename);
+        if($bib['tracks'][$tracknum]['filename']) {
+          $filename = $bib['tracks'][$tracknum]['filename'];
+        }
+        else {
+          $filename = $paddedtrack."-".str_replace(array(' ','(',')'),'-', $trackname).".mp3";
+        }
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".str_replace(array(' ','(',')'),'-', $bib['title'])."/".urlencode($filename)."?name=".urlencode($filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         //readfile($path);
         header("Location: $path");
@@ -342,8 +347,13 @@ function sopac_bib_record_download($bnum = NULL) {
         $locum->count_download($bnum,"play",$tracknum);
         $paddedtrack = str_pad($tracknum, 2, "0", STR_PAD_LEFT);
         $trackname = $bib['tracks'][$tracknum]['title'] . "-" . $bib['artist'];
-        $filename = str_replace(array(' ','(',')'),'-', $trackname).".mp3";
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/streaming/".urlencode($paddedtrack."-".$filename);
+        if($bib['tracks'][$tracknum]['filename']) {
+          $filename = $bib['tracks'][$tracknum]['filename'];
+        }
+        else {
+          $filename = $paddedtrack."-".str_replace(array(' ','(',')'),'-', $trackname).".mp3";
+        }
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/streaming/".urlencode($filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         header('Content-Type: audio/mpeg');
         readfile($path);
