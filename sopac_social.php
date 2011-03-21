@@ -310,13 +310,13 @@ function sopac_user_tag_hitlist($tag) {
     $locum_result = $locum->get_bib_item($bnum);
 
     // Grab Stdnum
-    $stdnum = $locum_result['stdnum'];
+    $stdnum = $locum_result['stdnum'][0];
     // Grab item status from Locum
     $locum_result['status'] = $locum->get_item_status($bnum);
     // Get the cover image
     $cover_img_url = $locum_result['cover_img'];
     // Grab Syndetics reviews, etc..
-    $review_links = $locum->get_syndetics($locum_result['stdnum']);
+    $review_links = $locum->get_syndetics($locum_result['stdnum'][0]);
     if (count($review_links)) {
       $locum_result['review_links'] = $review_links;
     }

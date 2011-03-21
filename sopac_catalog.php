@@ -154,13 +154,13 @@ function sopac_catalog_search() {
     foreach ($locum_results_all['results'] as $locum_result) {
 
       // Grab Stdnum
-      $stdnum = $locum_result['stdnum'];
+      $stdnum = $locum_result['stdnum'][0];
 
       // Get the cover image
       $cover_img_url = $locum_result['cover_img'];
       $locum_result['sort'] = $sort;
       // Grab Syndetics reviews, etc..
-      $review_links = $locum->get_syndetics($locum_result['stdnum']);
+      $review_links = $locum->get_syndetics($locum_result['stdnum'][0]);
       if (count($review_links)) {
         $locum_result['review_links'] = $review_links;
       }
@@ -249,7 +249,7 @@ function sopac_bib_record() {
     $item['trackupc'] = $locum->get_upc($bnum);
     $item_status = $locum->get_item_status($bnum, TRUE);
     // Grab Syndetics reviews, etc..
-    $review_links = $locum->get_syndetics($item['stdnum']);
+    $review_links = $locum->get_syndetics($item['stdnum'][0]);
     if (count($review_links)) {
       $item['review_links'] = $review_links;
     }

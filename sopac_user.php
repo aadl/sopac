@@ -2142,7 +2142,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
               $avail_count++;
             }
             // Grab Syndetics reviews, etc..
-            $review_links = $locum->get_syndetics($item['stdnum']);
+            $review_links = $locum->get_syndetics($item['stdnum'][0]);
             if (count($review_links)) {
               $item['review_links'] = $review_links;
             }
