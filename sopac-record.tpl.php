@@ -313,6 +313,7 @@ if (count($item_status['items'])) {
       flashvars='provider=video&file=<?php echo rawurlencode($item['trailer_url']); if($item['trailer_image']) { echo '&image='.$item['trailer_image']; } ?>' />
       </object>
       </p>
+      <p>Trailers Powered by Internet Video Archive</p>
     </div>
     <?php } ?>
     <?php if($item['tracks']) { ?>
