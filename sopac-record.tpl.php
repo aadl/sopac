@@ -5,6 +5,18 @@
 
 // Set the page title
 drupal_set_title(mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"));
+$useriplabels = ipmap_labels();
+if($item['trailers']){
+  if($item['trailers'][0]['type'] == 'trailer'){
+    $trailer_url = $item['trailers'][0]['url'];
+    if($item['trailers'][0]['image']){
+      $trailer_image = $item['trailers'][0]['image'];
+    }
+    if($item['trailers'][0]['cached'] && in_array('internal',$useriplabels)){
+      $trailer_url = 'http://media.aadl.org/trailers/'.$item['bnum'].'.mp4';
+    }
+  }
+}
 
 // Set up some variables.
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
@@ -289,7 +301,7 @@ if (count($item_status['items'])) {
       }
       ?>
     </div>
-    <?php if($item['trailer_url']){ ?>
+    <?php if($trailer_url){ ?>
     <div id="item-trailer">
       <h2>Watch the Trailer</h2>
       <p>
@@ -298,7 +310,7 @@ if (count($item_status['items'])) {
       <param name='allowfullscreen' value='true'>
       <param name='allowscriptaccess' value='always'>
       <param name='wmode' value='transparent'>
-      <param name='flashvars' value='provider=video&file=<?php echo rawurlencode($item['trailer_url']); if($item['trailer_image']) { echo '&image='.$item['trailer_image']; } ?>'>
+      <param name='flashvars' value='provider=video&file=<?php echo rawurlencode($trailer_url); if($trailer_image) { echo '&image='.$trailer_image; } ?>'>
       <embed
       type='application/x-shockwave-flash'
       id='single2'
@@ -310,7 +322,7 @@ if (count($item_status['items'])) {
       allowscriptaccess='always'
       allowfullscreen='true'
       wmode='transparent'
-      flashvars='provider=video&file=<?php echo rawurlencode($item['trailer_url']); if($item['trailer_image']) { echo '&image='.$item['trailer_image']; } ?>' />
+      flashvars='provider=video&file=<?php echo rawurlencode($trailer_url); if($trailer_image) { echo '&image='.$trailer_image; } ?>' />
       </object>
       </p>
       <p>Trailers Powered by Internet Video Archive</p>
