@@ -122,7 +122,9 @@ if ($locum_result['status']['holds'] > 0) {
         }
         print '</ul><span></span></li>';
       }
-    ?>
+      if($locum_result['trailers']) { ?>
+        <li class="button"><?php print l("Watch Trailer", $url_prefix . '/record/' . $locum_result['bnum']); ?></li>    
+    <?php  } ?>
     </ul>
     </td>
     <td class="hitlist-actions">
