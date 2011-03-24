@@ -303,7 +303,7 @@ if (count($item_status['items'])) {
     </div>
     <?php if($trailer_url){ ?>
     <div id="item-trailer">
-      <h2>Watch the Trailer</h2>
+      <h2>Trailer / Previews</h2>
       <p>
       <object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' width='480' height='308' id='single1' name='single1'>
       <param name='movie' value='http://media.aadl.org/jw52/player.swf'>
