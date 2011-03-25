@@ -395,13 +395,18 @@ if (count($item_status['items'])) {
     </div>
 
     <!-- Google Books Preview -->
+    <?php
+    foreach($item['stdnum'] as $stdnum) {
+      $isbnarr[] = 'ISBN:'.preg_replace("/[^0-9]/","", $stdnum);
+    }
+    ?>
     <div id="item-google-books">
       <div class="item-google-prev">
         <script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
           <script type="text/javascript">
             var w=document.getElementById("item-google-books").offsetWidth;
             var h=(w*1.3);
-            GBS_insertEmbeddedViewer('ISBN:<?php print $item['stdnum'][0]; ?>',w,h);
+            GBS_insertEmbeddedViewer(['<?php print implode("','",$isbnarr); ?>'],w,h);
           </script>
       </div>
     </div>
