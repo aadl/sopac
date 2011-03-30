@@ -142,7 +142,7 @@ if($locum_result['mat_code'] == 'z') {
       <ul>
         <?php
           if($locum_result['mat_code'] == 'z') { ?>
-            <li class="button green"><?php echo l("Download Album", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
+            <li class="button green"><?php echo l("View Album", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
        <?php  }
           else if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
             <li class="button">Library Use Only</li>
