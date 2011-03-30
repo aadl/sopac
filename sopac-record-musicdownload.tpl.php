@@ -36,7 +36,7 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Cover Image -->
     <?php
-      $cover_img = "http://media.aadl.org/magnatune/".$item['_id']."/data/cover.jpg";;
+      $cover_img = "http://media.aadl.org/magnatune/".$item['_id']."/data/cover.jpg";
       $cover_img = '<img class="item-cover" width="200" src="' . $cover_img . '">';
     print $cover_img;
     ?>
@@ -120,7 +120,7 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Actions -->
     <ul class="item-actions">
-      <?php echo sopac_put_request_link($item['_id'],0,0,'magnatune'); ?>
+      <?php echo sopac_put_request_link($item['_id'],0,0,'Music Download'); ?>
       <?php
         include_once('sopac_user.php');
         //print sopac_put_list_links($item['magnatune_id']);

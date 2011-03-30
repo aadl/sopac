@@ -6,20 +6,29 @@
 
 // Prep some stuff here
 $new_author_str = sopac_author_format($locum_result['author'], $locum_result['addl_author']);
+if($locum_result['artist']){
+  $new_author_str = $locum_result['artist'];
+}
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 global $user;
-if (!module_exists('covercache')) {
+if (!module_exists('covercache') || $locum_result['magnatune_id']) {
   if (strpos($locum_result['cover_img'], 'http://') !== FALSE) {
     $cover_img = $locum_result['cover_img'];
+  }
+  else if($locum_result['magnatune_id']) {
+    $cover_img = "http://media.aadl.org/magnatune/".$locum_result['_id']."/data/cover.jpg";
+    $locum_result['mat_code'] = 'z';
+    $locum_result['callnum'] = "Magnatune";
   }
   else {
     $cover_img = base_path() . drupal_get_path('module', 'sopac') . '/images/nocover.png';
   }
   $cover_img = '<img width="100" src="' . $cover_img . '">';
   $cover_img = l($cover_img,
-                 variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['bnum'],
+                 variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'],
                  array('html' => TRUE, 'alias' => TRUE));
 }
+
 $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
 
 // Get Zoom Lends copies
@@ -43,12 +52,14 @@ if ($locum_result['status']['avail']) {
 if ($locum_result['status']['holds'] > 0) {
   $reqtext = $locum_result['status']['holds'] . ' request' . ($locum_result['status']['holds'] == 1 ? '' : 's') . " on " . $locum_result['status']['total'] . ' ' . ($locum_result['status']['total'] == 1 ? 'copy' : 'copies');
 }
-
+if($locum_result['mat_code'] == 'z') {
+  $availtext = "This item is available for download";
+}
 ?>
   <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
     <?php if($minimal) { ?>
-    <td><strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); if($locum_result[title_medium]){ print ' ['.$locum_result[title_medium].']'; } ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
+    <td><strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); if($locum_result[title_medium]){ print ' ['.$locum_result[title_medium].']'; } ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
     <?php 
     } 
     else {
@@ -64,7 +75,7 @@ if ($locum_result['status']['holds'] > 0) {
       ?>
       <ul>
         <li class="hitlist-title">
-          <strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['bnum'],array('alias' => TRUE)); ?></strong>
+          <strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); ?></strong>
           <?php
           if ($locum_result['title_medium']) {
             print "[$locum_result[title_medium]]";
@@ -115,7 +126,7 @@ if ($locum_result['status']['holds'] > 0) {
     <?php
       if ($locum_result['review_links']) {
         print '<li class="button hassub">Reviews &amp; Summaries (' .
-              count($locum_result['review_links']) . ')<ul class="submenu" id="rev_' . $locum_result['bnum'] . '">';
+              count($locum_result['review_links']) . ')<ul class="submenu" id="rev_' . $locum_result['_id'] . '">';
         foreach ($locum_result['review_links'] as $rev_title => $rev_link) {
           $rev_link = explode('?', $rev_link);
           print '<li>' . l($rev_title, $rev_link[0], array('query' => $rev_link[1], 'attributes' => array('html' => TRUE, 'target' => "_new", 'alias' => TRUE))) . '</li>';
@@ -123,33 +134,36 @@ if ($locum_result['status']['holds'] > 0) {
         print '</ul><span></span></li>';
       }
       if($locum_result['trailers']) { ?>
-        <li class="button"><?php print l("Watch Trailer / Previews", $url_prefix . '/record/' . $locum_result['bnum']); ?></li>    
+        <li class="button"><?php print l("Watch Trailer / Previews", $url_prefix . '/record/' . $locum_result['_id']); ?></li>    
     <?php  } ?>
     </ul>
     </td>
     <td class="hitlist-actions">
       <ul>
         <?php
-          if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
+          if($locum_result['mat_code'] == 'z') { ?>
+            <li class="button green"><?php echo l("Download Album", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
+       <?php  }
+          else if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
             <li class="button">Library Use Only</li>
         <?php } else if (in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
             <li class="button red">Not Requestable</li>
         <?php }
           else {
-            print sopac_put_request_link($locum_result['bnum'],
+            print sopac_put_request_link($locum_result['_id'],
                                          $locum_result['status']['avail'],
                                          $locum_result['status']['holds'],
                                          $locum_config['formats'][$locum_result['mat_code']]);
           }
-          if ($user->uid) {
+          if ($user->uid && $locum_result['mat_code'] != 'z') {
             include_once('sopac_user.php');
-            print sopac_put_list_links($locum_result['bnum'], $list_display);
+            print sopac_put_list_links($locum_result['_id'], $list_display);
           }
           if ($list_display && $locum_result['uid'] == $user->uid) {
             // PART OF A LIST, SHOW ADDITIONAL ACTIONS
             $list_id = intval(str_replace('list', '', $locum_result['namespace']));
             $value = $locum_result['value'];
-            $bnum = $locum_result['bnum'];
+            $bnum = $locum_result['_id'];
             if (!$locum_result['freeze']) {
               print '<li class="button green">' . l('Move to Top of List', "user/listmovetop/$list_id/$value", array('alias' => TRUE)) . '</li>';
             }

@@ -469,7 +469,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $text = 'Request an Issue';
           $options = array('alias' => TRUE); // no lightbox on links
         }
-        else if($mattype == 'magnatune') {
+        else if($mattype == 'Music Download') {
           $locum = sopac_get_locum();
           $bib = $locum->get_bib_item($bnum);
           $size = round(($bib['zipsize'] / 1048576), 2);
@@ -480,7 +480,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $options = array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
         }
 
-        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'magnatune') {
+        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'Music Download') {
           $locum = sopac_get_locum();
           $branches = $locum->locum_config['branches'];
           $class .= ' hassub';
@@ -514,7 +514,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           }
           $text .= "</ul><span></span>";
         }
-        else if($mattype == 'magnatune') {
+        else if($mattype == 'Music Download') {
           $text = '<a href="/'.variable_get('sopac_url_prefix', 'cat/seek').'/record/'.$bnum.'/download?type=album">'.$text.'</a>';
         }
         else {
