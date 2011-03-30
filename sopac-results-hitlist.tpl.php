@@ -156,6 +156,9 @@ if($locum_result['mat_code'] == 'z') {
                                          $locum_result['status']['avail'],
                                          $locum_result['status']['holds'],
                                          $locum_config['formats'][$locum_result['mat_code']]);
+            if(user_access('staff request')){
+              print sopac_put_staff_request_link($locum_result['_id']);
+            }
           }
           if ($user->uid && $locum_result['mat_code'] != 'z') {
             include_once('sopac_user.php');

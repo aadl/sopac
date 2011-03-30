@@ -541,6 +541,55 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
   }
 }
 
+function sopac_put_staff_request_link($bnum) {
+  if (variable_get('sopac_catalog_disabled', 0)) {
+    $text = 'Requesting Currently Disabled';
+  } else {
+    global $user;
+    $class = 'button green';
+    $text = 'Request For Patron';
+    $options = array('query' => array('lightbox' => 1,'staff' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
+        if (variable_get('sopac_multi_branch_enable', 0)) {
+          $locum = sopac_get_locum();
+          $branches = $locum->locum_config['branches'];
+          $class .= ' hassub';
+
+          $text .= "<ul class=\"submenu\"><li>for pickup at</li>";
+          if ($mattype == 'Art Print') {
+            $text .= '<li>' .
+                     l("Downtown", variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/d', $options) .
+                     '</li>';
+            $text .= '<li>Art Prints are only available for pickup at the Downtown Library</li>';
+          }
+          else {
+            if ($user->profile_pref_home_branch) {
+              $home_branch_code = array_search($user->profile_pref_home_branch, $branches);
+              $text .= '<li>' .
+                       l($user->profile_pref_home_branch,
+                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
+                         $options) .
+                       '</li>';
+              $text .= '<li>Other Location...</li>';
+            }
+            foreach ($branches as $branch_code => $branch_name) {
+              if ($branch_name != $user->profile_pref_home_branch) {
+                $text .= '<li>' .
+                         l($branch_name,
+                           variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
+                           $options) .
+                         '</li>';
+              }
+            }
+          }
+          $text .= "</ul><span></span>";
+        }
+        else {
+          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
+        }  
+    return "<li class=\"$class\">$text</li>";
+   }
+}
+
 /**
  * Build a form to request a hold, including where to pick up item. Uses branches config info from locum.
  *
@@ -644,10 +693,12 @@ function sopac_request_item() {
   global $user;
   // avoid php errors when debugging
   $varname = $request_result_msg = $request_error_msg = $item_form = $bnum = NULL;
-
+  $staff_request = $_GET['staff'];
+  $patron_bcode = $_POST['patron_barcode'];
+  
   $button_txt = t('Request Selected Item');
   //profile_load_profile(&$user);
-  if ($user->uid && $user->bcode_verified) {
+  if (($user->uid && $user->bcode_verified) || $staff_request == 1) {
     // support multi-branch & user home branch
     $locum = sopac_get_locum();
     $actions = sopac_parse_uri();
@@ -657,8 +708,19 @@ function sopac_request_item() {
     $pickup_name = $locum->locum_config['branches'][$pickup_arg];
     $varname = $actions[3] ? $actions[3] : NULL;
     $bib_item = $locum->get_bib_item($bnum, TRUE);
-    $hold_result = $locum->place_hold($user->profile_pref_cardnum, $bnum, $varname, $user->locum_pass, $pickup_arg);
-
+    $barcode = $user->profile_pref_cardnum;
+    if($staff_request && $patron_bcode && user_access('staff request')) {
+      $barcode = $patron_bcode;
+    }
+    
+    if($staff_request && !$patron_bcode){
+      $item_form = drupal_get_form('sopac_staff_request_form');
+      $result_page = theme('sopac_request', $request_result_msg, $request_error_msg, $item_form, $bnum);
+      return '<p>'. t($result_page) .'</p>';
+    }
+    else {
+      $hold_result = $locum->place_hold($barcode, $bnum, $varname, $user->locum_pass, $pickup_arg);
+    }
     // Set home branch if none set
     if ($pickup_name && !$user->profile_pref_home_branch) {
       user_save($user, array('profile_pref_home_branch' => $pickup_name));
@@ -671,7 +733,12 @@ function sopac_request_item() {
       if ($pickup_name) {
         $request_result_msg .= t(' for pickup at ') . $pickup_name;
       }
-      $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
+      if($staff_request){
+        $request_result_msg .= '<br />for patron barcode '.$barcode;
+      }
+      else {
+        $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
+      }
     }
     else if (count($hold_result['choose_location'])) {
       $locum = sopac_get_locum();
@@ -862,6 +929,26 @@ function sopac_savesearch_link() {
   $search_link = l(t('Save this search'), str_replace('/search/', '/savesearch/', $_GET['q']),
                    array('query' => sopac_make_pagevars(sopac_parse_get_vars())));
   return $search_link;
+}
+
+function sopac_staff_request_form(&$form_state, $patron_barcode = NULL) {
+  $form['inline'] = array(
+    '#prefix' => '<div>',
+    '#suffix' => '</div>',
+  );
+  $form['inline']['patron_barcode'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Patron Barcode',
+    '#default_value' => $patron_barcode,
+    '#size' => 25,
+    '#maxlength' => 255,
+  );
+  $form['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Request'),
+  );
+  $form['#name'] = 'patron-barcode';
+  return $form;
 }
 
 /**

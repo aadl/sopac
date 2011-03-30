@@ -67,7 +67,7 @@ function sopac_help($path, $arg) {
  * @return array An array of valid permissions for the sopac module
  */
 function sopac_perm() {
-  return array('access user pages', 'administer sopac', 'show suppressed records');
+  return array('access user pages', 'administer sopac', 'show suppressed records', 'staff request');
 }
 
 /**

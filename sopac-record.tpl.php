@@ -219,6 +219,9 @@ if (count($item_status['items'])) {
       <?php }
       else {
         print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
+        if(user_access('staff request')){
+              print sopac_put_staff_request_link($item['bnum']);
+        }
       }
       if ($user->uid) {
         include_once('sopac_user.php');

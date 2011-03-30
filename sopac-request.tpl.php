@@ -28,3 +28,4 @@ else {
   }
 }
 ?>
+<script>$('#edit-patron-barcode').focus();</script>
