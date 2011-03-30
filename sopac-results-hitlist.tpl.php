@@ -30,7 +30,9 @@ if (!module_exists('covercache') || $locum_result['magnatune_id']) {
 }
 
 $list_display = strpos($locum_result['namespace'], 'list') !== FALSE;
-
+if($list_display) {
+  $locum_result['_id'] = $locum_result['bnum'];
+}
 // Get Zoom Lends copies
 $zooms_avail = $locum_result['status']['callnums']['Zoom Lends DVD']['avail'] + $locum_result['status']['callnums']['Zoom Lends Book']['avail'];
 $avail = $locum_result['status']['avail'] - $zooms_avail;
