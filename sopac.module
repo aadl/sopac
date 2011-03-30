@@ -18,7 +18,7 @@ function sopac_init() {
   if (variable_get('sopac_ssl_enable', 0)) {
     $protected_uri = preg_match('/^(\/user|\/myaccount|\/login|\/donate)/', request_uri(), $debug_match);
     $lists = preg_match('/.*list.*/', request_uri(), $debug_match);
-    if ($_SERVER['HTTPS'] && !$protected_uri) {
+    if (($_SERVER['HTTPS'] && !$protected_uri) || ($_SERVER['HTTPS'] && $lists)) {
       $new_link = 'http://' . $_SERVER['HTTP_HOST'] . request_uri();
     }
     elseif (!$_SERVER['HTTPS'] && $protected_uri && !$lists) {
