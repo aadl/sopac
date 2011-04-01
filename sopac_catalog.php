@@ -714,6 +714,7 @@ function sopac_request_item() {
     $barcode = $user->profile_pref_cardnum;
     if($staff_request && $patron_bcode && user_access('staff request')) {
       $barcode = $patron_bcode;
+      $patron_info = $locum->get_patron_info($barcode);
     }
     
     if($staff_request && !$patron_bcode){
@@ -737,8 +738,8 @@ function sopac_request_item() {
         $request_result_msg .= t(' for pickup at ') . $pickup_name;
       }
       if($staff_request){
-        $request_result_msg .= '<br />for patron barcode '.$barcode;
-      }
+        $request_result_msg .= '<br />for patron '.$patron_info['name'].' ( '.$barcode.' )';
+      } 
       else {
         $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
       }
