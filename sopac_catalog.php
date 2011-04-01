@@ -695,6 +695,9 @@ function sopac_request_item() {
   $varname = $request_result_msg = $request_error_msg = $item_form = $bnum = NULL;
   $staff_request = $_GET['staff'];
   $patron_bcode = $_POST['patron_barcode'];
+  if($_GET['patron_barcode']) {
+    $patron_bcode = $_GET['patron_barcode'];
+  }
   
   $button_txt = t('Request Selected Item');
   //profile_load_profile(&$user);
@@ -757,7 +760,13 @@ function sopac_request_item() {
       $link_options = array();
 
       if ($_GET['lightbox']) {
-        $link_options['query'] = array('lightbox' => 1);
+        $link_options['query']['lightbox'] = 1;
+      }
+      if($staff_request) {
+        $link_options['query']['staff'] = 1;
+      }
+      if($patron_bcode) {
+        $link_options['query']['patron_barcode'] = $patron_bcode;
       }
 
       // Group items by callnumber
