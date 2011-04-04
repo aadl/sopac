@@ -74,7 +74,7 @@ function sec2hms ($sec, $padHours = false) {
     <!-- Subject Headings -->
     <?php
     }
-    if ($item->genres) {
+    if ($item['genres']) {
       print '<h3>Genres</h3><ul>';
       if (is_array($item['genres'])) {
         foreach ($item['genres'] as $genre) {
