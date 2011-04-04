@@ -530,7 +530,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         $text = l(t('Register card to request'), 'user/' . $user->uid);
       }
     }
-    else if($mattype == 'magnatune'){
+    else if($mattype == 'Music Download'){
       $text = l(t('Log in to Download'), 'user/login', array('query' => drupal_get_destination()));
     }
     else {

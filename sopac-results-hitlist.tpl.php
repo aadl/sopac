@@ -18,7 +18,6 @@ if (!module_exists('covercache') || $locum_result['magnatune_id']) {
   else if($locum_result['magnatune_id']) {
     $cover_img = "http://media.aadl.org/magnatune/".$locum_result['_id']."/data/cover.jpg";
     $locum_result['mat_code'] = 'z';
-    $locum_result['callnum'] = "Magnatune";
   }
   else {
     $cover_img = base_path() . drupal_get_path('module', 'sopac') . '/images/nocover.png';
