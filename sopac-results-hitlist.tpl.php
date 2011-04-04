@@ -96,6 +96,9 @@ if($locum_result['mat_code'] == 'z') {
         elseif (count($locum_result['avail_details'])) {
           ?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
         } ?>
+        <?php if ($locum_result['genres']) { ?>
+        <li>Genres: <?php echo implode(', ',$locum_result['genres']); ?></li>
+        <?php } ?>
         <?php if ($locum_result['sort'] == 'catalog_newest') { ?>
         <li><strong>Added on <?php echo date('m-d-Y', strtotime($locum_result['bib_created'])); ?></strong></li>
         <?php } ?>
