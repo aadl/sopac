@@ -4,7 +4,32 @@
  */
 
 // Set the page title
+global $user;
 drupal_set_title(mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"));
+drupal_set_html_head('<meta property="og:image" content="'.$cover_url.'" />');
+drupal_set_html_head('<meta property="og:title" content="'.mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8").'" />');
+// hard coding url for now. don't want to have tests pick up other installs
+drupal_set_html_head('<meta property="og:url" content="http://www.aadl.org/catalog/record/'.$item['_id'].'" />');
+$books = $locum->csv_parser($locum_config['format_groups']['books']);
+$video = $locum->csv_parser($locum_config['format_groups']['video']);
+$music = $locum->csv_parser($locum_config['format_groups']['music']);
+if(in_array($item['mat_code'],$books)){
+  drupal_set_html_head('<meta property="og:type" content="book" />');
+}
+else if(in_array($item['mat_code'],$music)){
+  drupal_set_html_head('<meta property="og:type" content="album" />');
+}
+else if(in_array($item['mat_code'],$video)){
+  if(stristr('DVD TV',$item['callnum'])) {
+    drupal_set_html_head('<meta property="og:type" content="tv_show" />');
+  }
+  else {
+    drupal_set_html_head('<meta property="og:type" content="movie" />');
+  }
+}
+else {
+  drupal_set_html_head('<meta property="og:type" content="product" />');
+}
 $useriplabels = ipmap_labels();
 if($item['trailers']){
   if($item['trailers'][0]['type'] == 'trailer'){
@@ -186,8 +211,15 @@ if (count($item_status['items'])) {
       $block = module_invoke('sopac','block','view', 4);
       print $block['content'];
     }
-    ?>
-
+  if (in_array('beta tester', array_values($user->roles))) {
+  ?>
+    <h3>Share This</h3>
+    <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+    <ul>
+    <li><fb:like href="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" layout="button_count" show_faces="false" width="450" font=""></fb:like></li>
+    </ul>
+    
+  <?php } ?>
   <!-- end left-hand column -->
   </div>
 
