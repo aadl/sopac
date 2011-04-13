@@ -153,6 +153,7 @@ td.hitlist-cover {
 .item-left {
   width: 28%;
   margin-right: 15px;
+  margin-bottom: 20px;
 }
 .item-left ul {
   list-style-type: none;
