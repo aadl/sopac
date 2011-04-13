@@ -2186,6 +2186,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
       }
       $top .= '</select>';
       $top .= '</span>';
+      $top .= '<span class="pagination">'. l('List/Print View', 'user/lists/' . $list['list_id'] .'/print') . '</span>';
       $top .= '</div>';
       if ($expanded) {
         $top .= drupal_get_form('sopac_list_item_search_form', $_GET['search']);
