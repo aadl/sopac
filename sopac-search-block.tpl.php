@@ -200,7 +200,7 @@ if (is_array($getvars['facet_subject']) && count($getvars['facet_subject'])) {
 ?>
 <br />
 <?php
-print '<div style="float: right;">» ' . l(t('Need help?'), 'research_help') . '</div>';
+print '<div style="float: right;">» ' . l(t('Need help?'), 'catalog/tips') . '</div>';
 if ($user->uid) {
   print '<div style="float: right;">» ' . sopac_savesearch_link() . '&nbsp;</div>';
 }
