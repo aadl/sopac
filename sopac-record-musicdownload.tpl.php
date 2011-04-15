@@ -45,7 +45,7 @@ function sec2hms ($sec, $padHours = false) {
     <?php
     if (variable_get('sopac_social_enable', 1)) {
       print '<div class="item-rating">';
-      print theme_sopac_get_rating_stars($item['sphinxid']);
+      print theme_sopac_get_rating_stars($item['_id']);
       print '</div>';
     }
     ?>
@@ -96,11 +96,11 @@ function sec2hms ($sec, $padHours = false) {
     
         <!-- Tags -->
     <?php
-//    if (variable_get('sopac_social_enable', 1)) {
-//      print '<h3>Tags</h3>';
-      //$block = module_invoke('sopac','block','view', 4);
-      //print $block['content'];
-//    }
+    if (variable_get('sopac_social_enable', 1)) {
+      print '<h3>Tags</h3>';
+      $block = module_invoke('sopac','block','view', 4);
+      print $block['content'];
+    }
     ?>
   <!-- end left-hand column -->
   </div>
@@ -163,7 +163,6 @@ function sec2hms ($sec, $padHours = false) {
 </div>
 <?php } ?>
     <!-- Community / SOPAC Reviews -->
-<!--
     <div id="item-reviews">
       <h2>Community Reviews</h2>
       <?php
@@ -192,7 +191,6 @@ function sec2hms ($sec, $padHours = false) {
       print $rev_form ? $rev_form : '<p>' . l(t('Login'), 'user/login', array('query' => array('destination' => $_GET['q']))) . ' to write a review of your own.</p>';
       ?>
     </div>
--->
 
   <!-- end right-hand column -->
   </div>
