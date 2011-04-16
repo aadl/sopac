@@ -211,7 +211,7 @@ if (count($item_status['items'])) {
       $block = module_invoke('sopac','block','view', 4);
       print $block['content'];
     }
-  if (in_array('beta tester', array_values($user->roles))) {
+  if (in_array('beta tester', array_values($user->roles)) || in_array('desk staff', array_values($user->roles))) {
   ?>
     <h3>Share This</h3>
     <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
