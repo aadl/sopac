@@ -576,6 +576,10 @@ function sopac_theme() {
       'template' => 'sopac-pat-overview',
       'arguments' => array('review_display' => NULL, 'ratings_chunk' => NULL, 'tag_cloud' => NULL),
     ),
+    'sopac_patron_profile' => array(
+      'arguments' => array('element' => NULL),
+      'template' => 'sopac-patroninfo-profile',
+    ),
     'sopac_ratings_page' => array(
       'template' => 'sopac-ratings-page',
       'arguments' => array('ratings_arr' => NULL),
@@ -973,4 +977,13 @@ function sopac_lists_access($list_id) {
     $access = TRUE;
   }
   return $access;
+}
+
+function template_preprocess_sopac_patron_profile(&$variables) {
+  $variables['title'] = check_plain($variables['element']['#title']);
+  $variables['profile_items'] = $variables['element']['#children'];
+  $variables['attributes'] = '';
+  if (isset($variables['element']['#attributes'])) {
+    $variables['attributes'] = drupal_attributes($variables['element']['#attributes']);
+  }
 }

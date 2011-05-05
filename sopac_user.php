@@ -23,7 +23,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
   if (variable_get('sopac_summary_enable', 1)) {
     $result['patroninfo']['#title'] = t('Account Summary');
     $result['patroninfo']['#weight'] = 1;
-    $result['patroninfo']['#type'] = 'user_profile_category';
+    $result['patroninfo']['#type'] = 'sopac_patron_profile';
     $result['patroninfo']['details']['#value'] = $patron_details_table;
   }
 
@@ -52,7 +52,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
   }
 
   // Commit the page content
-  $account->content[] = $result;
+  $account->content = array_merge($account->content, $result);
 
   // The Summary is not really needed.
   if (variable_get('sopac_history_hide', 1)) {
@@ -358,6 +358,8 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
   $form = array(
     '#theme' => 'form_theme_bridge',
     '#bridge_to_theme' => 'sopac_user_holds_list',
+    '#cardnum' => $cardnum,
+    '#ils_pass' => $ils_pass,
   );
 
   $sopac_prefix = variable_get('sopac_url_prefix', 'cat/seek') . '/record/';
@@ -484,7 +486,7 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
       '#value' => $current_pref . " [ " . l("See All Requests", 'user/requests') . " ]",
     );
   }
-  if($locker_message) {
+  if ($locker_message) {
     $form['lockers'] = array('#value' => $locker_message);
   }
   $form['submit'] = array(
@@ -506,9 +508,6 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
  * @param array $form_state
  */
 function sopac_user_holds_form_validate(&$form, &$form_state) {
-  global $user;
-  //profile_load_profile($user);
-
   // Set defaults to avoid errors when debugging.
   $pickup_changes = $suspend_from_changes = $suspend_to_changes = NULL;
 
@@ -521,8 +520,8 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
   $suspend_to_changes = array();
 
   // Get holds.
-  $cardnum = $user->profile_pref_cardnum;
-  $password = $user->locum_pass;
+  $cardnum = $form['#cardnum'];
+  $password = $form['#ils_pass'];
   $locum = sopac_get_locum();
   $holds = $locum->get_patron_holds($cardnum, $password);
 
@@ -632,9 +631,8 @@ function sopac_user_holds_form_validate(&$form, &$form_state) {
  * @param array $form_state
  */
 function sopac_user_holds_form_submit(&$form, &$form_state) {
-  global $user;
-  $cardnum = $user->profile_pref_cardnum;
-  $password = $user->locum_pass;
+  $cardnum = $form['#cardnum'];
+  $password = $form['#ils_pass'];
   $cancellations = $form_state['sopac_user_holds']['cancellations'];
   $freeze_changes = $form_state['sopac_user_holds']['freeze_changes'];
   $pickup_changes = $form_state['sopac_user_holds']['pickup_changes'];
