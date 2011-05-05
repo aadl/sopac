@@ -220,31 +220,35 @@ function sopac_bib_record() {
 
   // Load social function
   require_once('sopac_social.php');
-
+  drupal_add_js('misc/collapse.js');
+  
   $no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
   $show_inactive = user_access('show suppressed records');
   $item = $locum->get_bib_item($bnum, $show_inactive);
+  $bnum_arr[] = $bnum;
+  $reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL);
+  $i = 0;
+  foreach ($reviews['reviews'] as $insurge_review) {
+    $rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
+    $rev_arr[$i]['bnum'] = $insurge_review['bnum'];
+    if ($insurge_review['uid']) {
+      $rev_arr[$i]['uid'] = $insurge_review['uid'];
+    }
+    $rev_arr[$i]['timestamp'] = $insurge_review['rev_create_date'];
+    $rev_arr[$i]['rev_title'] = $insurge_review['rev_title'];
+    $rev_arr[$i]['rev_body'] = $insurge_review['rev_body'];
+    $i++;
+  }
+  if (!$insurge->check_reviewed($user->uid, $bnum_arr[0]) && $user->uid) {
+      $rev_form = drupal_get_form('sopac_review_form', $bnum_arr[0]);
+  }
+  else {
+      $rev_form = NULL;
+  }
   if($item['magnatune_url']){
-    $result_page = theme('sopac_record_musicdownload', $item, $locum->locum_config);
+    $result_page = theme('sopac_record_musicdownload', $item, $locum->locum_config, $rev_arr, $rev_form);
   }
   else if ($item['bnum']) {
-    $bnum_arr[] = $bnum;
-    $reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL);
-    $i = 0;
-    foreach ($reviews['reviews'] as $insurge_review) {
-      $rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
-      $rev_arr[$i]['bnum'] = $insurge_review['bnum'];
-      if ($insurge_review['uid']) {
-        $rev_arr[$i]['uid'] = $insurge_review['uid'];
-      }
-      $rev_arr[$i]['timestamp'] = $insurge_review['rev_create_date'];
-      $rev_arr[$i]['rev_title'] = $insurge_review['rev_title'];
-      $rev_arr[$i]['rev_body'] = $insurge_review['rev_body'];
-      $i++;
-    }
-
-    // Load javascript collapsible code
-    drupal_add_js('misc/collapse.js');
     $item['tracks'] = $locum->get_cd_tracks($bnum);
     $item['trackupc'] = $locum->get_upc($bnum);
     $item_status = $locum->get_item_status($bnum, TRUE);
@@ -252,14 +256,6 @@ function sopac_bib_record() {
     $review_links = $locum->get_syndetics($item['stdnum'][0]);
     if (count($review_links)) {
       $item['review_links'] = $review_links;
-    }
-
-    // Get and patron reviews
-    if (!$insurge->check_reviewed($user->uid, $item['bnum']) && $user->uid) {
-      $rev_form = drupal_get_form('sopac_review_form', $item['bnum']);
-    }
-    else {
-      $rev_form = NULL;
     }
 
     // Build the page
@@ -530,7 +526,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         $text = l(t('Register card to request'), 'user/' . $user->uid);
       }
     }
-    else if($mattype == 'magnatune'){
+    else if($mattype == 'Music Download'){
       $text = l(t('Log in to Download'), 'user/login', array('query' => drupal_get_destination()));
     }
     else {

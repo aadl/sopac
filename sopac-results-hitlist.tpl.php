@@ -18,7 +18,6 @@ if (!module_exists('covercache') || $locum_result['magnatune_id']) {
   else if($locum_result['magnatune_id']) {
     $cover_img = "http://media.aadl.org/magnatune/".$locum_result['_id']."/data/cover.jpg";
     $locum_result['mat_code'] = 'z';
-    $locum_result['callnum'] = "Magnatune";
   }
   else {
     $cover_img = base_path() . drupal_get_path('module', 'sopac') . '/images/nocover.png';
@@ -96,6 +95,9 @@ if($locum_result['mat_code'] == 'z') {
         elseif (count($locum_result['avail_details'])) {
           ?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
         } ?>
+        <?php if ($locum_result['genres']) { ?>
+        <li>Genres: <?php echo implode(', ',$locum_result['genres']); ?></li>
+        <?php } ?>
         <?php if ($locum_result['sort'] == 'catalog_newest') { ?>
         <li><strong>Added on <?php echo date('m-d-Y', strtotime($locum_result['bib_created'])); ?></strong></li>
         <?php } ?>

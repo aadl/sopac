@@ -367,7 +367,7 @@ function sopac_tag_form_validate($form, &$form_state) {
     return;
   }
   $bnum = $form_state['values']['bnum'];
-  if (!$bnum || !is_numeric($bnum)) {
+  if (!$bnum) {
     form_set_error('tags', t("We're sorry, but we cannot determine which item you're trying to add a tag to. Please try again."));
     return;
   }
@@ -454,9 +454,9 @@ function sopac_review_page($page_type) {
         $i++;
       }
 
-      if ($item['bnum']) {
-        if (!$insurge->check_reviewed($user->uid, $item['bnum']) && $user->uid) {
-          $rev_form = drupal_get_form('sopac_review_form', $item['bnum']);
+      if ($bnum) {
+        if (!$insurge->check_reviewed($user->uid, $bnum) && $user->uid) {
+          $rev_form = drupal_get_form('sopac_review_form', $bnum);
         }
         elseif (!$user->uid) {
           $rev_form = '<div class="review-login">' . l(t('Login'), 'user/login', array('query' => drupal_get_destination())) . t(' to write a review') . '</div>';
@@ -506,7 +506,7 @@ function sopac_review_page($page_type) {
       $no_rev_msg = t('This review does not exist.');
       $i = 0;
       foreach ($reviews['reviews'] as $insurge_review) {
-        $bib_item_arr = $locum->get_bib_items_arr(array($insurge_review['bnum']));
+        $bib_item_arr[(string) $insurge_review['bnum']] = $locum->get_bib_item($insurge_review['bnum']);
         $rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
         $rev_arr[$i]['bnum'] = $insurge_review['bnum'];
         $rev_arr[$i]['uid'] = $insurge_review['uid'];
@@ -657,7 +657,7 @@ function sopac_delete_review_form() {
   $pathinfo = explode('/', trim($_GET['q']));
   $rev_id = $pathinfo[2];
 
-  $form['#redirect'] = substr(urldecode($_GET['ref']), 1);
+  $form['#redirect'] = urldecode($_GET['ref']);
   $form['revform'] = array(
     '#type' => 'fieldset',
     '#title' => t('Do you really want to delete this review?'),
