@@ -60,8 +60,11 @@ function sopac_personal_overview_page() {
       $rate_bnums[] = $rate_arr['bnum'];
     }
   }
-  $ratings_chunk['bibs'] = $locum->get_bib_items_arr($rate_bnums);
-
+  $bibs = $locum->get_bib_items($rate_bnums);
+  foreach($bibs as $bib){
+    $ratings[$bib['id']] = $bib['doc'];
+  }
+  $ratings_chunk['bibs'] = $ratings;
   // Pull together the tags
   $tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, variable_get('sopac_random_tags', 1), variable_get('sopac_tag_limit', 100), 0, variable_get('sopac_tag_sort', 'ORDER BY count DESC'));
   if (count($tag_arr)) {
@@ -97,7 +100,12 @@ function sopac_ratings_page() {
       $rate_bnums[] = $rate_arr['bnum'];
     }
   }
-  $ratings_arr['bibs'] = $locum->get_bib_items_arr($rate_bnums);
+  $bibs = $locum->get_bib_items($rate_bnums);
+  foreach($bibs as $bib){
+    $ratings[$bib['id']] = $bib['doc'];
+  }
+  $ratings_arr['bibs'] = $ratings;
+  
   $result_page = theme('sopac_ratings_page', $ratings_arr);
   $result_page .= theme('pager', NULL, $page_limit, 0, NULL, 6);
   return $result_page;
@@ -657,7 +665,7 @@ function sopac_delete_review_form() {
   $pathinfo = explode('/', trim($_GET['q']));
   $rev_id = $pathinfo[2];
 
-  $form['#redirect'] = substr(urldecode($_GET['ref']), 1);
+  $form['#redirect'] = urldecode($_GET['ref']);
   $form['revform'] = array(
     '#type' => 'fieldset',
     '#title' => t('Do you really want to delete this review?'),
