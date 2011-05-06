@@ -171,7 +171,6 @@ function sec2hms ($sec, $padHours = false) {
 </div>
 <?php } ?>
     <!-- Community / SOPAC Reviews -->
-<!--
     <div id="item-reviews">
       <h2>Community Reviews</h2>
       <?php
@@ -200,7 +199,6 @@ function sec2hms ($sec, $padHours = false) {
       print $rev_form ? $rev_form : '<p>' . l(t('Login'), 'user/login', array('query' => array('destination' => $_GET['q']))) . ' to write a review of your own.</p>';
       ?>
     </div>
--->
 
   <!-- end right-hand column -->
   </div>

@@ -226,9 +226,6 @@ function sopac_bib_record() {
   $show_inactive = user_access('show suppressed records');
   $item = $locum->get_bib_item($bnum, $show_inactive);
   $bnum_arr[] = $bnum;
-  if($item['sphinxid']){
-    $bnum_arr[] = $item['sphinxid'];
-  }
   $reviews = $insurge->get_reviews(NULL, $bnum_arr, NULL);
   $i = 0;
   foreach ($reviews['reviews'] as $insurge_review) {
