@@ -367,7 +367,7 @@ function sopac_tag_form_validate($form, &$form_state) {
     return;
   }
   $bnum = $form_state['values']['bnum'];
-  if (!$bnum || !is_numeric($bnum)) {
+  if (!$bnum) {
     form_set_error('tags', t("We're sorry, but we cannot determine which item you're trying to add a tag to. Please try again."));
     return;
   }

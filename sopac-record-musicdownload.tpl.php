@@ -43,13 +43,11 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Ratings -->
     <?php
-/*
     if (variable_get('sopac_social_enable', 1)) {
       print '<div class="item-rating">';
-      print theme_sopac_get_rating_stars($item['sphinxid']);
+      print theme_sopac_get_rating_stars($item['_id']);
       print '</div>';
     }
-*/
     ?>
 
     <!-- Item Details -->
@@ -98,11 +96,11 @@ function sec2hms ($sec, $padHours = false) {
     
         <!-- Tags -->
     <?php
-//    if (variable_get('sopac_social_enable', 1)) {
-//      print '<h3>Tags</h3>';
-      //$block = module_invoke('sopac','block','view', 4);
-      //print $block['content'];
-//    }
+    if (variable_get('sopac_social_enable', 1)) {
+      print '<h3>Tags</h3>';
+      $block = module_invoke('sopac','block','view', 4);
+      print $block['content'];
+    }
   ?>
     <h3>Share This</h3>
     <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
