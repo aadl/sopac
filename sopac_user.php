@@ -22,7 +22,7 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
   $patron_details_table = sopac_user_info_table($account, $locum);
   if (variable_get('sopac_summary_enable', 1)) {
     $result['patroninfo']['#title'] = t('Account Summary');
-    $result['patroninfo']['#weight'] = 1;
+    $result['patroninfo']['#weight'] = 0;
     $result['patroninfo']['#type'] = 'sopac_patron_profile';
     $result['patroninfo']['details']['#value'] = $patron_details_table;
   }
