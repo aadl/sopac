@@ -2129,6 +2129,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
       $content .= '<table class="hitlist-content">';
       foreach($list['items'] as $item) {
         $item['bib'] = $locum->get_bib_item($item['bnum']);
+        $item['cover_img'] = $item['bib']['cover_img'];
         if ($item['active'] || user_access('show suppressed records')) {
           // Check updated date
           if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
@@ -2151,7 +2152,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
             $item['freeze'] = TRUE;
           }
 
-          $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item['bib'], $locum->locum_config, $no_circ, $minimal);
+          $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ, $minimal);
         }
       }
       $content .= '</table>';
