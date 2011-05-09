@@ -1403,7 +1403,7 @@ function sopac_bcode_verify_form() {
 
   $form['sopac_card_verify'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Verify your Library Card Number'),
+    '#title' => t('Verify the Library Card Number'),
     '#description' => t($form_desc),
     '#collapsible' => FALSE,
     '#validate' => 'sopac_bcode_verify_form_validate',
@@ -1412,7 +1412,7 @@ function sopac_bcode_verify_form() {
   if (variable_get('sopac_require_name', 1)) {
     $form['sopac_card_verify']['last_name'] = array(
       '#type' => 'textfield',
-      '#title' => t('What is your last name?'),
+      '#title' => t("What is the cardholder's last name?"),
       '#size' => 32,
       '#maxlength' => 128,
       '#required' => $req_flds,
@@ -1423,7 +1423,7 @@ function sopac_bcode_verify_form() {
   if (variable_get('sopac_require_streetname', 1)) {
     $form['sopac_card_verify']['streetname'] = array(
       '#type' => 'textfield',
-      '#title' => t('What is the name of the street you live on?'),
+      '#title' => t("What is the name of the street the cardholder lives on?"),
       '#size' => 24,
       '#maxlength' => 32,
       '#required' => $req_flds,
@@ -1434,7 +1434,7 @@ function sopac_bcode_verify_form() {
   if (variable_get('sopac_require_tel', 1)) {
     $form['sopac_card_verify']['telephone'] = array(
       '#type' => 'textfield',
-      '#title' => t('What is your telephone number?'),
+      '#title' => t("What is the cardholder's telephone number?"),
       '#description' => t("Please provide your area code as well as your phone number, eg: 203-555-1234."),
       '#size' => 18,
       '#maxlength' => 24,
