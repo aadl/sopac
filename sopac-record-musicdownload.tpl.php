@@ -101,7 +101,15 @@ function sec2hms ($sec, $padHours = false) {
       $block = module_invoke('sopac','block','view', 4);
       print $block['content'];
     }
-    ?>
+  ?>
+    <h3>Share This</h3>
+    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+    <ul>
+    <li><fb:like href="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" layout="button_count" show_faces="false" width="450" font=""></fb:like></li>
+    <li><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" data-text="Enjoying <?php echo mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"); ?>" data-count="none" data-via="aadl">Tweet</a></li>
+    </ul>
+    
   <!-- end left-hand column -->
   </div>
 

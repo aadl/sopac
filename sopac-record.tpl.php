@@ -211,7 +211,6 @@ if (count($item_status['items'])) {
       $block = module_invoke('sopac','block','view', 4);
       print $block['content'];
     }
-  if (in_array('beta tester', array_values($user->roles))) {
   ?>
     <h3>Share This</h3>
     <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
@@ -221,7 +220,6 @@ if (count($item_status['items'])) {
     <li><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" data-text="Enjoying <?php echo mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"); ?>" data-count="none" data-via="aadl">Tweet</a></li>
     </ul>
     
-  <?php } ?>
   <!-- end left-hand column -->
   </div>
 

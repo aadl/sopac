@@ -60,8 +60,11 @@ function sopac_personal_overview_page() {
       $rate_bnums[] = $rate_arr['bnum'];
     }
   }
-  $ratings_chunk['bibs'] = $locum->get_bib_items_arr($rate_bnums);
-
+  $bibs = $locum->get_bib_items($rate_bnums);
+  foreach($bibs as $bib){
+    $ratings[$bib['id']] = $bib['doc'];
+  }
+  $ratings_chunk['bibs'] = $ratings;
   // Pull together the tags
   $tag_arr = $insurge->get_tag_totals($user->uid, NULL, NULL, variable_get('sopac_random_tags', 1), variable_get('sopac_tag_limit', 100), 0, variable_get('sopac_tag_sort', 'ORDER BY count DESC'));
   if (count($tag_arr)) {
@@ -97,7 +100,12 @@ function sopac_ratings_page() {
       $rate_bnums[] = $rate_arr['bnum'];
     }
   }
-  $ratings_arr['bibs'] = $locum->get_bib_items_arr($rate_bnums);
+  $bibs = $locum->get_bib_items($rate_bnums);
+  foreach($bibs as $bib){
+    $ratings[$bib['id']] = $bib['doc'];
+  }
+  $ratings_arr['bibs'] = $ratings;
+  
   $result_page = theme('sopac_ratings_page', $ratings_arr);
   $result_page .= theme('pager', NULL, $page_limit, 0, NULL, 6);
   return $result_page;
@@ -454,9 +462,9 @@ function sopac_review_page($page_type) {
         $i++;
       }
 
-      if ($bnum) {
-        if (!$insurge->check_reviewed($user->uid, $bnum) && $user->uid) {
-          $rev_form = drupal_get_form('sopac_review_form', $bnum);
+      if ($item['bnum']) {
+        if (!$insurge->check_reviewed($user->uid, $item['bnum']) && $user->uid) {
+          $rev_form = drupal_get_form('sopac_review_form', $item['bnum']);
         }
         elseif (!$user->uid) {
           $rev_form = '<div class="review-login">' . l(t('Login'), 'user/login', array('query' => drupal_get_destination())) . t(' to write a review') . '</div>';
@@ -506,7 +514,7 @@ function sopac_review_page($page_type) {
       $no_rev_msg = t('This review does not exist.');
       $i = 0;
       foreach ($reviews['reviews'] as $insurge_review) {
-        $bib_item_arr[(string) $insurge_review['bnum']] = $locum->get_bib_item($insurge_review['bnum']);
+        $bib_item_arr = $locum->get_bib_items_arr(array($insurge_review['bnum']));
         $rev_arr[$i]['rev_id'] = $insurge_review['rev_id'];
         $rev_arr[$i]['bnum'] = $insurge_review['bnum'];
         $rev_arr[$i]['uid'] = $insurge_review['uid'];

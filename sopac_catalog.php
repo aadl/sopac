@@ -1240,7 +1240,6 @@ function sopac_search_catalog_submit($form, &$form_state) {
   if ($search_type_arr[0] == 'cat') {
     $search_type = $search_type_arr[1];
     $search_fmt = $search_type_arr[2];
-    $search_url = variable_get('sopac_url_prefix', 'cat/seek') . '/search/' . $search_type . '/' . $search_query;
 
     // Material / Format types
     if ($search_fmt) {
@@ -1312,7 +1311,8 @@ function sopac_search_catalog_submit($form, &$form_state) {
 
     // Publisher Search
     if ($form_state['values']['publisher']) {
-      $uris['pub'] = trim($form_state['values']['publisher']);
+      //$uris['pub'] = trim($form_state['values']['publisher']);
+      $search_query .= " @publisher ".trim($form_state['values']['publisher']);
     }
 
     // Publication date ranges
@@ -1320,6 +1320,7 @@ function sopac_search_catalog_submit($form, &$form_state) {
       $uris['pub_year'] = trim($form_state['values']['pub_year_start']) . '|' .
                           trim($form_state['values']['pub_year_end']);
     }
+    $search_url = variable_get('sopac_url_prefix', 'cat/seek') . '/search/' . $search_type . '/' . $search_query;
   }
   elseif ($search_type_arr[0] == 'web') {
     switch ($search_type_arr[1]) {
