@@ -142,7 +142,9 @@ if (count($item_status['items'])) {
       if ($item['mat_code']) {
         print '<li><b>Format:</b> ' . $locum_config['formats'][$item['mat_code']] . '</li>';
       }
-      ?>
+      if ($item['mpaa_rating'] && $item['mat_code'] == 'u') { ?>
+        <li><strong>Rated:</strong> <span class="mpaa_rating"><?php echo $item['mpaa_rating']; ?></span></li>
+      <?php } ?>
     </ul>
     <?php if ($item['stdnum'] && is_array($item['stdnum'])) { ?>
     <h3>ISBN/Standard Number</h3>
