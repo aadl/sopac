@@ -88,7 +88,7 @@ if($locum_result['mat_code'] == 'z') {
           print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE));
         ?><?php if($locum_result['non_romanized_author']){ echo " (". $locum_result['non_romanized_author'] .")";}?>
         </li>
-        <?php if ($locum_result['callnum'] != ' ') {
+        <?php if ($locum_result['callnum'] && $locum_result['callnum'] != ' ') {
           ?><li><?php print t('Call number: '); ?><strong><?php print l($locum_result['callnum'], $url_prefix . '/search/callnum/"' . urlencode($locum_result['callnum']) .'"',array('alias' => TRUE)); ?></strong></li><?php
         }
         elseif (count($locum_result['avail_details'])) {
