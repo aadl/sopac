@@ -221,7 +221,8 @@ function sopac_bib_record() {
   // Load social function
   require_once('sopac_social.php');
   drupal_add_js('misc/collapse.js');
-  
+  drupal_add_js(drupal_get_path('theme', 'aadl').'/soundmanager2-nodebug-jsmin.js');
+  drupal_add_js(drupal_get_path('theme', 'aadl').'/inlineplayer.js');
   $no_circ = $locum->csv_parser($locum->locum_config['location_limits']['no_request']);
   $show_inactive = user_access('show suppressed records');
   $item = $locum->get_bib_item($bnum, $show_inactive);
