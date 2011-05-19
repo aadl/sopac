@@ -717,7 +717,7 @@ function sopac_search_form($form_type = 'both') {
  * @return string cleaned-up URI.
  */
 function utf8_urldecode($str) {
-  $str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str));
+  $str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", rawurldecode($str));
   return html_entity_decode($str, NULL, 'UTF-8');
 }
 
@@ -744,7 +744,7 @@ function sopac_parse_uri($strip_prefix = TRUE) {
   }
 
   foreach ($uri_array as $uri_elem) {
-    $result[] = urldecode(trim($uri_elem));
+    $result[] = utf8_urldecode(trim($uri_elem));
   }
 
   return $result;
