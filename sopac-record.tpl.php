@@ -6,6 +6,7 @@
 // Set the page title
 global $user;
 drupal_set_title(mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"));
+drupal_set_html_head('<link rel="canonical" href="http://www.aadl.org/catalog/record/'.$item['_id'].'" />');
 drupal_set_html_head('<meta property="og:image" content="'.$cover_url.'" />');
 drupal_set_html_head('<meta property="og:title" content="'.mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8").'" />');
 // hard coding url for now. don't want to have tests pick up other installs
