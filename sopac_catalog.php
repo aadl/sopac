@@ -1235,6 +1235,9 @@ function sopac_search_catalog_submit($form, &$form_state) {
   if (!$search_query) {
     $search_query = '*';
   }
+  if(strstr($search_query,'+')){
+    $search_query = urlencode($search_query);
+  }
   $search_type = $form_state['values']['search_type'];
   $search_type_arr = explode('_', $search_type);
   if ($search_type_arr[0] == 'cat') {
