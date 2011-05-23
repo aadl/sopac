@@ -721,6 +721,42 @@ function utf8_urldecode($str) {
   return html_entity_decode($str, NULL, 'UTF-8');
 }
 
+/*
+ * Exceptions in lower case are words you don't want converted
+ * Exceptions all in upper case are any words you don't want converted to title case
+ *   but should be converted to upper case, e.g.:
+ *   king henry viii or king henry Viii should be King Henry VIII
+ * From: http://www.php.net/manual/en/function.mb-convert-case.php#92317
+ */
+function title_case($string) {
+  $delimiters = array(" ", "-", ".", "'", "O'", "Mc"); 
+  $exceptions = array("út", "u", "s", "és", "utca", "tér", "krt", "körút", "sétány", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "3rd", "2nd" );
+       
+  $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
+
+  foreach ($delimiters as $dlnr => $delimiter){
+    $words = explode($delimiter, $string);
+    $newwords = array();
+    foreach ($words as $wordnr => $word){
+      if (in_array(mb_strtoupper($word, "UTF-8"), $exceptions)){
+        // check exceptions list for any words that should be in upper case
+        $word = mb_strtoupper($word, "UTF-8");
+      }
+      elseif (in_array(mb_strtolower($word, "UTF-8"), $exceptions)){
+        // check exceptions list for any words that should be in upper case
+        $word = mb_strtolower($word, "UTF-8");
+      }
+      elseif (!in_array($word, $exceptions) ){
+        // convert to uppercase (non-utf8 only)
+        $word = ucfirst($word);
+      }
+      array_push($newwords, $word);
+    }
+    $string = join($delimiter, $newwords);
+  }
+  return $string;
+}
+
 /**
  * This function parses the URI to grab the elements upon which SOPAC acts. This is an
  * attempt at pseudo-RESTful URIs within the catalog.  We'll still use some GET vars but

@@ -5,10 +5,10 @@
 
 // Set the page title
 global $user;
-drupal_set_title(mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"));
+drupal_set_title(title_case($item['title'] . ' ' .$item['title_medium']));
 drupal_set_html_head('<link rel="canonical" href="http://www.aadl.org/catalog/record/'.$item['_id'].'" />');
 drupal_set_html_head('<meta property="og:image" content="'.$cover_url.'" />');
-drupal_set_html_head('<meta property="og:title" content="'.mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8").'" />');
+drupal_set_html_head('<meta property="og:title" content="'.title_case($item['title'] . ' ' .$item['title_medium']).'" />');
 // hard coding url for now. don't want to have tests pick up other installs
 drupal_set_html_head('<meta property="og:url" content="http://www.aadl.org/catalog/record/'.$item['_id'].'" />');
 $books = $locum->csv_parser($locum_config['format_groups']['books']);
@@ -220,7 +220,7 @@ if (count($item_status['items'])) {
     <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
     <ul>
     <li><fb:like href="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" layout="button_count" show_faces="false" width="450" font=""></fb:like></li>
-    <li><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" data-text="Enjoying <?php echo mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8"); ?>" data-count="none" data-via="aadl">Tweet</a></li>
+    <li><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" data-text="Enjoying <?php echo title_case($item['title'] . ' ' .$item['title_medium']); ?>" data-count="none" data-via="aadl">Tweet</a></li>
     </ul>
     
   <!-- end left-hand column -->
@@ -268,9 +268,9 @@ if (count($item_status['items'])) {
     <!-- Item Title -->
     <h1>
       <?php
-      print mb_convert_case($item['title'],MB_CASE_TITLE, "UTF-8");
+      print title_case($item['title']);
       if ($item['title_medium']) {
-        print " $item[title_medium]";
+        print ' '.title_case($item[title_medium]);
       }
       ?>
     </h1>
