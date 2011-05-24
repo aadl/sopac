@@ -729,7 +729,7 @@ function utf8_urldecode($str) {
  * From: http://www.php.net/manual/en/function.mb-convert-case.php#92317
  */
 function title_case($string) {
-  $delimiters = array(" ", "-", ".", "'", "O'", "Mc"); 
+  $delimiters = array(" ", "-", ".", "O'", "Mc"); 
   $exceptions = array("út", "u", "s", "és", "utca", "tér", "krt", "körút", "sétány", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "3rd", "2nd" );
        
   $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
