@@ -147,12 +147,15 @@ if (count($item_status['items'])) {
         <li><strong>Rated:</strong> <span class="mpaa_rating"><?php echo $item['mpaa_rating']; ?></span></li>
       <?php } ?>
     </ul>
-    <?php if ($item['stdnum'] && is_array($item['stdnum'])) { ?>
+    <?php if (($item['stdnum'] && is_array($item['stdnum'])) || ($item['upc'] && is_array($item['upc']) )) { ?>
     <h3>ISBN/Standard Number</h3>
     <ul>
     <?php
         foreach($item['stdnum'] as $stdnum) {
           print '<li>' . $stdnum . '</li>';
+        }
+        foreach($item['upc'] as $upc) {
+          print '<li>' . $upc . '</li>';
         }
       ?>
 
