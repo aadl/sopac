@@ -76,12 +76,13 @@ if($locum_result['mat_code'] == 'z') {
       ?>
       <ul>
         <li class="hitlist-title">
-          <strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); ?></strong>
           <?php
           if ($locum_result['title_medium']) {
-            print "[$locum_result[title_medium]]";
+            $locum_result['title'] = $locum_result['title'] . ' ' .$locum_result['title_medium'];
           }
-          ?><?php if($locum_result['non_romanized_title']){ echo " (". $locum_result['non_romanized_title'] .")";} ?>
+          ?>
+          <strong><?php print l(title_case($locum_result['title']), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); ?></strong>
+          <?php if($locum_result['non_romanized_title']){ echo " (". $locum_result['non_romanized_title'] .")";} ?>
         </li>
         <li>
         <?php
