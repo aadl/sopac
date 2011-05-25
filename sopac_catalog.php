@@ -258,7 +258,15 @@ function sopac_bib_record() {
     if (count($review_links)) {
       $item['review_links'] = $review_links;
     }
-
+    $lists = $insurge->get_item_list_ids($item['bnum']);
+    if(count($lists)){
+      $lists = array_slice($lists, 0, 10);
+      $sql = "SELECT * FROM {sopac_lists} WHERE public = 1 and list_id IN (".implode($lists,',').") ORDER BY list_id DESC";
+      $res = db_query($sql);
+      while ($record = db_fetch_array($res)) {
+        $item['lists'][] = $record;
+      }
+    }
     // Build the page
     $result_page = theme('sopac_record', $item, $item_status, $locum->locum_config, $no_circ, &$locum, $rev_arr, $rev_form);
   }

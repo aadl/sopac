@@ -209,7 +209,15 @@ if (count($item_status['items'])) {
       print '</ul>';
     }
     ?>
-
+    <!-- Lists -->
+    <?php if ($item['lists']){ ?>
+    <h3>Recently Listed On</h3>
+    <ul>
+    <?php foreach($item['lists'] as $list) { ?>
+      <li><?php echo l($list['title'],'/user/lists/'.$list['list_id']); ?></li>
+    <?php } ?>
+    </ul>
+    <?php } ?>
     <!-- Tags -->
     <?php
     if (variable_get('sopac_social_enable', 1)) {
