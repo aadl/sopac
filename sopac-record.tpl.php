@@ -214,7 +214,7 @@ if (count($item_status['items'])) {
     <h3>Recently Listed On</h3>
     <ul>
     <?php foreach($item['lists'] as $list) { ?>
-      <li><?php echo l($list['title'],'/user/lists/'.$list['list_id']); ?></li>
+      <li><?php echo l($list['title'],'user/lists/'.$list['list_id']); ?></li>
     <?php } ?>
     </ul>
     <?php } ?>
