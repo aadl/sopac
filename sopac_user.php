@@ -418,6 +418,12 @@ function sopac_user_holds_form($form_state, $account = NULL, $max_disp = NULL) {
       $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
     }
 
+    // Replace 'In Transit' with 'Requested' for ILL items
+    if (stripos($hold['status'], 'in transit') !== FALSE &&
+       ($hold['ill'] || in_array($bnum, $ill_bnums))) {
+      $hold['status'] = 'Requested';
+    }
+
     $ready = (strpos($hold['status'], 'Ready') !== FALSE || strpos($hold['status'], 'MEL RECEIVED') !== FALSE);
     if (module_exists('sopac_lockers')) {
         if (sopac_lockers_available($hold)) {
