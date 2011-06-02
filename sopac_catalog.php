@@ -40,8 +40,10 @@ function sopac_catalog_search() {
   $limit_avail = $getvars['limit_avail'];
   $pager_page_array = explode(',', $getvars['page']);
   $search_type = $actions[1];
+  if ($actions[3]) {
+      $actions[2] = $actions[2] . "/" . $actions[3];
+  }
   $search_term = $actions[2];
-
   // If there is a proper search query, we get that data here.
   if (in_array($actions[1], $valid_search_types)) {
     $valid_search = TRUE;
