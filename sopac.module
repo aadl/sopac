@@ -748,7 +748,7 @@ function title_case($string) {
       }
       elseif (!in_array($word, $exceptions) ){
         // convert to uppercase (non-utf8 only)
-        $word = ucfirst($word);
+        $word = mb_strtoupper($word, "UTF-8");
       }
       array_push($newwords, $word);
     }
