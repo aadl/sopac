@@ -151,12 +151,16 @@ if (count($item_status['items'])) {
     <h3>ISBN/Standard Number</h3>
     <ul>
     <?php
+      if (count($item['stdnum'])) {
         foreach($item['stdnum'] as $stdnum) {
           print '<li>' . $stdnum . '</li>';
         }
+      }
+      if (count($item['upc'])) {
         foreach($item['upc'] as $upc) {
           print '<li>' . $upc . '</li>';
         }
+      }
       ?>
 
     </ul>
@@ -233,7 +237,7 @@ if (count($item_status['items'])) {
     <li><fb:like href="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" layout="button_count" show_faces="false" width="450" font=""></fb:like></li>
     <li><a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.aadl.org/catalog/record/<?php echo $item['_id']; ?>" data-text="Enjoying <?php echo title_case($item['title'] . ' ' .$item['title_medium']); ?>" data-count="none" data-via="aadl">Tweet</a></li>
     </ul>
-    
+
   <!-- end left-hand column -->
   </div>
 
