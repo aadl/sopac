@@ -248,7 +248,7 @@ function sopac_bib_record() {
   else {
       $rev_form = NULL;
   }
-  if($item['magnatune_url']){
+  if($item['magnatune_url'] || $item['mat_code'] == 'z'){
     $result_page = theme('sopac_record_musicdownload', $item, $locum->locum_config, $rev_arr, $rev_form);
   }
   else if ($item['bnum']) {

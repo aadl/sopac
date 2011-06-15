@@ -53,10 +53,10 @@ function sec2hms ($sec, $padHours = false) {
     <!-- Item Details -->
     <ul>
       <?php
-      if ($item->release_date) {
+      if ($item['release_date']) {
         print '<li><b>Magnatune Release:</b> ' . $item['release_date'] . '</li>';
       }
-      if ($item->pub_year) {
+      if ($item['pub_year']) {
         print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';
       }
       ?>
