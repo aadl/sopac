@@ -360,7 +360,7 @@ function sopac_bib_record_download($bnum = NULL) {
         else {
           $filename = $paddedtrack."-".str_replace(array(' ','(',')'),'-', $trackname).".mp3";
         }
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/streaming/".urlencode($filename);
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/streaming/".rawurlencode($filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         header('Content-Type: audio/mpeg');
         readfile($path);
