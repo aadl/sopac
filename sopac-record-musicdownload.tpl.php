@@ -59,11 +59,13 @@ function sec2hms ($sec, $padHours = false) {
       if ($item['pub_year']) {
         print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';
       }
+      if($item['magnatune_id']){
       ?>
       <li><b>Format:</b> 320Kbps MP3</li>
       <li><b>Collection:</b> Magnatune</li>
+      <?php } ?>
     </ul>
-    <?php if($verified) { ?>
+    <?php if($verified && $item['magnatune_id']) { ?>
     <h3>All Formats</h3>
     <ul>
     <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=album'; ?>">Download MP3 Album</a></li>
@@ -83,12 +85,15 @@ function sec2hms ($sec, $padHours = false) {
       print '</ul>';
     }
     ?>
-
+  <?php if($item['license']) { ?>
     <h3>License</h3>
     <ul>
     <li><a href="<?php echo $item['license']; ?>">Creative Commons</a></li>
     <li>This download is available for personal use only.</li>
     </ul>
+  <?php } 
+    if($item['magnatune_url']) {
+  ?>
     <h3>Elsewhere</h3>
     <ul>
     <li><a href="<?php echo $item['magnatune_url']; ?>">Magnatune</a></li>
@@ -96,6 +101,7 @@ function sec2hms ($sec, $padHours = false) {
     
         <!-- Tags -->
     <?php
+    }
     if (variable_get('sopac_social_enable', 1)) {
       print '<h3>Tags</h3>';
       $block = module_invoke('sopac','block','view', 4);
