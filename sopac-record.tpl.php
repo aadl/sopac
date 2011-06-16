@@ -277,6 +277,14 @@ if (count($item_status['items'])) {
         include_once('sopac_user.php');
         print sopac_put_list_links($item['bnum']);
       }
+      // Summer Game links
+      if (module_exists('summergame')) {
+        if ($player = summergame_player_load(array('uid' => $user->uid))) {
+          print '<li class="button">' .
+                l('I Finished This', 'summergame/player/consume/' . $player['pid'] . '/' . $item['bnum']) .
+                '</li>';
+        }
+      }
       ?>
     </ul>
 
