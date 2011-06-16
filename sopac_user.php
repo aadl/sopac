@@ -1956,13 +1956,24 @@ function sopac_list_edit_form_submit($form, &$form_state) {
     db_query("INSERT INTO {sopac_lists} (list_id, uid, title, description, public) VALUES (NULL, '%d', '%s', '%s', '%d')",
              $user->uid, $values['title'], $values['description'], $values['public']);
     drupal_set_message('List "' . $values['title'] . '" created');
+    $list_id = db_last_insert_id('sopac_lists', 'list_id');
+
+    // Summer Game
+    if (module_exists('summergame')) {
+      if ($player = summergame_player_load(array('uid' => $user->uid))) {
+        $points = summergame_player_points($player['pid'], 50, 'Created List',
+                                           'Created List ' . trim($values['title']) . ' list:' . $list_id);
+        drupal_set_message("Earned $points Summer Game points for creating a new list");
+      }
+    }
+
     if ($values['bnum']) {
       $insurge = sopac_get_insurge();
-      $list_id = db_last_insert_id('sopac_lists', 'list_id');
       $insurge->add_list_item($user->uid, $list_id, $values['bnum']);
       drupal_set_message("Item added to your list");
       drupal_goto("user/lists/$list_id");
     }
+
   }
   drupal_goto('user/lists');
 }
@@ -2004,6 +2015,15 @@ function sopac_list_add($bnum, $list_id = 0) {
     // add to list and redirect to that list
     if ($insurge->add_list_item($user->uid, $list_id, $bnum)) {
       $output .= '<h2>"' . $bib['title'] . '" has been added to your list</h2>';
+
+      // Summer Game
+      if (module_exists('summergame')) {
+        if ($player = summergame_player_load(array('uid' => $user->uid))) {
+          $points = summergame_player_points($player['pid'], 10, 'Add to List',
+                                             'Added an item to a list bnum:' . $bnum);
+          drupal_set_message("Earned $points Summer Game points for adding an item to a list");
+        }
+      }
     }
     else {
       drupal_set_message('"' . $bib['title'] . '" has not been added, already on list', 'error');
@@ -2349,6 +2369,15 @@ function sopac_update_history($list) {
     db_query("DELETE FROM circhistory WHERE patronNum = %d", $userinfo['pnum']);
     db_set_active('default');
     drupal_set_message("Updated Checkout History with $total new checkouts");
+
+    // Summer Game
+    if (module_exists('summergame')) {
+      if ($player = summergame_player_load(array('uid' => $user->uid))) {
+        $points = summergame_player_points($player['pid'], 10 * $total, 'Checkouts',
+                                           'Checkout History updated with ' . $total . ' items');
+        drupal_set_message("Earned $points Summer Game points for $total new checkouts");
+      }
+    }
   }
 }
 
