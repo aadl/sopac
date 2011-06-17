@@ -736,6 +736,15 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
   if ($_POST[$id . '_rating_submit_' . $bnum] && $user->uid) {
     $insurge = sopac_get_insurge();
     $insurge->submit_rating($user->uid, $bnum, $_POST[$id . '_bib_rating_' . $bnum]);
+    // Summer Game
+    if (module_exists('summergame')) {
+      if ($player = summergame_player_load(array('uid' => $user->uid))) {
+        $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
+                                           'Added a Rating to the Catalog bnum:' . $bnum);
+        drupal_set_message("Earned $points Summer Game points for rating an item in the catalog");
+      }
+    }
+    
     if ($post_redirect) {
       header('Location: ' . request_uri());
     }
