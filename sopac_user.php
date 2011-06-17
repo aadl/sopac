@@ -2373,7 +2373,7 @@ function sopac_update_history($list) {
     // Summer Game
     if (module_exists('summergame')) {
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
-        $points = summergame_player_points($player['pid'], 10 * $total, 'Checkouts',
+        $points = summergame_player_points($player['pid'], 10 * $total, 'Checkout History',
                                            'Checkout History updated with ' . $total . ' items');
         drupal_set_message("Earned $points Summer Game points for $total new checkouts");
       }
