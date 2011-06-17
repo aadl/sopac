@@ -2357,9 +2357,20 @@ function sopac_update_history($list) {
   $res = db_query("SELECT * FROM circhistory WHERE patronNum = %d ORDER BY checkout DESC", $userinfo['pnum']);
   db_set_active('default');
 
+  // Summer Game
+  if (module_exists('summergame')) {
+    $player = summergame_player_load(array('uid' => $user->uid));
+  }
+  
   while ($checkout = db_fetch_array($res)) {
     if ($insurge->add_list_item($account->uid, $list['list_id'], $checkout['bibNum'], strtotime($checkout['checkOut']))) {
       $total++;
+      // Summer Game
+      if ($player) {
+        $points = summergame_player_points($player['pid'], 10, 'Checkout History',
+                                           'Item added from Checkout History bnum:' . $checkout['bibNum']);
+        drupal_set_message("Earned $points Summer Game points for a new checkout");
+      }
     }
   }
 
@@ -2369,15 +2380,6 @@ function sopac_update_history($list) {
     db_query("DELETE FROM circhistory WHERE patronNum = %d", $userinfo['pnum']);
     db_set_active('default');
     drupal_set_message("Updated Checkout History with $total new checkouts");
-
-    // Summer Game
-    if (module_exists('summergame')) {
-      if ($player = summergame_player_load(array('uid' => $user->uid))) {
-        $points = summergame_player_points($player['pid'], 10 * $total, 'Checkout History',
-                                           'Checkout History updated with ' . $total . ' items');
-        drupal_set_message("Earned $points Summer Game points for $total new checkouts");
-      }
-    }
   }
 }
 
