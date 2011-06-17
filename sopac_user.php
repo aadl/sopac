@@ -2359,9 +2359,9 @@ function sopac_update_history($list) {
 
   // Summer Game
   if (module_exists('summergame')) {
-    $player = summergame_player_load(array('uid' => $user->uid));
+    $player = summergame_player_load(array('uid' => $list['uid']));
   }
-  
+
   while ($checkout = db_fetch_array($res)) {
     if ($insurge->add_list_item($account->uid, $list['list_id'], $checkout['bibNum'], strtotime($checkout['checkOut']))) {
       $total++;
