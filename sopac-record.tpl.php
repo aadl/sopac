@@ -281,7 +281,7 @@ if (count($item_status['items'])) {
       if (module_exists('summergame')) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
           print '<li class="button">' .
-                l('I Finished This', 'summergame/player/consume/' . $player['pid'] . '/' . $item['bnum']) .
+                l('I Finished This', 'http://play.aadl.org/summergame/player/consume/' . $player['pid'] . '/' . $item['bnum']) .
                 '</li>';
         }
       }
