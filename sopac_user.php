@@ -1963,7 +1963,8 @@ function sopac_list_edit_form_submit($form, &$form_state) {
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
         $points = summergame_player_points($player['pid'], 50, 'Created List',
                                            'Created List ' . trim($values['title']) . ' list:' . $list_id);
-        drupal_set_message("Earned $points Summer Game points for creating a new list");
+        $points_link = l($points . ' Summer Game points', 'summergame/player');
+        drupal_set_message("Earned $points_link for creating a new list");
       }
     }
 
@@ -2021,7 +2022,8 @@ function sopac_list_add($bnum, $list_id = 0) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
           $points = summergame_player_points($player['pid'], 10, 'Add to List',
                                              'Added an item to a list bnum:' . $bnum);
-          drupal_set_message("Earned $points Summer Game points for adding an item to a list");
+          $points_link = l($points . ' Summer Game points', 'summergame/player');
+          drupal_set_message("Earned $points_link for adding an item to a list");
         }
       }
     }
@@ -2369,7 +2371,8 @@ function sopac_update_history($list) {
       if ($player) {
         $points = summergame_player_points($player['pid'], 10, 'Checkout History',
                                            'Item added from Checkout History bnum:' . $checkout['bibNum']);
-        drupal_set_message("Earned $points Summer Game points for a new checkout");
+        $points_link = l($points . ' Summer Game points', 'summergame/player');
+        drupal_set_message("Earned $points_link Summer Game points for a new checkout");
       }
     }
   }

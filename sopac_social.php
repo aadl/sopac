@@ -396,7 +396,8 @@ function sopac_tag_form_submit($form, &$form_state) {
     if ($player = summergame_player_load(array('uid' => $user->uid))) {
       $points = summergame_player_points($player['pid'], 10, 'Tagged an Item',
                                          'Added ' . trim($form_state['values']['tags']) . ' bnum:' . $bnum);
-      drupal_set_message("Earned $points Summer Game points for tagging an item in the catalog");
+      $points_link = l($points . ' Summer Game points', 'summergame/player');
+      drupal_set_message("Earned $points_link for tagging an item in the catalog");
     }
   }
 }
@@ -622,7 +623,8 @@ function sopac_review_form_submit($form, &$form_state) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
           $points = summergame_player_points($player['pid'], 200, 'Wrote Review',
                                              $form_state['values']['rev_title'] . ' bnum:' . $form_state['values']['rev_bnum']);
-          drupal_set_message("Earned $points Summer Game points for writing a review");
+          $points_link = l($points . ' Summer Game points', 'summergame/player');
+          drupal_set_message("Earned $points_link for writing a review");
         }
       }
     }
@@ -710,6 +712,22 @@ function sopac_delete_review_form_submit($form, &$form_state) {
 
   if (strtolower($form_state['values']['op']) == 'yes') {
     $insurge = sopac_get_insurge();
+
+    if (module_exists('summergame')) {
+      if ($player = summergame_player_load(array('uid' => $user->uid))) {
+        $reviews = $insurge->get_reviews(NULL, NULL, array($form_state['values']['rev_id']));
+        $review = $reviews['reviews'][0];
+
+        // Delete the points from the player record if found
+        db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Wrote Review' " .
+                 "AND description LIKE '%%bnum:%d' AND description LIKE '%s%%'",
+                 $player['pid'], $review['bnum'], $review['rev_title']);
+        if (db_affected_rows()) {
+          $player_link = l($points . ' Summer Game score card', 'summergame/player');
+          drupal_set_message("Removed points for this review from your $player_link");
+        }
+      }
+    }
     $insurge->delete_review($user->uid, $form_state['values']['rev_id']);
   }
 }
@@ -741,10 +759,11 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
         $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
                                            'Added a Rating to the Catalog bnum:' . $bnum);
-        drupal_set_message("Earned $points Summer Game points for rating an item in the catalog");
+        $points_link = l($points . ' Summer Game points', 'summergame/player');
+        drupal_set_message("Earned $points_link for rating an item in the catalog");
       }
     }
-    
+
     if ($post_redirect) {
       header('Location: ' . request_uri());
     }
