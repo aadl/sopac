@@ -453,3 +453,124 @@ function sopac_setup_user_home_selector() {
 function sopac_admin_submit($form, &$form_state) {
   menu_rebuild();
 }
+
+function sopac_admin_moderate_form($form_state, $offset = 0) {
+  $insurge = sopac_get_insurge();
+
+  if ($form_state['storage']['review_ids']) {
+    $review_ids = $form_state['storage']['review_ids'];
+    $form['reviews'] = array(
+      '#prefix' => '<h2>Are you sure you want to delete these reviews?</h2><ul>',
+      '#suffix' => '</ul>',
+      '#tree' => TRUE,
+    );
+    $reviews = $insurge->get_reviews(NULL, NULL, $review_ids);
+    foreach ($reviews['reviews'] as $review) {
+      $rev_id = $review['rev_id'];
+      $form['reviews'][$rev_id] = array(
+        '#type' => 'hidden',
+        '#value' => $rev_id,
+        '#prefix' => '<li>',
+        '#suffix' => check_plain($review['rev_title']) . "</li>\n",
+      );
+    }
+    $form['operation'] = array(
+      '#type' => 'hidden',
+      '#value' => 'delete',
+    );
+    $form['#submit'][] = 'sopac_multiple_reviews_delete_confirm_submit';
+    return confirm_form($form,
+                        t('Are you sure you want to delete these reviews?'),
+                        'admin/settings/sopac/moderate', t('This action cannot be undone.'),
+                        t('Delete all'), t('Cancel'));
+  }
+  else {
+    $limit = 100;
+    $reviews = $insurge->get_reviews(NULL, NULL, NULL, $limit, intval($offset));
+
+    $checkboxes = array();
+    $form = array();
+    foreach ($reviews['reviews'] as $review) {
+      $checkboxes[$review['rev_id']] = '';
+      $account = user_load(array('uid' => $review['uid']));
+      $form[$review['rev_id']] = array(
+        'user' => array('#value' => l($account->name, 'user/' . $account->uid)),
+        'bnum' => array('#value' => l($review['bnum'], 'catalog/record/' . $review['bnum'])),
+        'title' => array('#value' =>  $review['rev_title']),
+        'body' => array('#value' => $review['rev_body']),
+        'created' => array('#value' => date("F j, Y, g:i a", $review['rev_create_date'])),
+        'update' => array('#value' => date("F j, Y, g:i a", $review['rev_last_update'])),
+      );
+    }
+    $form['checkboxes'] = array(
+      '#type' => 'checkboxes',
+      '#options' => $checkboxes,
+    );
+    $form['operation'] = array(
+      '#type' => 'hidden',
+      '#value' => 'delete',
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete Selected Reviews'),
+    );
+    $form['next'] = array(
+      '#value' => '<p>' . l('NEXT PAGE', 'admin/settings/sopac/moderate/' . ($offset + $limit)) . '</p>',
+    );
+    $form['#theme'] = 'sopac_admin_moderate_reviews';
+
+    return $form;
+  }
+}
+
+function sopac_admin_moderate_form_submit($form, &$form_state) {
+  $form_state['storage']['review_ids'] = $form_state['values']['checkboxes'];
+  $form_state[‘rebuild’] = TRUE;
+}
+
+function sopac_multiple_reviews_delete_confirm_submit($form, &$form_state) {
+  $insurge = sopac_get_insurge();
+
+  $reviews = $insurge->get_reviews(NULL, NULL, $form_state['values']['reviews']);
+  foreach ($reviews['reviews'] as $review) {
+    if (module_exists('summergame')) {
+      if ($player = summergame_player_load(array('uid' => $review['uid']))) {
+        // Delete the points from the player record if found
+        db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Wrote Review' " .
+                 "AND description LIKE '%%bnum:%d' AND description LIKE '%s%%'",
+                 $player['pid'], $review['bnum'], $review['rev_title']);
+        if (db_affected_rows()) {
+          $player_link = l($points . ' Summer Game score card', 'summergame/player/' . $player['pid']);
+          drupal_set_message("Removed points for this review from player's $player_link");
+        }
+      }
+    }
+    $insurge->delete_review($review['uid'], $review['rev_id']);
+  }
+  drupal_goto('admin/settings/sopac/moderate');
+}
+
+function theme_sopac_admin_moderate_reviews($form) {
+  $rows = array();
+  foreach (element_children($form['checkboxes']) as $rev_id) {
+    $rows[] = array(
+      drupal_render($form['checkboxes'][$rev_id]),
+      drupal_render($form[$rev_id]['user']),
+      drupal_render($form[$rev_id]['bnum']),
+      drupal_render($form[$rev_id]['title']),
+      drupal_render($form[$rev_id]['body']),
+      drupal_render($form[$rev_id]['created']),
+      drupal_render($form[$rev_id]['update']),
+    );
+  }
+  $header = array(
+    'Select',
+    'User',
+    'Bib #',
+    'Title',
+    'Body',
+    'Created',
+    'Updated',
+  );
+  return theme('table', $header, $rows) . drupal_render($form);
+}

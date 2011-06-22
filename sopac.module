@@ -212,6 +212,16 @@ function sopac_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['admin/settings/sopac/moderate'] = array(
+    'title' => 'Moderate SOPAC Reviews',
+    'description' => 'SOPAC Moderation Page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sopac_admin_moderate_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'sopac_admin.php',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items[$sopac_prefix . '/search'] = array(
     'title' => 'Catalog Search',
     'page callback' => 'sopac_catalog_search',
@@ -621,6 +631,9 @@ function sopac_theme() {
     'sopac_list_block' => array(
       'arguments' => array('block_type' => NULL),
     ),
+    'sopac_admin_moderate_reviews' => array(
+      'arguments' => array('form' => NULL),
+    ),
   );
 }
 
@@ -729,9 +742,9 @@ function utf8_urldecode($str) {
  * From: http://www.php.net/manual/en/function.mb-convert-case.php#92317
  */
 function title_case($string) {
-  $delimiters = array(" ", "-", ".", "O'", "Mc"); 
+  $delimiters = array(" ", "-", ".", "O'", "Mc");
   $exceptions = array("út", "u", "s", "és", "utca", "tér", "krt", "körút", "sétány", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "3rd", "2nd" );
-       
+
   $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
 
   foreach ($delimiters as $dlnr => $delimiter){
