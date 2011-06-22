@@ -757,10 +757,17 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
     // Summer Game
     if (module_exists('summergame')) {
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
-        $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
-                                           'Added a Rating to the Catalog bnum:' . $bnum);
-        $points_link = l($points . ' Summer Game points', 'summergame/player');
-        drupal_set_message("Earned $points_link for rating an item in the catalog");
+        // Check that player has not already rated this item
+        $res = db_query("SELECT lid FROM sg_ledger WHERE pid = %d AND code_text = 'Rated an Item' " .
+                        "AND description LIKE '%%bnum:%d' LIMIT 1",
+                        $player['pid'], $bnum);
+        $rate_count = db_fetch_object($res);
+        if (!$rate_count->lid) {
+          $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
+                                             'Added a Rating to the Catalog bnum:' . $bnum);
+          $points_link = l($points . ' Summer Game points', 'summergame/player');
+          drupal_set_message("Earned $points_link for rating an item in the catalog");
+        }
       }
     }
 
