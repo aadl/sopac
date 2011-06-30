@@ -164,6 +164,21 @@ function sopac_admin() {
     '#required' => TRUE,
   );
 
+  $form['sopac_general']['sopac_catalog_disabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Disable Catalog'),
+    '#default_value' => variable_get('sopac_catalog_disabled', 0),
+    '#description' => t("Selecting this option will disable Requests and the My Account information provided by the catalog. Searches and Social functions will still work."),
+  );
+
+  $form['sopac_general']['sopac_catalog_disabled_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Catalog Disabled Message'),
+    '#default_value' => variable_get('sopac_catalog_disabled_message', 'Catalog access is currently disabled'),
+    '#description' => t("This is the message displayed on the My Account page and as a tool tip on Request buttons when catalog is disabled"),
+    '#required' => TRUE,
+  );
+
   $form['sopac_fines'] = array(
     '#type' => 'fieldset',
     '#title' => t('Fines Settings'),

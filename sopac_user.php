@@ -13,41 +13,49 @@
  * This is a sub-function of the hook_user "view" operation.
  */
 function sopac_user_view($op, &$edit, &$account, $category = NULL) {
-  $locum = sopac_get_locum();
-  // SOPAC uses the first 7 characters of the MD5 hash instead of caching the user's password
-  // like it used to do.  It's more secure this way, IMHO.
-  $account->locum_pass = substr($account->pass, 0, 7);
-
-  // Patron information table (top of the page)
-  $patron_details_table = sopac_user_info_table($account, $locum);
-  if (variable_get('sopac_summary_enable', 1)) {
+  if (variable_get('sopac_catalog_disabled', 0)) {
     $result['patroninfo']['#title'] = t('Account Summary');
     $result['patroninfo']['#weight'] = 0;
     $result['patroninfo']['#type'] = 'sopac_patron_profile';
-    $result['patroninfo']['details']['#value'] = $patron_details_table;
+    $result['patroninfo']['details']['#value'] = variable_get('sopac_catalog_disabled_message', 'Catalog is currently disabled');
   }
+  else {
+    $locum = sopac_get_locum();
+    // SOPAC uses the first 7 characters of the MD5 hash instead of caching the user's password
+    // like it used to do.  It's more secure this way, IMHO.
+    $account->locum_pass = substr($account->pass, 0, 7);
 
-  // Patron checkouts (middle of the page)
-  if ($account->valid_card && $account->bcode_verify) {
-    $max_disp = intval($account->profile_numco);
-    $co_table = sopac_user_chkout_table($account, $locum, $max_disp);
-    if ($co_table) {
-      $result['patronco']['#title'] = t('Checked-out Items');
-      $result['patronco']['#weight'] = 2;
-      $result['patronco']['#type'] = 'user_profile_category';
-      $result['patronco']['details']['#value'] = $co_table;
+    // Patron information table (top of the page)
+    $patron_details_table = sopac_user_info_table($account, $locum);
+    if (variable_get('sopac_summary_enable', 1)) {
+      $result['patroninfo']['#title'] = t('Account Summary');
+      $result['patroninfo']['#weight'] = 0;
+      $result['patroninfo']['#type'] = 'sopac_patron_profile';
+      $result['patroninfo']['details']['#value'] = $patron_details_table;
     }
-  }
 
-  // Patron holds (bottom of the page)
-  if ($account->valid_card && $account->bcode_verify) {
-    $max_disp = intval($account->profile_numreq);
-    $holds_table = drupal_get_form('sopac_user_holds_form', $account, $max_disp);
-    if ($holds_table) {
-      $result['patronholds']['#title'] = t('Requested Items');
-      $result['patronholds']['#weight'] = 3;
-      $result['patronholds']['#type'] = 'user_profile_category';
-      $result['patronholds']['details']['#value'] = $holds_table;
+    // Patron checkouts (middle of the page)
+    if ($account->valid_card && $account->bcode_verify) {
+      $max_disp = intval($account->profile_numco);
+      $co_table = sopac_user_chkout_table($account, $locum, $max_disp);
+      if ($co_table) {
+        $result['patronco']['#title'] = t('Checked-out Items');
+        $result['patronco']['#weight'] = 2;
+        $result['patronco']['#type'] = 'user_profile_category';
+        $result['patronco']['details']['#value'] = $co_table;
+      }
+    }
+
+    // Patron holds (bottom of the page)
+    if ($account->valid_card && $account->bcode_verify) {
+      $max_disp = intval($account->profile_numreq);
+      $holds_table = drupal_get_form('sopac_user_holds_form', $account, $max_disp);
+      if ($holds_table) {
+        $result['patronholds']['#title'] = t('Requested Items');
+        $result['patronholds']['#weight'] = 3;
+        $result['patronholds']['#type'] = 'user_profile_category';
+        $result['patronholds']['details']['#value'] = $holds_table;
+      }
     }
   }
 
@@ -734,6 +742,11 @@ function _sopac_user_holds_form_multirow($holds) {
  * A dedicated check-outs page to list all checkouts.
  */
 function sopac_checkouts_page() {
+  if (variable_get('sopac_catalog_disabled', FALSE)) {
+    drupal_set_message(variable_get('sopac_catalog_disabled_message', 'Catalog access is disabled'), 'error');
+    drupal_goto('user');
+  }
+
   global $user;
 
   $account = user_load($user->uid);
@@ -778,6 +791,11 @@ function sopac_checkouts_page() {
  * A dedicated checkout history page.
  */
 function sopac_checkout_history_page() {
+  if (variable_get('sopac_catalog_disabled', FALSE)) {
+    drupal_set_message(variable_get('sopac_catalog_disabled_message', 'Catalog access is disabled'), 'error');
+    drupal_goto('user');
+  }
+
   global $user;
   //profile_load_profile(&$user);
   if ($user->profile_pref_cardnum) {
@@ -902,6 +920,11 @@ function sopac_checkout_history_toggle($action) {
  * A dedicated holds page to list all holds.
  */
 function sopac_holds_page() {
+  if (variable_get('sopac_catalog_disabled', FALSE)) {
+    drupal_set_message(variable_get('sopac_catalog_disabled_message', 'Catalog access is disabled'), 'error');
+    drupal_goto('user');
+  }
+
   global $user;
 
   $account = user_load($user->uid);
@@ -945,6 +968,11 @@ function sopac_holds_page() {
  * A dedicated page for managing fines and payments.
  */
 function sopac_fines_page() {
+  if (variable_get('sopac_catalog_disabled', FALSE)) {
+    drupal_set_message(variable_get('sopac_catalog_disabled_message', 'Catalog access is disabled'), 'error');
+    drupal_goto('user');
+  }
+
   global $user;
 
   $locum = sopac_get_locum();
