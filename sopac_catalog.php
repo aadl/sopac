@@ -763,6 +763,7 @@ function sopac_request_item() {
       else {
         $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
       }
+/*
       // probably abstract this out to a locum->sendalert or something?
       $item_status = $locum->get_item_status($bnum);
       $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
@@ -786,6 +787,7 @@ function sopac_request_item() {
         $redis = new redisent('multivac');
         $redis->publish('redisbot', json_encode($redisjob));
       }
+*/
 
     }
     else if (count($hold_result['choose_location'])) {
