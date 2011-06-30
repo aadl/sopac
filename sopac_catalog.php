@@ -462,25 +462,28 @@ function suggestion_link($locum_result) {
  */
 function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item') {
   if (variable_get('sopac_catalog_disabled', 0)) {
-    $text = 'Requesting Currently Disabled';
-  } else {
+    $class = 'button red';
+    $text = 'Requesting Disabled';
+    if ($message = variable_get('sopac_catalog_disabled_message', FALSE)) {
+      $text = "<a title=\"$message\">$text</a>";
+    }
+  }
+  else {
     global $user;
     $class = 'button green';
-    //profile_load_profile(&$user);
 
     if ($user->uid) {
       if ($user->bcode_verified) {
         // User is logged in and has a verified card number
-
         if ($mattype == 'Magazine') {
           $text = 'Request an Issue';
           $options = array('alias' => TRUE); // no lightbox on links
         }
-        else if($mattype == 'Music Download') {
+        else if ($mattype == 'Music Download') {
           $locum = sopac_get_locum();
           $bib = $locum->get_bib_item($bnum);
           $size = round(($bib['zipsize'] / 1048576), 2);
-          $text = 'Download MP3 Album ('.$size.'MB)';
+          $text = 'Download MP3 Album (' . $size . 'MB)';
         }
         else {
           $text = 'Request this';
@@ -543,58 +546,63 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
     else {
       $text = l(t('Log in to request'), 'user/login', array('query' => drupal_get_destination()));
     }
-
-    return "<li class=\"$class\">$text</li>";
   }
+  return "<li class=\"$class\">$text</li>";
 }
 
 function sopac_put_staff_request_link($bnum) {
   if (variable_get('sopac_catalog_disabled', 0)) {
-    $text = 'Requesting Currently Disabled';
-  } else {
+    $class = 'button red';
+    $text = 'Staff Requests Disabled';
+    if ($message = variable_get('sopac_catalog_disabled_message', FALSE)) {
+      $text = "<a title=\"$message\">$text</a>";
+    }
+  }
+  else {
     global $user;
     $class = 'button green';
     $text = 'Request For Patron';
     $options = array('query' => array('lightbox' => 1,'staff' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
-        if (variable_get('sopac_multi_branch_enable', 0)) {
-          $locum = sopac_get_locum();
-          $branches = $locum->locum_config['branches'];
-          $class .= ' hassub';
+    if (variable_get('sopac_multi_branch_enable', 0)) {
+      $locum = sopac_get_locum();
+      $branches = $locum->locum_config['branches'];
+      $class .= ' hassub';
 
-          $text .= "<ul class=\"submenu\"><li>for pickup at</li>";
-          if ($mattype == 'Art Print') {
-            $text .= '<li>' .
-                     l("Downtown", variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/d', $options) .
-                     '</li>';
-            $text .= '<li>Art Prints are only available for pickup at the Downtown Library</li>';
-          }
-          else {
-            if ($user->profile_pref_home_branch) {
-              $home_branch_code = array_search($user->profile_pref_home_branch, $branches);
-              $text .= '<li>' .
-                       l($user->profile_pref_home_branch,
-                         variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
-                         $options) .
-                       '</li>';
-              $text .= '<li>Other Location...</li>';
-            }
-            foreach ($branches as $branch_code => $branch_name) {
-              if ($branch_name != $user->profile_pref_home_branch) {
-                $text .= '<li>' .
-                         l($branch_name,
-                           variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
-                           $options) .
-                         '</li>';
-              }
-            }
-          }
-          $text .= "</ul><span></span>";
+      $text .= "<ul class=\"submenu\"><li>for pickup at</li>";
+      if ($mattype == 'Art Print') {
+        $text .= '<li>' .
+                 l("Downtown", variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/d', $options) .
+                 '</li>';
+        $text .= '<li>Art Prints are only available for pickup at the Downtown Library</li>';
+      }
+      else {
+        if ($user->profile_pref_home_branch) {
+          $home_branch_code = array_search($user->profile_pref_home_branch, $branches);
+          $text .= '<li>' .
+                   l($user->profile_pref_home_branch,
+                     variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $home_branch_code,
+                     $options) .
+                   '</li>';
+          $text .= '<li>Other Location...</li>';
         }
-        else {
-          $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
-        }  
-    return "<li class=\"$class\">$text</li>";
-   }
+        foreach ($branches as $branch_code => $branch_name) {
+          if ($branch_name != $user->profile_pref_home_branch) {
+            $text .= '<li>' .
+                     l($branch_name,
+                       variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum . '/' . $branch_code,
+                       $options) .
+                     '</li>';
+          }
+        }
+      }
+      $text .= "</ul><span></span>";
+    }
+    else {
+      $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
+    }
+  }
+
+  return "<li class=\"$class\">$text</li>";
 }
 
 /**
@@ -697,6 +705,11 @@ function sopac_prev_search_url($override = FALSE) {
  * @return string Request result
  */
 function sopac_request_item() {
+  if (variable_get('sopac_catalog_disabled', FALSE)) {
+    drupal_set_message(variable_get('sopac_catalog_disabled_message', 'Requesting is disabled'), 'error');
+    drupal_goto(variable_get('sopac_url_prefix', 'cat/seek'));
+  }
+
   global $user;
   // avoid php errors when debugging
   $varname = $request_result_msg = $request_error_msg = $item_form = $bnum = NULL;
@@ -705,7 +718,7 @@ function sopac_request_item() {
   if($_GET['patron_barcode']) {
     $patron_bcode = $_GET['patron_barcode'];
   }
-  
+
   $button_txt = t('Request Selected Item');
   //profile_load_profile(&$user);
   if (($user->uid && $user->bcode_verified) || $staff_request == 1) {
@@ -723,7 +736,7 @@ function sopac_request_item() {
       $barcode = $patron_bcode;
       $patron_info = $locum->get_patron_info($barcode);
     }
-    
+
     if($staff_request && !$patron_bcode){
       $item_form = drupal_get_form('sopac_staff_request_form');
       $result_page = theme('sopac_request', $request_result_msg, $request_error_msg, $item_form, $bnum);
@@ -746,7 +759,7 @@ function sopac_request_item() {
       }
       if($staff_request){
         $request_result_msg .= '<br />for patron '.$patron_info['name'].' ( '.$barcode.' )';
-      } 
+      }
       else {
         $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
       }
