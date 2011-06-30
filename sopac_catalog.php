@@ -750,6 +750,30 @@ function sopac_request_item() {
       else {
         $request_result_msg .= '<br />(Please allow a few moments for the request to appear on your My Account list)';
       }
+      // probably abstract this out to a locum->sendalert or something?
+      $item_status = $locum->get_item_status($bnum);
+      $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
+      $avail = $item_status['avail'] - $zooms_avail;
+      if ($avail > 0) {
+        require_once('/usr/local/lib/libphp-aadl/contrib/redisent/redisent.php');
+        $redisjob = array();
+        $redisjob['command'] = 'holdrequest';
+        $redisjob['title'] = $bib_item['title'];
+        $redisjob['bnum'] = $bib_item['bnum'];
+        // Build list of locations
+        $locations = array();
+        foreach ($item_status['items'] as $itemstat) {
+          if ($itemstat['avail']) {
+            $locations[$itemstat['loc_code']] = $itemstat['location'] . " (".$itemstat['callnum'].")";
+          }
+        }
+        $locations = implode(', ', $locations);
+        $redisjob['locations'] = $locations; 
+        $redisjob['pickup_loc'] = $pickup_name;   
+        $redis = new redisent('multivac');
+        $redis->publish('redisbot', json_encode($redisjob));
+      }
+
     }
     else if (count($hold_result['choose_location'])) {
       $locum = sopac_get_locum();
