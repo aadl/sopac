@@ -621,7 +621,7 @@ function sopac_review_form_submit($form, &$form_state) {
       // Summer Game
       if (module_exists('summergame')) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
-          $points = summergame_player_points($player['pid'], 200, 'Wrote Review',
+          $points = summergame_player_points($player['pid'], 100, 'Wrote Review',
                                              $form_state['values']['rev_title'] . ' bnum:' . $form_state['values']['rev_bnum']);
           $points_link = l($points . ' Summer Game points', 'summergame/player');
           drupal_set_message("Earned $points_link for writing a review");
