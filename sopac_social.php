@@ -361,6 +361,10 @@ function sopac_tag_form($form_state, $bnum) {
     '#value' => t('Add Tags'),
     '#attributes' => array('class' => 'tagsubmit'),
   );
+  $form['tagform']['help'] = array(
+    '#type' => 'item',
+    '#value' => "Seperate tags with a space or use quotes to join multiple words together.",
+  );
   $form['tagform']['bnum'] = array(
     '#type' => 'hidden',
     '#default_value' => $bnum,
