@@ -401,6 +401,10 @@ div.searchtips {
   padding-top: 4px;
 }
 
+#sopac-search-form-basic .form-item label {
+  font-weight: normal;
+}
+
 /* Search Tracker Block styles */
 
 .search-block-attr {
