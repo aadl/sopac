@@ -91,6 +91,7 @@ if (count($item_status['items'])) {
 
 function linkfromcallnum($callnum)
 {
+    $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
     return l($callnum, $url_prefix . '/search/callnum/"' . urlencode($callnum) .'"',array('alias' => TRUE));
 }
 ?>
