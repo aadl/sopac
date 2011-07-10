@@ -1987,12 +1987,12 @@ function sopac_list_edit_form_submit($form, &$form_state) {
     $list_id = db_last_insert_id('sopac_lists', 'list_id');
 
     // Summer Game
-    if (module_exists('summergame')) {
+    if ($values['public'] && module_exists('summergame')) {
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
         $points = summergame_player_points($player['pid'], 50, 'Created List',
                                            'Created List ' . trim($values['title']) . ' list:' . $list_id);
         $points_link = l($points . ' Summer Game points', 'summergame/player');
-        drupal_set_message("Earned $points_link for creating a new list");
+        drupal_set_message("Earned $points_link for creating a new public list");
       }
     }
 
@@ -2046,7 +2046,7 @@ function sopac_list_add($bnum, $list_id = 0) {
       $output .= '<h2>"' . $bib['title'] . '" has been added to your list</h2>';
 
       // Summer Game
-      if (module_exists('summergame')) {
+      if ($list->public && module_exists('summergame')) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
           $points = summergame_player_points($player['pid'], 10, 'Add to List',
                                              'Added an item to a list bnum:' . $bnum);
