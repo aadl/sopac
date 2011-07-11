@@ -393,15 +393,19 @@ function sopac_tag_form_submit($form, &$form_state) {
   global $user;
   $bnum = $form_state['values']['bnum'];
   $insurge = sopac_get_insurge();
-  $insurge->submit_tags($user->uid, $bnum, trim($form_state['values']['tags']));
+  $tids = $insurge->submit_tags($user->uid, $bnum, trim($form_state['values']['tags']));
 
   // Summer Game
-  if (module_exists('summergame')) {
+  if (count($tids) && module_exists('summergame')) {
     if ($player = summergame_player_load(array('uid' => $user->uid))) {
-      $points = summergame_player_points($player['pid'], 10, 'Tagged an Item',
-                                         'Added ' . trim($form_state['values']['tags']) . ' bnum:' . $bnum);
-      $points_link = l($points . ' Summer Game points', 'summergame/player');
-      drupal_set_message("Earned $points_link for tagging an item in the catalog");
+      foreach ($tids as $tid) {
+        $tag = $insurge->get_tag($tid);
+        $points = summergame_player_points($player['pid'], 10, 'Tagged an Item',
+                                           'Added ' . $tag['tag'] . ' bnum:' . $bnum);
+        $points_link = l($points . ' Summer Game points', 'summergame/player');
+        drupal_set_message("Earned $points_link for tagging an item in the catalog");
+      }
+
     }
   }
 }
