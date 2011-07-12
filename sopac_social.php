@@ -162,6 +162,16 @@ function theme_sopac_tag_block($block_type) {
       if ($_GET['deltag'] && $bnum && $user->uid) {
         $insurge->delete_user_tag($user->uid, urldecode($_GET['deltag']), $bnum);
         drupal_set_message('Tag "' . urldecode($_GET['deltag']) . '" Deleted');
+        if ($player = summergame_player_load(array('uid' => $user->uid))) {
+          // Delete the points from the player record if found
+          db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Tagged an Item' " .
+                   "AND description LIKE '%%bnum:%d' AND description LIKE '%%%s%%'",
+                   $player['pid'], $bnum, urldecode($_GET['deltag']));
+          if (db_affected_rows()) {
+            $player_link = l('Summer Game score card', 'summergame/player/' . $player['pid']);
+            drupal_set_message("Removed points for this tag from your $player_link");
+          }
+        }
         drupal_goto($_GET[q]);
       }
       $tag_arr = $insurge->get_tag_totals(NULL, $bnum_arr);
