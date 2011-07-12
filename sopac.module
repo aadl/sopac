@@ -634,6 +634,9 @@ function sopac_theme() {
     'sopac_admin_moderate_reviews' => array(
       'arguments' => array('form' => NULL),
     ),
+    'sopac_admin_moderate_tags' => array(
+      'arguments' => array('form' => NULL),
+    ),
   );
 }
 

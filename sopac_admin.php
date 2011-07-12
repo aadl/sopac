@@ -469,100 +469,175 @@ function sopac_admin_submit($form, &$form_state) {
   menu_rebuild();
 }
 
-function sopac_admin_moderate_form($form_state, $offset = 0) {
+function sopac_admin_moderate_form($form_state, $type = 'reviews', $offset = 0) {
   $insurge = sopac_get_insurge();
+  $limit = 100; // per page
 
-  if ($form_state['storage']['review_ids']) {
-    $review_ids = $form_state['storage']['review_ids'];
-    $form['reviews'] = array(
-      '#prefix' => '<h2>Are you sure you want to delete these reviews?</h2><ul>',
+  if ($form_state['storage']['confirm_ids']) {
+    // CONFIRM FORM
+    $confirm_ids = $form_state['storage']['confirm_ids'];
+    $form['confirm_message'] = array(
+      '#prefix' => '<h2>Are you sure you want to delete these ' . $type . '?</h2><ul>',
       '#suffix' => '</ul>',
       '#tree' => TRUE,
     );
-    $reviews = $insurge->get_reviews(NULL, NULL, $review_ids);
-    foreach ($reviews['reviews'] as $review) {
-      $rev_id = $review['rev_id'];
-      $form['reviews'][$rev_id] = array(
-        '#type' => 'hidden',
-        '#value' => $rev_id,
-        '#prefix' => '<li>',
-        '#suffix' => check_plain($review['rev_title']) . "</li>\n",
+
+    if ($type == 'reviews') {
+      $reviews = $insurge->get_reviews(NULL, NULL, $confirm_ids, $limit);
+      $form['reviews'] = array(
+        '#type' => 'value',
+        '#value' => $reviews['reviews'],
+      );
+      foreach ($reviews['reviews'] as $review) {
+        $form['confirm_message'][] = array(
+          '#value' => '<li>'. check_plain($review['rev_title']) . "</li>\n",
+        );
+      }
+    }
+    else if ($type == 'tags') {
+      $tags = array();
+      foreach ($confirm_ids as $tag_id) {
+        $tag = $insurge->get_tag($tag_id);
+        $tags[] = $tag;
+        $form['confirm_message'][] = array(
+          '#value' => '<li>'. check_plain($tag['tag']) . "</li>\n",
+        );
+      }
+      $form['tags'] = array(
+        '#type' => 'value',
+        '#value' => $tags,
       );
     }
+
     $form['operation'] = array(
       '#type' => 'hidden',
       '#value' => 'delete',
     );
-    $form['#submit'][] = 'sopac_multiple_reviews_delete_confirm_submit';
+    $form['#submit'][] = 'sopac_admin_moderate_delete_confirm_submit';
     return confirm_form($form,
-                        t('Are you sure you want to delete these reviews?'),
-                        'admin/settings/sopac/moderate', t('This action cannot be undone.'),
+                        t('Are you sure you want to delete these ' . $type . '?'),
+                        'admin/settings/sopac/moderate/' . $type, t('This action cannot be undone.'),
                         t('Delete all'), t('Cancel'));
   }
   else {
-    $limit = 100;
-    $reviews = $insurge->get_reviews(NULL, NULL, NULL, $limit, intval($offset));
+    // REVIEW FORM
+    if ($type == 'reviews') {
+      $reviews = $insurge->get_reviews(NULL, NULL, NULL, $limit, intval($offset));
 
-    $checkboxes = array();
-    $form = array();
-    foreach ($reviews['reviews'] as $review) {
-      $checkboxes[$review['rev_id']] = '';
-      $account = user_load(array('uid' => $review['uid']));
-      $form[$review['rev_id']] = array(
-        'user' => array('#value' => l($account->name, 'user/' . $account->uid)),
-        'bnum' => array('#value' => l($review['bnum'], 'catalog/record/' . $review['bnum'])),
-        'title' => array('#value' =>  $review['rev_title']),
-        'body' => array('#value' => $review['rev_body']),
-        'created' => array('#value' => date("F j, Y, g:i a", $review['rev_create_date'])),
-        'update' => array('#value' => date("F j, Y, g:i a", $review['rev_last_update'])),
+      $checkboxes = array();
+      $form = array();
+      foreach ($reviews['reviews'] as $review) {
+        $checkboxes[$review['rev_id']] = '';
+        $account = user_load(array('uid' => $review['uid']));
+        $form[$review['rev_id']] = array(
+          'user' => array('#value' => l($account->name, 'user/' . $account->uid)),
+          'bnum' => array('#value' => l($review['bnum'], 'catalog/record/' . $review['bnum'])),
+          'title' => array('#value' =>  $review['rev_title']),
+          'body' => array('#value' => $review['rev_body']),
+          'created' => array('#value' => date("F j, Y, g:i a", $review['rev_create_date'])),
+          'update' => array('#value' => date("F j, Y, g:i a", $review['rev_last_update'])),
+        );
+      }
+      $form['checkboxes'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $checkboxes,
       );
+      $form['operation'] = array(
+        '#type' => 'hidden',
+        '#value' => 'delete',
+      );
+      $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Delete Selected Reviews'),
+      );
+      $form['next'] = array(
+        '#value' => '<p>' . l('NEXT PAGE', 'admin/settings/sopac/moderate/' . ($offset + $limit)) . '</p>',
+      );
+      $form['#theme'] = 'sopac_admin_moderate_reviews';
     }
-    $form['checkboxes'] = array(
-      '#type' => 'checkboxes',
-      '#options' => $checkboxes,
-    );
-    $form['operation'] = array(
-      '#type' => 'hidden',
-      '#value' => 'delete',
-    );
-    $form['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Delete Selected Reviews'),
-    );
-    $form['next'] = array(
-      '#value' => '<p>' . l('NEXT PAGE', 'admin/settings/sopac/moderate/' . ($offset + $limit)) . '</p>',
-    );
-    $form['#theme'] = 'sopac_admin_moderate_reviews';
-
+    else if ($type == 'tags') {
+      $tags = $insurge->get_tags(1, $limit, $offset);
+      $checkboxes = array();
+      $form = array();
+      foreach ($tags as $tag) {
+        $checkboxes[$tag['tid']] = '';
+        $account = user_load(array('uid' => $tag['uid']));
+        $form[$tag['tid']] = array(
+          'user' => array('#value' => l($account->name, 'user/' . $account->uid)),
+          'bnum' => array('#value' => l($tag['bnum'], 'catalog/record/' . $tag['bnum'])),
+          'tag' => array('#value' =>  $tag['tag']),
+          'created' => array('#value' => $tag['tag_date']),
+          'public' => array('#value' => $tag['public'] ? 'Public' : 'Private'),
+        );
+      }
+      $form['checkboxes'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $checkboxes,
+      );
+      $form['operation'] = array(
+        '#type' => 'hidden',
+        '#value' => 'delete',
+      );
+      $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Delete Selected Tags'),
+      );
+      $form['next'] = array(
+        '#value' => '<p>' . l('NEXT PAGE', 'admin/settings/sopac/moderate/' . $type . '/' . ($offset + $limit)) . '</p>',
+      );
+      $form['#theme'] = 'sopac_admin_moderate_tags';
+    }
     return $form;
   }
 }
 
 function sopac_admin_moderate_form_submit($form, &$form_state) {
-  $form_state['storage']['review_ids'] = $form_state['values']['checkboxes'];
-  $form_state[‘rebuild’] = TRUE;
+  foreach($form_state['values']['checkboxes'] as $confirm_id) {
+    if ($confirm_id) {
+      $form_state['storage']['confirm_ids'][] = $confirm_id;
+    }
+  }
+  $form_state['rebuild'] = TRUE;
 }
 
-function sopac_multiple_reviews_delete_confirm_submit($form, &$form_state) {
+function sopac_admin_moderate_delete_confirm_submit($form, &$form_state) {
   $insurge = sopac_get_insurge();
-
-  $reviews = $insurge->get_reviews(NULL, NULL, $form_state['values']['reviews']);
-  foreach ($reviews['reviews'] as $review) {
-    if (module_exists('summergame')) {
-      if ($player = summergame_player_load(array('uid' => $review['uid']))) {
-        // Delete the points from the player record if found
-        db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Wrote Review' " .
-                 "AND description LIKE '%%bnum:%d' AND description LIKE '%s%%'",
-                 $player['pid'], $review['bnum'], $review['rev_title']);
-        if (db_affected_rows()) {
-          $player_link = l($points . ' Summer Game score card', 'summergame/player/' . $player['pid']);
-          drupal_set_message("Removed points for this review from player's $player_link");
+  if ($reviews = $form_state['values']['reviews']) {
+    foreach ($reviews as $review) {
+      if (module_exists('summergame')) {
+        if ($player = summergame_player_load(array('uid' => $review['uid']))) {
+          // Delete the points from the player record if found
+          db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Wrote Review' " .
+                   "AND description LIKE '%%bnum:%d' AND description LIKE '%s%%'",
+                   $player['pid'], $review['bnum'], $review['rev_title']);
+          if (db_affected_rows()) {
+            $player_link = l($points . ' Summer Game score card', 'summergame/player/' . $player['pid']);
+            drupal_set_message("Removed points for this review from player's $player_link");
+          }
         }
       }
+      $insurge->delete_review($review['uid'], $review['rev_id']);
     }
-    $insurge->delete_review($review['uid'], $review['rev_id']);
+    drupal_goto('admin/settings/sopac/moderate/reviews');
   }
-  drupal_goto('admin/settings/sopac/moderate');
+  else if ($tags = $form_state['values']['tags']) {
+    if (module_exists('summergame')) {
+      foreach($tags as $tag) {
+        if ($player = summergame_player_load(array('uid' => $tag['uid']))) {
+          // Delete the points from the player record if found
+          db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Tagged an Item' " .
+                   "AND description LIKE '%%bnum:%d' AND description LIKE '%%%s%%'",
+                   $player['pid'], $tag['bnum'], $tag['tag']);
+          if (db_affected_rows()) {
+            $player_link = l($points . ' Summer Game score card', 'summergame/player/' . $player['pid']);
+            drupal_set_message("Removed points for this tag from player's $player_link");
+          }
+        }
+        $insurge->delete_user_tag($tag['uid'], $tag['tag'], $tag['bnum']);
+      }
+    }
+    drupal_goto('admin/settings/sopac/moderate/tags');
+  }
 }
 
 function theme_sopac_admin_moderate_reviews($form) {
@@ -586,6 +661,29 @@ function theme_sopac_admin_moderate_reviews($form) {
     'Body',
     'Created',
     'Updated',
+  );
+  return theme('table', $header, $rows) . drupal_render($form);
+}
+
+function theme_sopac_admin_moderate_tags($form) {
+  $rows = array();
+  foreach (element_children($form['checkboxes']) as $tid) {
+    $rows[] = array(
+      drupal_render($form['checkboxes'][$tid]),
+      drupal_render($form[$tid]['user']),
+      drupal_render($form[$tid]['bnum']),
+      drupal_render($form[$tid]['tag']),
+      drupal_render($form[$tid]['created']),
+      drupal_render($form[$tid]['public']),
+    );
+  }
+  $header = array(
+    'Select',
+    'User',
+    'Bib #',
+    'Tag',
+    'Created',
+    'Public',
   );
   return theme('table', $header, $rows) . drupal_render($form);
 }
