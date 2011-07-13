@@ -551,7 +551,7 @@ function sopac_admin_moderate_form($form_state, $type = 'reviews', $offset = 0) 
         '#value' => t('Delete Selected Reviews'),
       );
       $form['next'] = array(
-        '#value' => '<p>' . l('NEXT PAGE', 'admin/settings/sopac/moderate/' . ($offset + $limit)) . '</p>',
+        '#value' => '<p>' . l('NEXT PAGE', 'admin/settings/sopac/moderate/' . $type . '/' . ($offset + $limit)) . '</p>',
       );
       $form['#theme'] = 'sopac_admin_moderate_reviews';
     }
