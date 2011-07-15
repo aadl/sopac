@@ -373,7 +373,7 @@ function sopac_tag_form($form_state, $bnum) {
   );
   $form['tagform']['help'] = array(
     '#type' => 'item',
-    '#value' => "Seperate tags with a space or use quotes to join multiple words together.",
+    '#value' => "Seperate tags with a comma.",
   );
   $form['tagform']['bnum'] = array(
     '#type' => 'hidden',
