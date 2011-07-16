@@ -829,21 +829,21 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
   }
   $star_code .= '<input type="hidden" name="' . $id . '_rating_submit_' . $bnum . '" value="1"></form></td><td>';
 
-  /*
+  
 if ($show_label) {
     if (!$ratings_info_arr['count']) {
-      $count_msg = t('No votes yet');
+      $count_msg = t('No ratings yet');
     }
     elseif ($ratings_info_arr['count'] == 1) {
-      $count_msg = '1 vote';
+      $count_msg = '1 rating';
     }
     else {
-      $count_msg = $ratings_info_arr['count'] . t(' votes');
+      $count_msg = $ratings_info_arr['count'] . t(' ratings');
     }
     $count_msg .= $login_string;
     $star_code .= '<span id="star_vote_count">(' . $count_msg . ')</span>';
   }
-*/
+
 
   $star_code .= '</td></tr></table>';
 
