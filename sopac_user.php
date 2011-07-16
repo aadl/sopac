@@ -39,10 +39,10 @@ function sopac_user_view($op, &$edit, &$account, $category = NULL) {
       $max_disp = intval($account->profile_numco);
       $co_table = sopac_user_chkout_table($account, $locum, $max_disp);
       if ($co_table) {
-        $result['patronco']['#title'] = t('Checked-out Items');
+        $result['patronco']['#title'] = t('Checked-out Items ('.$co_table['total'].')');
         $result['patronco']['#weight'] = 2;
         $result['patronco']['#type'] = 'user_profile_category';
-        $result['patronco']['details']['#value'] = $co_table;
+        $result['patronco']['details']['#value'] = $co_table['content'];
       }
     }
 
@@ -142,9 +142,9 @@ function sopac_user_info_table(&$account, &$locum) {
       }
       if (variable_get('sopac_fines_display', 1) && variable_get('sopac_fines_enable', 1)) {
         if (variable_get('sopac_fines_warning_amount', 0) > 0 && $userinfo['balance'] > variable_get('sopac_fines_warning_amount', 0)) {
-          drupal_set_message('WARNING: Your fine balance of $' .
+          drupal_set_message('We\'re sorry, but your account balance is over $' .
                              number_format($userinfo['balance'], 2, '.', '') .
-                             ' exceeds the limit. You will not be able to request or renew items.');
+                             '. You won\'t be able to Request or Renew items until your fine balance drops below '.number_format($userinfo['balance'], 2, '.', '') . '.You can '.l('pay online', 'user/fines').', or '.l('contactus', 'contactus').' if you have any questions or concerns.  Thanks for your patience!');
         }
         $balance = '$' . number_format($userinfo['balance'], 2, '.', '');
         if ($userinfo['balance'] > 0) {
@@ -221,7 +221,8 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     $total = count($checkouts);
 
     if (!$total) {
-      return t('No items checked out.');
+      $checkout_table['content'] = t('No items checked out.');
+      return $checkout_table;
     }
 
     $locum_cfg = $locum->locum_config;
@@ -326,7 +327,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     $content .= '<p><a href="http://api.aadl.org/user/checkouts?token='.$token.'"><img src="https://www.aadl.org/sites/default/themes/zen/aadl/images/feed.png" alt = "Syndicate Your Checkouts" /> <a href="webcal://api.aadl.org/user/ical?token='.$token.'"><img src="https://www.aadl.org/sites/default/themes/zen/aadl/images/ical.png" alt = "iCal feed for Checkouts" /></a></p>';
   }
 
-  return $content;
+  $checkout_table['total'] = $total;
+  $checkout_table['content'] = $content;
+  return $checkout_table;
 }
 
 /**
