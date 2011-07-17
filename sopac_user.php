@@ -772,7 +772,8 @@ function sopac_checkouts_page() {
   //profile_load_profile(&$user);
 
   if ($account->valid_card && $bcode_verify) {
-    $content = sopac_user_chkout_table(&$user, &$locum);
+    $checkout_table = sopac_user_chkout_table(&$user, &$locum);
+    $content = $checkout_table['content'];
   }
   elseif ($account->valid_card && !$bcode_verify) {
     $content = '<div class="error">' . variable_get('sopac_uv_cardnum', t('The card number you have provided has not yet been verified by you.  In order to make sure that you are the rightful owner of this library card number, we need to ask you some simple questions.')) . '</div>' . drupal_get_form('sopac_bcode_verify_form', $account->uid, $cardnum);
