@@ -753,7 +753,7 @@ function sopac_request_item() {
 
     if ($hold_result['success']) {
       // handling multi-branch scenario
-      $request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item['title'] . '</span>';
+      $request_result_msg = t('You have successfully requested a copy of ') . '<span class="req_bib_title"> ' . $bib_item['title'] . ' ' .$bib_item['title_medium'] . '</span>';
       if ($pickup_name) {
         $request_result_msg .= t(' for pickup at ') . $pickup_name;
       }
