@@ -422,7 +422,7 @@ function sopac_tag_form_submit($form, &$form_state) {
 
 function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $max_size = 24, $wraplength = 19) {
   if (!count($tags)) {
-    return t('No tags.');
+    return '<h3>Tags</h3>'.t('No tags.');
   }
 
   // largest and smallest array values
@@ -440,22 +440,42 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
 
   // loop through the tag array
   foreach ($tags as $tag => $value) {
-    if ($cloud_type == 'personal') {
-      $link = 'user/tag/show/' . urlencode($tag);
+    if(preg_match("/^([a-z](?:[a-z0-9_]+))\:([a-z](?:[a-z0-9_]+))\=(.*)/i",$tag, $mt)) {
+      $machinetags[] = $mt;
     }
     else {
-      $link = variable_get('sopac_url_prefix', 'cat/seek') . '/search/tags/' . urlencode($tag);
+      if ($cloud_type == 'personal') {
+        $link = 'user/tag/show/' . urlencode($tag);
+      }
+      else {
+        $link = variable_get('sopac_url_prefix', 'cat/seek') . '/search/tags/' . urlencode($tag);
+      }
+      $size = round($min_size + (($value - $min_qty) * $step));
+      if ($spread == 1) {
+        $size = $size + 2;
+      }
+  //    $disp_tag = htmlentities(wordwrap($tag, $wraplength, "-<br />-", 1));
+      $disp_tag = htmlentities($tag, ENT_NOQUOTES, 'UTF-8');
+      $attributes = array('title' => $value . ' things tagged with ' . $tag, 'style' => 'font-size: ' . $size . 'px');
+      $cloud .= l($disp_tag, $link, array('attributes' => $attributes)) . ' ';
     }
-    $size = round($min_size + (($value - $min_qty) * $step));
-    if ($spread == 1) {
-      $size = $size + 2;
-    }
-//    $disp_tag = htmlentities(wordwrap($tag, $wraplength, "-<br />-", 1));
-    $disp_tag = htmlentities($tag, ENT_NOQUOTES, 'UTF-8');
-    $attributes = array('title' => $value . ' things tagged with ' . $tag, 'style' => 'font-size: ' . $size . 'px');
-    $cloud .= l($disp_tag, $link, array('attributes' => $attributes)) . ' ';
   }
-  return '<div class="tag-cloud">' . $cloud . '</div>';
+  if($machinetags){
+    $content .= '<h3>Game Code</h3><ul>';
+    foreach($machinetags as $machinetag){
+      if($machinetag[1] == 'sg'){
+        $content .= '<li>'.l(strtoupper($machinetag[3]),'http://play.aadl.org/summergame/player').'</li>';
+      }
+    }
+    $content .= '</ul>';
+  }
+  if($cloud){
+    $content .=  '<h3>Tags</h3><div class="tag-cloud">' . $cloud . '</div>';
+  } else {
+    $content .= '<h3>Tags</h3>'.t('No tags.');
+  }
+  return $content;
+
 }
 
 function sopac_review_page($page_type) {

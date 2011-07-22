@@ -231,7 +231,6 @@ function linkfromcallnum($callnum)
     <!-- Tags -->
     <?php
     if (variable_get('sopac_social_enable', 1)) {
-      print '<h3>Tags</h3>';
       $block = module_invoke('sopac','block','view', 4);
       print $block['content'];
     }
