@@ -2336,13 +2336,12 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   while ($list = db_fetch_array($res)) {
     // Check if item is already in the list
     $in_list = FALSE;
-    foreach($insurge->get_list_items($list['list_id']) as $list_item) {
-      if ($list_item['bnum'] == $bnum) {
-        $in_list = TRUE;
-        break;
-      }
+    $biblists = $insurge->get_item_list_ids($bnum);
+    
+    if(in_array($list['list_id'],$biblists)){
+      $in_list = TRUE;
     }
-
+    
     if ($list['title'] == 'Wishlist') {
       if ($in_list) {
         $wishlist = '<li class="button">Already on Wishlist</li>';
