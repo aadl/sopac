@@ -2322,9 +2322,9 @@ function theme_sopac_list_block($block_type = 'public') {
 
 function sopac_put_list_links($bnum, $list_display = FALSE) {
   global $user;
+  static $lists;
   $insurge = sopac_get_insurge();
   $bnum = intval($bnum);
-  $lists = array();
   $action_text = ($list_display ? "Copy to" : "Add to");
 
   $output .= "<li class=\"button hassub\">$action_text other list";
@@ -2332,8 +2332,13 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   $output .= "<ul class=\"submenu\" id=\"moreact_$bnum\">";
   $output .= '<li>Add to:</li>';
   $biblists = $insurge->get_item_list_ids($bnum);
-  $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d AND title NOT LIKE 'Checkout History' ORDER BY list_id DESC", $user->uid); // Latest lists first
-  while ($list = db_fetch_array($res)) {
+  if(!isset($lists[0]['list_id'])){
+    $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d AND title NOT LIKE 'Checkout History' ORDER BY list_id DESC", $user->uid); // Latest lists first
+    while ($list = db_fetch_array($res)) {
+      $lists[] = $list;
+    }
+  }  
+  foreach($lists as $list){
     // Check if item is already in the list
     $in_list = FALSE;
     
