@@ -470,7 +470,9 @@ function sopac_admin_submit($form, &$form_state) {
 }
 
 function sopac_admin_moderate_form($form_state, $type = 'reviews', $offset = 0) {
+  include_once('sopac_catalog.php');
   $insurge = sopac_get_insurge();
+  $locum = sopac_get_locum();
   $limit = 100; // per page
 
   if ($form_state['storage']['confirm_ids']) {
@@ -527,11 +529,19 @@ function sopac_admin_moderate_form($form_state, $type = 'reviews', $offset = 0) 
       $checkboxes = array();
       $form = array();
       foreach ($reviews['reviews'] as $review) {
+        $bib = $locum->get_bib_item($review['bnum'], TRUE);
+
+        // Hover text for the bib
+        $hover = $bib['title'] . "\n" .
+                 $bib['callnum'] . "\n" .
+                 $bib['pub_info'] . "\n" .
+                 $bib['descr'];
+
         $checkboxes[$review['rev_id']] = '';
         $account = user_load(array('uid' => $review['uid']));
         $form[$review['rev_id']] = array(
           'user' => array('#value' => l($account->name, 'user/' . $account->uid)),
-          'bnum' => array('#value' => l($review['bnum'], 'catalog/record/' . $review['bnum'])),
+          'bnum' => array('#value' => l($bib['title'], 'catalog/record/' . $review['bnum'], array('attributes' => array('title' => $hover)))),
           'title' => array('#value' =>  $review['rev_title']),
           'body' => array('#value' => $review['rev_body']),
           'created' => array('#value' => date("F j, Y, g:i a", $review['rev_create_date'])),
@@ -560,11 +570,19 @@ function sopac_admin_moderate_form($form_state, $type = 'reviews', $offset = 0) 
       $checkboxes = array();
       $form = array();
       foreach ($tags as $tag) {
+        $bib = $locum->get_bib_item($tag['bnum'], TRUE);
+
+        // Hover text for the bib
+        $hover = $bib['title'] . "\n" .
+                 $bib['callnum'] . "\n" .
+                 $bib['pub_info'] . "\n" .
+                 $bib['descr'];
+
         $checkboxes[$tag['tid']] = '';
         $account = user_load(array('uid' => $tag['uid']));
         $form[$tag['tid']] = array(
           'user' => array('#value' => l($account->name, 'user/' . $account->uid)),
-          'bnum' => array('#value' => l($tag['bnum'], 'catalog/record/' . $tag['bnum'])),
+          'bnum' => array('#value' => l($bib['title'], 'catalog/record/' . $tag['bnum'], array('attributes' => array('title' => $hover)))),
           'tag' => array('#value' =>  $tag['tag']),
           'created' => array('#value' => $tag['tag_date']),
           'public' => array('#value' => $tag['public'] ? 'Public' : 'Private'),
