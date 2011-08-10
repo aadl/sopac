@@ -460,11 +460,24 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
       $cloud .= l($disp_tag, $link, array('attributes' => $attributes)) . ' ';
     }
   }
-  if($machinetags){
+  if ($machinetags) {
     $content .= '<h3>Game Code</h3><ul>';
-    foreach($machinetags as $machinetag){
-      if($machinetag[1] == 'sg'){
-        $content .= '<li>'.l(strtoupper($machinetag[3]),'http://play.aadl.org/summergame/player').'</li>';
+    global $user;
+    if ($user->uid) {
+      $player = summergame_player_load(array('uid' => $user->uid));
+    }
+    foreach ($machinetags as $machinetag) {
+      if ($machinetag[1] == 'sg') {
+        $text = strtoupper($machinetag[3]);
+        $content .= '<li>';
+        if ($player['pid']) {
+          $content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $player['pid'],
+                        array('query' => array('text' => $text)));
+        }
+        else {
+          $content .= l($text, 'http://play.aadl.org/summergame/player');
+        }
+        $content .= '</li>';
       }
     }
     $content .= '</ul>';
@@ -849,7 +862,7 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
   }
   $star_code .= '<input type="hidden" name="' . $id . '_rating_submit_' . $bnum . '" value="1"></form></td><td>';
 
-  
+
 if ($show_label) {
     if (!$ratings_info_arr['count']) {
       $count_msg = t('No ratings yet');
