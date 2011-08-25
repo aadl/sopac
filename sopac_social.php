@@ -407,15 +407,16 @@ function sopac_tag_form_submit($form, &$form_state) {
 
   // Summer Game
   if (count($tids) && module_exists('summergame')) {
-    if ($player = summergame_player_load(array('uid' => $user->uid))) {
-      foreach ($tids as $tid) {
-        $tag = $insurge->get_tag($tid);
-        $points = summergame_player_points($player['pid'], 10, 'Tagged an Item',
-                                           'Added ' . $tag['tag'] . ' bnum:' . $bnum);
-        $points_link = l($points . ' Summer Game points', 'summergame/player');
-        drupal_set_message("Earned $points_link for tagging an item in the catalog");
+    if (variable_get('summergame_points_enabled', 0)) {
+      if ($player = summergame_player_load(array('uid' => $user->uid))) {
+        foreach ($tids as $tid) {
+          $tag = $insurge->get_tag($tid);
+          $points = summergame_player_points($player['pid'], 10, 'Tagged an Item',
+                                             'Added ' . $tag['tag'] . ' bnum:' . $bnum);
+          $points_link = l($points . ' Summer Game points', 'summergame/player');
+          drupal_set_message("Earned $points_link for tagging an item in the catalog");
+        }
       }
-
     }
   }
 }
@@ -671,11 +672,13 @@ function sopac_review_form_submit($form, &$form_state) {
       $insurge->submit_review($user->uid, $form_state['values']['rev_bnum'], $form_state['values']['rev_title'], $form_state['values']['rev_body']);
       // Summer Game
       if (module_exists('summergame')) {
-        if ($player = summergame_player_load(array('uid' => $user->uid))) {
-          $points = summergame_player_points($player['pid'], 100, 'Wrote Review',
-                                             $form_state['values']['rev_title'] . ' bnum:' . $form_state['values']['rev_bnum']);
-          $points_link = l($points . ' Summer Game points', 'summergame/player');
-          drupal_set_message("Earned $points_link for writing a review");
+        if (variable_get('summergame_points_enabled', 0)) {
+          if ($player = summergame_player_load(array('uid' => $user->uid))) {
+            $points = summergame_player_points($player['pid'], 100, 'Wrote Review',
+                                               $form_state['values']['rev_title'] . ' bnum:' . $form_state['values']['rev_bnum']);
+            $points_link = l($points . ' Summer Game points', 'summergame/player');
+            drupal_set_message("Earned $points_link for writing a review");
+          }
         }
       }
     }
@@ -807,17 +810,19 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
     $insurge->submit_rating($user->uid, $bnum, $_POST[$id . '_bib_rating_' . $bnum]);
     // Summer Game
     if (module_exists('summergame')) {
-      if ($player = summergame_player_load(array('uid' => $user->uid))) {
-        // Check that player has not already rated this item
-        $res = db_query("SELECT lid FROM sg_ledger WHERE pid = %d AND code_text = 'Rated an Item' " .
-                        "AND description LIKE '%%bnum:%d' LIMIT 1",
-                        $player['pid'], $bnum);
-        $rate_count = db_fetch_object($res);
-        if (!$rate_count->lid) {
-          $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
-                                             'Added a Rating to the Catalog bnum:' . $bnum);
-          $points_link = l($points . ' Summer Game points', 'summergame/player');
-          drupal_set_message("Earned $points_link for rating an item in the catalog");
+      if (variable_get('summergame_points_enabled', 0)) {
+        if ($player = summergame_player_load(array('uid' => $user->uid))) {
+          // Check that player has not already rated this item
+          $res = db_query("SELECT lid FROM sg_ledger WHERE pid = %d AND code_text = 'Rated an Item' " .
+                          "AND description LIKE '%%bnum:%d' LIMIT 1",
+                          $player['pid'], $bnum);
+          $rate_count = db_fetch_object($res);
+          if (!$rate_count->lid) {
+            $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
+                                               'Added a Rating to the Catalog bnum:' . $bnum);
+            $points_link = l($points . ' Summer Game points', 'summergame/player');
+            drupal_set_message("Earned $points_link for rating an item in the catalog");
+          }
         }
       }
     }
