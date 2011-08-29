@@ -286,10 +286,12 @@ function linkfromcallnum($callnum)
       }
       // Summer Game links
       if (module_exists('summergame')) {
-        if ($player = summergame_player_load(array('uid' => $user->uid))) {
-          print '<li class="button">' .
-                l('I Finished This', 'http://play.aadl.org/summergame/player/consume/' . $player['pid'] . '/' . $item['bnum']) .
-                '</li>';
+        if (variable_get('summergame_points_enabled', 0)) {
+          if ($player = summergame_player_load(array('uid' => $user->uid))) {
+            print '<li class="button">' .
+                  l('I Finished This', 'http://play.aadl.org/summergame/player/consume/' . $player['pid'] . '/' . $item['bnum']) .
+                  '</li>';
+          }
         }
       }
       ?>
