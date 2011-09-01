@@ -371,6 +371,12 @@ function linkfromcallnum($callnum)
       }
       ?>
     </div>
+    <?php if($item['tq_item']){ ?>
+    <div id="item-trailer">
+    <h2><?php echo $item['tq_item']; ?></h2>
+    <p><?php echo $item['tq_text']; ?></p>
+    </div>
+    <?php } ?>
     <?php if($trailer_url){ ?>
     <div id="item-trailer">
       <h2>Trailer / Previews</h2>
