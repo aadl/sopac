@@ -18,7 +18,10 @@ if ($ratings) {
 if ($rev_form) {
   print '<br />' . $rev_form;
 }
-
+foreach($bib_info as $bib){
+  $tmp[$bib[id]] = $bib['value'];
+}
+$bib_info = $tmp;
 if (count($rev_arr)) {
   print '<div class="review-page">';
   foreach ($rev_arr as $rev_item) {
