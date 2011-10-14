@@ -143,8 +143,8 @@ function sopac_user_info_table(&$account, &$locum) {
       if (variable_get('sopac_fines_display', 1) && variable_get('sopac_fines_enable', 1)) {
         if (variable_get('sopac_fines_warning_amount', 0) > 0 && $userinfo['balance'] > variable_get('sopac_fines_warning_amount', 0)) {
           drupal_set_message('We\'re sorry, but your account balance is over $' .
-                             number_format($userinfo['balance'], 2, '.', '') .
-                             '. You won\'t be able to Request or Renew items until your fine balance drops below '.number_format($userinfo['balance'], 2, '.', '') . '.You can '.l('pay online', 'user/fines').', or '.l('contactus', 'contactus').' if you have any questions or concerns.  Thanks for your patience!');
+                             number_format(variable_get('sopac_fines_warning_amount', 0), 2, '.', '') .
+                             '. You won\'t be able to Request or Renew items until your fine balance drops below $'.number_format(variable_get('sopac_fines_warning_amount', 0), 2, '.', '') . '. You can '.l('pay online', 'user/fines').', or '.l('contactus', 'contactus').' if you have any questions or concerns.  Thanks for your patience!');
         }
         $balance = '$' . number_format($userinfo['balance'], 2, '.', '');
         if ($userinfo['balance'] > 0) {
