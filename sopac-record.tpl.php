@@ -371,7 +371,15 @@ function linkfromcallnum($callnum)
       }
       ?>
     </div>
-    <?php if($item['tq_item']){ ?>
+    <?php if($item['machinetags']['bctg']) { ?>
+    <div id="item-trailer">
+      <h2>Additional Content</h2>
+      <p>Each Book Club to Go kit contains a guide to facilitate group discussion and understanding of the book that includes summary information and reviews of the title, an author biography, a list of suggested discussion questions and read-alikes, and tips for book groups.  This guide is available for download:</p>
+      <?php foreach($item['machinetags']['bctg'] as $machinetag) { ?>
+        <p><a href="<?php print $machinetag['value']; ?>">Guide<?php print ($machinetag['predicate'] == 'large') ? ' (large print)' : ''; ?>: <?php print title_case($item['title']);?></a></p>
+      <?php } ?>
+    </div>
+    <?php } if($item['tq_item']){ ?>    
     <div id="item-trailer">
     <h2><?php echo $item['tq_item']; ?></h2>
     <p><?php echo $item['tq_text']; ?></p>
