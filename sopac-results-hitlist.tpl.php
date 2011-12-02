@@ -81,7 +81,7 @@ if($locum_result['mat_code'] == 'z') {
             $locum_result['title'] = $locum_result['title'] . ' ' .$locum_result['title_medium'];
           }
           ?>
-          <strong><?php print l(title_case($locum_result['title']), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); ?></strong>
+          <strong><?php print l(title_case($locum_result['title']), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE,'html' => TRUE)); ?></strong>
           <?php if($locum_result['non_romanized_title']){ echo " (". $locum_result['non_romanized_title'] .")";} if($locum_result['pub_year']){ ?>
           (<?php echo $locum_result['pub_year']; ?>)<?php } ?>
         </li>
