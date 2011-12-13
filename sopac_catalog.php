@@ -787,8 +787,8 @@ function sopac_request_item() {
           }
         }
         $locations = implode(', ', $locations);
-        $redisjob['locations'] = $locations; 
-        $redisjob['pickup_loc'] = $pickup_name;   
+        $redisjob['locations'] = $locations;
+        $redisjob['pickup_loc'] = $pickup_name;
         $redis = new redisent('multivac');
         $redis->publish('redisbot', json_encode($redisjob));
       }
@@ -1375,7 +1375,7 @@ function sopac_search_catalog_submit($form, &$form_state) {
 
     // Publication date ranges
     if ($form_state['values']['pub_year_start'] || $form_state['values']['pub_year_end']) {
-      $uris['pub_year'] = trim($form_state['values']['pub_year_start']) . '|' .
+      $uris['pub_year'] = trim($form_state['values']['pub_year_start']) . '-' .
                           trim($form_state['values']['pub_year_end']);
     }
     $search_url = variable_get('sopac_url_prefix', 'cat/seek') . '/search/' . $search_type . '/' . $search_query;
