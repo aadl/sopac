@@ -1375,8 +1375,8 @@ function sopac_search_catalog_submit($form, &$form_state) {
 
     // Publication date ranges
     if ($form_state['values']['pub_year_start'] || $form_state['values']['pub_year_end']) {
-      $uris['pub_year'] = trim($form_state['values']['pub_year_start']) . '-' .
-                          trim($form_state['values']['pub_year_end']);
+      $uris['facet_year'] = trim($form_state['values']['pub_year_start']) . '-' .
+                            trim($form_state['values']['pub_year_end']);
     }
     $search_url = variable_get('sopac_url_prefix', 'cat/seek') . '/search/' . $search_type . '/' . $search_query;
   }
