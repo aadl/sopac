@@ -102,7 +102,7 @@ if($locum_result['mat_code'] == 'z') {
         <?php if ($locum_result['genres']) { ?>
         <li>Genres: <?php echo implode(', ',$locum_result['genres']); ?></li>
         <?php } ?>
-        <?php if ($locum_result['mpaa_rating'] && $locum_result['mat_code'] == 'u') { ?>
+        <?php if ($locum_result['mpaa_rating']) { ?>
         <li>Rated: <span class="mpaa_rating"><?php echo $locum_result['mpaa_rating']; ?></span></li>
         <?php } ?>
         <?php if ($locum_result['sort'] == 'catalog_newest') { ?>

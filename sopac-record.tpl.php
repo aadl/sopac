@@ -149,7 +149,7 @@ function linkfromcallnum($callnum)
       if ($item['mat_code']) {
         print '<li><b>Format:</b> ' . $locum_config['formats'][$item['mat_code']] . '</li>';
       }
-      if ($item['mpaa_rating'] && $item['mat_code'] == 'u') { ?>
+      if ($item['mpaa_rating']) { ?>
         <li><strong>Rated:</strong> <span class="mpaa_rating"><?php echo $item['mpaa_rating']; ?></span></li>
       <?php } ?>
     </ul>
