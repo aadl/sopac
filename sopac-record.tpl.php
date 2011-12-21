@@ -481,7 +481,7 @@ function linkfromcallnum($callnum)
     <!-- Google Books Preview -->
     <?php
     foreach($item['stdnum'] as $stdnum) {
-      $isbnarr[] = 'ISBN:'.preg_replace("/[^0-9]/","", $stdnum);
+      $isbnarr[] = 'ISBN:'.preg_replace("/[^0-9X]/","", $stdnum);
     }
     ?>
     <div id="item-google-books">
