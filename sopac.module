@@ -738,37 +738,12 @@ function utf8_urldecode($str) {
 }
 
 /*
- * Exceptions in lower case are words you don't want converted
- * Exceptions all in upper case are any words you don't want converted to title case
- *   but should be converted to upper case, e.g.:
- *   king henry viii or king henry Viii should be King Henry VIII
- * From: http://www.php.net/manual/en/function.mb-convert-case.php#92317
+ * Check if it is a stub record in all caps and title case if possible
  */
 function title_case($string) {
-  $delimiters = array(" ", "-", ".", "O'", "Mc");
-  $exceptions = array("út", "u", "s", "és", "utca", "tér", "krt", "körút", "sétány", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "3rd", "2nd" );
-
-  $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
-
-  foreach ($delimiters as $dlnr => $delimiter){
-    $words = explode($delimiter, $string);
-    $newwords = array();
-    foreach ($words as $wordnr => $word){
-      if (in_array(mb_strtoupper($word, "UTF-8"), $exceptions)){
-        // check exceptions list for any words that should be in upper case
-        $word = mb_strtoupper($word, "UTF-8");
-      }
-      elseif (in_array(mb_strtolower($word, "UTF-8"), $exceptions)){
-        // check exceptions list for any words that should be in upper case
-        $word = mb_strtolower($word, "UTF-8");
-      }
-      elseif (!in_array($word, $exceptions) ){
-        // convert to uppercase (non-utf8 only)
-        $word = mb_convert_case($word, MB_CASE_TITLE, "UTF-8");
-      }
-      array_push($newwords, $word);
-    }
-    $string = join($delimiter, $newwords);
+  $new_string = ereg_replace("[^A-Za-z]", "", $string);
+  if(ctype_upper($new_string)){
+    $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
   }
   return $string;
 }
