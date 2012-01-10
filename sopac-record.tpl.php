@@ -89,11 +89,6 @@ if (count($item_status['items'])) {
   }
 }
 
-function linkfromcallnum($callnum)
-{
-    $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
-    return l($callnum, $url_prefix . '/search/callnum/"' . urlencode($callnum) .'"',array('alias' => TRUE));
-}
 ?>
 
 <!-- begin item record -->
@@ -329,7 +324,7 @@ function linkfromcallnum($callnum)
         if (count($item_status['callnums']) > 10) {
           print '<p>Call number: <strong>' . l($item['callnum'], $url_prefix . '/search/callnum/"' . urlencode($item['callnum']) .'"',array('alias' => TRUE)) . '</strong> (see all copies below for individual call numbers)</p>';
         } else {
-          print '<p>Call number: <strong>' . implode(", ", array_map('linkfromcallnum', array_keys($item_status['callnums']))) . '</strong></p>';
+          print '<p>Call number: <strong>' . implode(", ", array_map('sopac_linkfromcallnum', array_keys($item_status['callnums']))) . '</strong></p>';
         }
       }
 

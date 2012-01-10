@@ -93,9 +93,14 @@ if($locum_result['mat_code'] == 'z') {
         <?php if($locum_result['Director']) { ?>
           <li>Director: <?php echo l($locum_result['Director'][0], $url_prefix . '/search/author/' . urlencode($locum_result['Director'][0]),array('alias' => TRUE)); ?></li>
         <?php } ?>
-        <?php if ($locum_result['callnum'] && $locum_result['callnum'] != ' ') {
-          ?><li><?php print t('Call number: '); ?><strong><?php print l($locum_result['callnum'], $url_prefix . '/search/callnum/"' . urlencode($locum_result['callnum']) .'"',array('alias' => TRUE)); ?></strong></li><?php
+              <?php
+      if ($locum_result['status']['callnums']) {
+        if (count($locum_result['status']['callnums']) > 5) {
+          print '<li>Call number: <strong>' . l($locum_result['callnum'], $url_prefix . '/search/callnum/"' . urlencode($locum_result['callnum']) .'"',array('alias' => TRUE)) . '</strong></li>';
+        } else {
+          print '<li>Call number: <strong>' . implode(", ", array_map('sopac_linkfromcallnum', array_keys($locum_result['status']['callnums']))) . '</strong></li>';
         }
+      }
         elseif (count($locum_result['avail_details'])) {
           ?><li><?php print t('Call number: '); ?><strong><?php print key($locum_result['avail_details']); ?></strong></li><?php
         } ?>
