@@ -39,6 +39,10 @@ function sopac_catalog_search() {
   $location = $getvars['location'];
   $limit_avail = $getvars['limit_avail'];
   $pager_page_array = explode(',', $getvars['page']);
+  // temp for advanced page. should this be broken out
+  if($actions[1] == 'isn'){
+    $actions[1] = 'keyword';
+  }
   $search_type = $actions[1];
   if ($actions[3]) {
       $actions[2] = $actions[2] . "/" . $actions[3];
