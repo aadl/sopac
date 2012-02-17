@@ -371,7 +371,7 @@ if (count($item_status['items'])) {
       <h2>Additional Content</h2>
       <p>Each Book Club to Go kit contains a guide to facilitate group discussion and understanding of the book that includes summary information and reviews of the title, an author biography, a list of suggested discussion questions and read-alikes, and tips for book groups.  This guide is available for download:</p>
       <?php foreach($item['machinetags']['bctg'] as $machinetag) { ?>
-        <p><a href="<?php print $machinetag['value']; ?>">Guide<?php print ($machinetag['predicate'] == 'large') ? ' (large print)' : ''; ?>: <?php print title_case($item['title']);?></a></p>
+        <p><a href="<?php print $machinetag['value']; ?>">Guide<?php print ($machinetag['predicate'] == 'large') ? ' (large print)' : ''; print ($machinetag['predicate'] == 'text') ? ' (text file)' : ''; ?>: <?php print title_case($item['title']);?></a></p>
       <?php } ?>
     </div>
     <?php } if($item['tq_item']){ ?>    
