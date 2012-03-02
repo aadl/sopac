@@ -664,6 +664,9 @@ function sopac_review_form_submit($form, &$form_state) {
   global $user;
 
   if ($user->uid) {
+    // Strip HTML from review
+    $form_state['values']['rev_body'] = strip_tags($form_state['values']['rev_body']);
+
     $insurge = sopac_get_insurge();
     if ($form_state['values']['form_type'] == 'edit') {
       $insurge->update_review($user->uid, $form_state['values']['rev_id'], $form_state['values']['rev_title'], $form_state['values']['rev_body']);
