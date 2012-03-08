@@ -2336,17 +2336,17 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   $output .= "<ul class=\"submenu\" id=\"moreact_$bnum\">";
   $output .= '<li>Add to:</li>';
   $biblists = $insurge->get_item_list_ids($bnum);
-  if(!isset($lists[0]['list_id'])){
-    $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d AND title NOT LIKE 'Checkout History' ORDER BY list_id DESC", $user->uid); // Latest lists first
+  if (!isset($lists[0]['list_id'])) {
+    $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d ORDER BY list_id DESC", $user->uid); // Latest lists first
     while ($list = db_fetch_array($res)) {
       $lists[] = $list;
     }
   }
-  foreach($lists as $list){
+  foreach ($lists as $list) {
     // Check if item is already in the list
     $in_list = FALSE;
 
-    if(in_array($list['list_id'],$biblists)){
+    if (in_array($list['list_id'], $biblists)) {
       $in_list = TRUE;
     }
 
@@ -2361,7 +2361,7 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
                     '</li>';
       }
     }
-    else if ($list['title'] != 'Checkout History') { // don't show checkout history in list links
+    else {
       $output .= '<li';
       if ($in_list) {
         $output .= ' class="disabled">' . $list['title'];
