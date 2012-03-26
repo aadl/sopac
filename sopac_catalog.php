@@ -174,9 +174,11 @@ function sopac_catalog_search() {
       // Send it all off to the template
       if ($output == "rss") {
         $result_body .= theme('sopac_results_hitlist_rss', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
-      } else if ($output == "xml") {
+      }
+      else if ($output == "xml") {
         $result_body .= theme('sopac_results_hitlist_xml', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
-      } else {
+      }
+      else {
         $result_body .= theme('sopac_results_hitlist', $hitnum, $cover_img_url, $locum_result, $locum_cfg, $no_circ);
       }
       $hitnum++;
@@ -184,7 +186,7 @@ function sopac_catalog_search() {
 
     $hitlist_pager = theme('pager', NULL, $limit, 0, NULL, 6);
   }
-  elseif ($valid_search) {
+  else if ($valid_search) {
     $result_body .= theme('sopac_results_nohits', $locum_results_all, $locum->locum_config);
   }
 
@@ -195,10 +197,12 @@ function sopac_catalog_search() {
   if ($output == "rss") {
     print theme('sopac_results_rss', $result_info, $search_term, $search_type, $result_body, $locum_results_all, $locum->locum_config);
     exit(0);
-  } else if ($output == "xml") {
+  }
+  else if ($output == "xml") {
     print theme('sopac_results_xml', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
     exit(0);
-  } else {
+  }
+  else {
     $result_page = $search_form . theme('sopac_results', $result_info, $hitlist_pager, $result_body, $locum_results_all, $locum->locum_config);
   }
 

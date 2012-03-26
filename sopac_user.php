@@ -1642,10 +1642,10 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
         if ($_GET['perpage']) {
           $limit = $_GET['perpage'];
         }
-        elseif ($account->profile_perpage) {
+        else if ($account->profile_perpage) {
           $limit = $account->profile_perpage;
         }
-        elseif ($op == 'print'){
+        else if ($op == 'print' || $op == 'csv'){
           $limit = NULL;
         }
         else {
@@ -1684,13 +1684,29 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
           $list['items']= $insurge->get_list_items($list_id, 'value', 'ASC', $search_term);
         }
         $list['total_items'] = count($list['items']);
-        if($limit){
+        if ($limit) {
           $pager_total[0] = ceil($list['total_items'] / $limit);
         }
         // Trim list items to display
         $list['items'] = array_slice($list['items'], $page_offset, $limit, TRUE);
-        if($op == 'print'){
+        if ($op == 'print') {
           $output .= theme('sopac_list', $list, TRUE, 'print');
+        }
+        else if ($op == 'csv') {
+          foreach ($list['items'] as &$item) {
+            unset($item['tid'],
+                  $item['repos_id'],
+                  $item['group_id'],
+                  $item['uid'],
+                  $item['tag'],
+                  $item['namespace'],
+                  $item['predicate'],
+                  $item['value']);
+            $item['url'] = 'http://www.aadl.org/catalog/record/' . $item['bnum'];
+          }
+
+          output_csv($list['items'], 'aadl-list-' . $list['list_id'] . '.csv');
+          exit(0);
         }
         else {
           $output .= theme('sopac_list', $list, TRUE);
@@ -2191,7 +2207,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
       $last_updated = 0;
       $total_count = $list['total_items'];
       $content .= '<table class="hitlist-content">';
-      foreach($list['items'] as $item) {
+      foreach ($list['items'] as $item) {
         $item['bib'] = $locum->get_bib_item($item['bnum']);
         $item['cover_img'] = $item['bib']['cover_img'];
         if ($item['active'] || user_access('show suppressed records')) {
@@ -2199,7 +2215,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
           if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
             $last_updated = $tag_date;
           }
-          if(!$minimal){
+          if (!$minimal) {
             // Grab item status
             $item['status'] = $locum->get_item_status($item['bnum']);
             if ($item['status']['avail']) {
@@ -2464,4 +2480,21 @@ function sopac_import_history($list_id, $uid) {
   while($history_item = db_fetch_object($res)) {
     $insurge->add_list_item($uid, $list_id, $history_item->bnum, strtotime($history_item->codate));
   }
+}
+
+function output_csv($data, $filename = 'output.csv') {
+  header("Content-type: text/csv");
+  header("Content-Disposition: attachment; filename=$filename");
+  header("Pragma: no-cache");
+  header("Expires: 0");
+
+  $out = fopen("php://output", "w");
+  foreach ($data as $line) {
+    if (!$header) {
+      fputcsv($out, array_keys($line));
+      $header = TRUE;
+    }
+    fputcsv($out, $line);
+  }
+  fclose($out);
 }
