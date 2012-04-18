@@ -52,43 +52,44 @@ $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_conf
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
 $note_arr = $item['notes'];
 
-// Get Zoom Lends copies
-$zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
-$avail = $item_status['avail'] - $zooms_avail;
-
-if ($avail > 0) {
-  $reqtext = 'There ' . ($avail == 1 ? 'is' : 'are') . " currently $avail available";
-}
-else {
-  $reqtext = 'There are no copies available';
-}
-if ($zooms_avail > 0) {
-  //$zoom_link = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
-  $zoom_link = 'Zoom Lends';
-  $reqtext .= " ($zooms_avail $zoom_link available)";
-}
-if ($item_status['holds'] > 0) {
-  $reqtext .= ' and ' . $item_status['holds'] . ' request' . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
-}
-
-// Build the item availability array
-if (count($item_status['items'])) {
-  foreach ($item_status['items'] as $copy_status) {
-    if ($copy_status['avail'] > 0) {
-      $status_msg = 'Available';
-    }
-    else {
-      $status_msg = ucwords(strtolower($copy_status['statusmsg']));
-    }
-    if (variable_get('sopac_multi_branch_enable', 0)) {
-      $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $locum_config['branches'][$copy_status['branch']], $status_msg);
-    }
-    else {
-      $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
+if($item_status) {
+  // Get Zoom Lends copies
+  $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
+  $avail = $item_status['avail'] - $zooms_avail;
+  
+  if ($avail > 0) {
+    $reqtext = 'There ' . ($avail == 1 ? 'is' : 'are') . " currently $avail available";
+  }
+  else {
+    $reqtext = 'There are no copies available';
+  }
+  if ($zooms_avail > 0) {
+    //$zoom_link = l('Zoom Lends', 'catalog/browse/unusual#ZOOM', array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
+    $zoom_link = 'Zoom Lends';
+    $reqtext .= " ($zooms_avail $zoom_link available)";
+  }
+  if ($item_status['holds'] > 0) {
+    $reqtext .= ' and ' . $item_status['holds'] . ' request' . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
+  }
+  
+  // Build the item availability array
+  if (count($item_status['items'])) {
+    foreach ($item_status['items'] as $copy_status) {
+      if ($copy_status['avail'] > 0) {
+        $status_msg = 'Available';
+      }
+      else {
+        $status_msg = ucwords(strtolower($copy_status['statusmsg']));
+      }
+      if (variable_get('sopac_multi_branch_enable', 0)) {
+        $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $locum_config['branches'][$copy_status['branch']], $status_msg);
+      }
+      else {
+        $copy_status_array[] = array($copy_status['location'], $copy_status['callnum'], $status_msg);
+      }
     }
   }
 }
-
 ?>
 
 <!-- begin item record -->
@@ -260,7 +261,6 @@ if (count($item_status['items'])) {
       <li><img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $item['mat_code'] . '.png' ?>"></li>
       <li style="margin-top: -2px;"><?php print wordwrap($locum_config['formats'][$item['mat_code']], 8, '<br />'); ?></li>
     </ul>
-
     <!-- Actions -->
     <ul class="item-actions">
       <?php
@@ -268,6 +268,9 @@ if (count($item_status['items'])) {
         <li class="button">Library Use Only</li>
       <?php } else if (in_array($item['loc_code'], $no_circ) || in_array($item['mat_code'], $no_circ)) { ?>
             <li class="button red">Not Requestable</li>
+      <?php }
+      else if ($item['db_link']){ ?>
+        <li class="button"><a href="<?php print $item['db_link']; ?>">Visit Website</a></li>
       <?php }
       else {
         print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
@@ -356,6 +359,9 @@ if (count($item_status['items'])) {
         print '<p>' . l(t('Download this Title'), $item['download_link'], array('attributes' => array('target' => '_new'))) . '</p>';
         print '</div>';
       }
+      elseif ($item['db_link']) { ?>
+        <p>This item is a database that AADL subscribes to. <a href="<?php print $item['db_link']; ?>">You can access it online.</a></p>
+      <?php }
       else {
         if (!$no_avail_mat_codes) {
           print '<p>No copies found.</p>';
@@ -366,6 +372,7 @@ if (count($item_status['items'])) {
       }
       ?>
     </div>
+    
     <?php if($item['machinetags']['bctg']) { ?>
     <div id="item-trailer">
       <h2>Additional Content</h2>
@@ -475,21 +482,22 @@ if (count($item_status['items'])) {
 
     <!-- Google Books Preview -->
     <?php
-    foreach($item['stdnum'] as $stdnum) {
-      $isbnarr[] = 'ISBN:'.preg_replace("/[^0-9X]/","", $stdnum);
-    }
-    ?>
-    <div id="item-google-books">
-      <div class="item-google-prev">
-        <script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
-          <script type="text/javascript">
-            var w=document.getElementById("item-google-books").offsetWidth;
-            var h=(w*1.3);
-            GBS_insertEmbeddedViewer(['<?php print implode("','",$isbnarr); ?>'],w,h);
-          </script>
+    if($item['stdnum']) {
+      foreach($item['stdnum'] as $stdnum) {
+        $isbnarr[] = 'ISBN:'.preg_replace("/[^0-9X]/","", $stdnum);
+      }
+      ?>
+      <div id="item-google-books">
+        <div class="item-google-prev">
+          <script type="text/javascript" src="http://books.google.com/books/previewlib.js"></script>
+            <script type="text/javascript">
+              var w=document.getElementById("item-google-books").offsetWidth;
+              var h=(w*1.3);
+              GBS_insertEmbeddedViewer(['<?php print implode("','",$isbnarr); ?>'],w,h);
+            </script>
+        </div>
       </div>
-    </div>
-
+    <?php } ?>
   <!-- end right-hand column -->
   </div>
 
