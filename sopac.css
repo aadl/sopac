@@ -790,7 +790,12 @@ input.tagsubmit {
 }
 #sopac-list-item-search-form {
   float: right;
+  clear: right;
   margin-top: 1em;
+}
+#sopac-list-manual-add-form {
+  float: right;
+  clear: right;
 }
 .sopac-list-expanded .hitlist-content {
   margin-top: 0;

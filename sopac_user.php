@@ -1623,7 +1623,7 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
     // display list contents
     $list = db_fetch_array(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
     if ($list['list_id']) {
-      if ($user->uid == $list['uid'] || $list['public'] || user_access('administer sopac')) {
+      if ($list['public'] || sopac_lists_access($list['list_id'])) {
         global $pager_page_array, $pager_total;
 
         drupal_set_title($list['title']);
@@ -2053,16 +2053,14 @@ function sopac_list_add($bnum, $list_id = 0) {
     else {
       $list_id = intval($list_id);
       // Check to see if $user owns the list
-      if (user_access('administer sopac')) {
+      if (sopac_lists_access($list_id)) {
         $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d'", $list_id));
       }
       else {
-        $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = '%d' AND uid = %d", $list_id, $user->uid));
-      }
-      if (!$list->list_id) {
         $output .= '<h2>Error: Unable to add item to list, you do not own this list</h2>';
       }
     }
+
     // add to list and redirect to that list
     if ($insurge->add_list_item($user->uid, $list_id, $bnum)) {
       $output .= '<h2>"' . $bib['title'] . '" has been added to your list</h2>';
@@ -2093,6 +2091,35 @@ function sopac_list_add($bnum, $list_id = 0) {
   $output .= '</ul>';
 
   return $output;
+}
+
+function sopac_list_manual_add_form($form_state, $list_id) {
+  $form = array();
+
+  $form['list_id'] = array(
+    '#type' => 'value',
+    '#value' => $list_id,
+  );
+  $form['inline'] = array(
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
+  $form['inline']['bnum'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Add By Bib Number',
+    '#size' => 16,
+    '#maxlength' => 32,
+  );
+  $form['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Add to List',
+  );
+
+  return $form;
+}
+
+function sopac_list_manual_add_form_submit($form, &$form_state) {
+  drupal_goto('user/listadd/' . $form_state['values']['bnum'] . '/' . $form_state['values']['list_id']);
 }
 
 function sopac_list_move_top($list_id, $cur_pos) {
@@ -2169,7 +2196,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
   $title = ($expanded ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
   $list_class = "sopac-list";
 
-  if ($user->uid == $list['uid'] || user_access('administer sopac')) {
+  if (sopac_lists_access($list['list_id'])) {
     $actions .= '<ul class="sopac-list-actions">';
     $actions .= '<li class="button green">' . l('Edit List Details', 'user/lists/edit/' . $list['list_id']) . '</li>';
     $actions .= '<li class="button red">' . l('Delete List', 'user/lists/delete/' . $list['list_id']) . '</li>';
@@ -2275,6 +2302,12 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
     else {
       $content .= '<p>This list is currently empty</p>';
     }
+
+    if ($expanded &&
+        $list['uid'] != $user->uid &&
+        sopac_lists_access($list['list_id'])) {
+      $content .= drupal_get_form('sopac_list_manual_add_form', $list['list_id']);
+    }
     $content .= '<ul><li class="button green">' . l('back to lists overview', 'user/lists') . '</li></ul>';
   }
   else {
@@ -2352,43 +2385,48 @@ function sopac_put_list_links($bnum, $list_display = FALSE) {
   $output .= "<ul class=\"submenu\" id=\"moreact_$bnum\">";
   $output .= '<li>Add to:</li>';
   $biblists = $insurge->get_item_list_ids($bnum);
+
   if (!isset($lists[0]['list_id'])) {
     $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d ORDER BY list_id DESC", $user->uid); // Latest lists first
     while ($list = db_fetch_array($res)) {
       $lists[] = $list;
     }
   }
-  foreach ($lists as $list) {
-    // Check if item is already in the list
-    $in_list = FALSE;
 
-    if (in_array($list['list_id'], $biblists)) {
-      $in_list = TRUE;
-    }
+  if (count($lists)) {
+    foreach ($lists as $list) {
+      // Check if item is already in the list
+      $in_list = FALSE;
 
-    if ($list['title'] == 'Wishlist') {
-      if ($in_list) {
-        $wishlist = '<li class="button">Already on Wishlist</li>';
+      if (in_array($list['list_id'], $biblists)) {
+        $in_list = TRUE;
+      }
+
+      if ($list['title'] == 'Wishlist') {
+        if ($in_list) {
+          $wishlist = '<li class="button">Already on Wishlist</li>';
+        }
+        else {
+          $wishlist = '<li class="button green">' .
+                      l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/' . $list['list_id'],
+                        array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
+                      '</li>';
+        }
       }
       else {
-        $wishlist = '<li class="button green">' .
-                    l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/' . $list['list_id'],
-                      array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE)) .
-                    '</li>';
+        $output .= '<li';
+        if ($in_list) {
+          $output .= ' class="disabled">' . $list['title'];
+        }
+        else {
+          $output .= '>' . l($list['title'], 'user/listadd/' . $bnum . '/' . $list['list_id'],
+                           array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE));
+        }
+        $output .= '</li>';
       }
-    }
-    else {
-      $output .= '<li';
-      if ($in_list) {
-        $output .= ' class="disabled">' . $list['title'];
-      }
-      else {
-        $output .= '>' . l($list['title'], 'user/listadd/' . $bnum . '/' . $list['list_id'],
-                         array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE));
-      }
-      $output .= '</li>';
     }
   }
+
   if (empty($wishlist)) {
     $wishlist = '<li class="button green">' .
                 l($action_text . ' Wishlist', 'user/listadd/' . $bnum . '/wish',

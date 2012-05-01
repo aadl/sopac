@@ -993,9 +993,28 @@ function sopac_lists_access($list_id) {
     }
     else {
       global $user;
-      $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = %d LIMIT 1", $list_id));
+      $list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE list_id = %d", $list_id));
       if ($user->uid == $list->uid) {
         $access = TRUE;
+      }
+      // Check if staff list and then if it is being viewed by staff
+      else if ($list->public) {
+        $list_user = user_load($list->uid);
+        $staff_roles = variable_get('sopac_lists_staff_roles', array());
+        foreach (array_keys($list_user->roles) as $role_id) {
+          if (in_array($role_id, $staff_roles)) {
+            $staff_list = TRUE;
+            break;
+          }
+        }
+        if ($staff_list) {
+          foreach (array_keys($user->roles) as $role_id) {
+            if (in_array($role_id, $staff_roles)) {
+              $access = TRUE;
+              break;
+            }
+          }
+        }
       }
     }
   }
