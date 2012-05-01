@@ -264,10 +264,12 @@ function sopac_bib_record() {
   if($item['magnatune_url'] || $item['mat_code'] == 'z'){
     $result_page = theme('sopac_record_musicdownload', $item, $locum->locum_config, $rev_arr, $rev_form);
   }
-  else if ($item['bnum']) {
+  else if ($item['mat_code']) {
     $item['tracks'] = $locum->get_cd_tracks($bnum);
     $item['trackupc'] = $locum->get_upc($bnum);
-    $item_status = $locum->get_item_status($bnum, TRUE);
+    if($item['bnum']) {
+      $item_status = $locum->get_item_status($bnum, TRUE);
+    }
     // Grab Syndetics reviews, etc..
     $review_links = $locum->get_syndetics($item['stdnum'][0]);
     if (count($review_links)) {
