@@ -227,6 +227,8 @@ function sopac_bib_record() {
   $insurge = sopac_get_insurge();
   $actions = sopac_parse_uri();
   $bnum = $actions[1];
+  $getvars = sopac_parse_get_vars();
+  $output = $getvars['output'];
 
   // Load social function
   require_once('sopac_social.php');
@@ -291,7 +293,14 @@ function sopac_bib_record() {
     $result_page = t('This record does not exist.');
   }
 
-  return '<p>'. t($result_page) .'</p>';
+  if ($output == "rss") {
+    $item['status'] = $item_status;
+    $item['type'] = 'bib';
+    $cover_img_url = $item['cover_img'];
+    return theme('sopac_results_hitlist_rss', 1, $cover_img_url, $item, $locum->locum_config, $no_circ);
+  } else {
+    return '<p>'. t($result_page) .'</p>';
+  }
 }
 
 /**

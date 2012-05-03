@@ -20,8 +20,13 @@ if (!module_exists('covercache')) {
                  variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['bnum'],
                  array('html' => TRUE));
 }
-
+if ($locum_result['type'] == 'bib') { 
 ?>
+<title><?php print $locum_result['title'];?></title>
+<updated><?php print $locum_result['bib_lastupdate']; ?>T00:00:00-05:00</updated>
+<id><?php print url($url_prefix . '/record/' . $locum_result['bnum'], array('absolute' => TRUE)); ?></id>
+<link rel="alternate" type="text/html" hreflang="en" href="<?php print url($url_prefix . '/record/' . $locum_result['bnum'], array('absolute' => TRUE)); ?>"/>
+<?php } ?>
 
     <entry>
       <title><?php print $locum_result['title'];?></title>
