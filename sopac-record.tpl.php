@@ -378,7 +378,6 @@ if($item_status) {
     <?php
     if($item['stream_filename']){
       $verified == FALSE;
-      if($user->uid && $user->bcode_verified){
         $secret = $locum_config['api_config']['streaming_secret'];
         $path   = '/streaming/'.$item['stream_filename'].'.mp4';
         $expire = time() + 7200; # 2 hours
@@ -387,6 +386,7 @@ if($item_status) {
         $md5 = str_replace('=', '', $md5);
         $stream_link = 'http://media.aadl.org'.$path.'?st='.$md5.'&e='.$expire;
         $picture_link = 'http://media.aadl.org/stream_covers/'.$item['stream_filename'].'.jpg';
+      if($user->uid && $user->bcode_verified){
         $verified = TRUE;
       }
     ?>
@@ -414,9 +414,11 @@ if($item_status) {
         		});
         </script></p>
         <?php } elseif ($user->uid) { ?>
-          <p><?php echo l(t('Register/Verify Card to Watch'), 'user/' . $user->uid); ?></p>
+          <p><?php echo l('<img src="' . $picture_link . '" alt="register to watch" />', 'user/login', array('query' => drupal_get_destination(), 'html' => TRUE)); ?></p>
+          <p><ul><li class="button green"><?php echo l(t('Register/Verify Card to Watch'), 'user/' . $user->uid); ?></li></ul></p>
         <?php } else { ?>
-          <p><?php echo l(t('Login to Watch'), 'user/login', array('query' => drupal_get_destination())); ?></p>
+          <p><?php echo l('<img src="' . $picture_link . '" alt="login to watch" />', 'user/login', array('query' => drupal_get_destination(), 'html' => TRUE)); ?></p>
+          <p><ul><li class="button green"><?php echo l(t('Login to Watch'), 'user/login', array('query' => drupal_get_destination())); ?></li></ul></p>
         <?php } ?> 
     </div>
     <?php } if($item['machinetags']['bctg']) { ?>
