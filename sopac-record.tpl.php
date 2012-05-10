@@ -278,7 +278,7 @@ if($item_status) {
               print sopac_put_staff_request_link($item['bnum']);
         }
       }
-      if ($user->uid) {
+      if ($user->uid && $item['bnum']) {
         include_once('sopac_user.php');
         print sopac_put_list_links($item['bnum']);
       }
