@@ -514,7 +514,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $options = array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
         }
 
-        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'Music Download' && $mattype != 'Streaming') {
+        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'Music Download' && $mattype != 'Stream') {
           $locum = sopac_get_locum();
           $branches = $locum->locum_config['branches'];
           $class .= ' hassub';
@@ -551,7 +551,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         else if($mattype == 'Music Download') {
           $text = '<a href="/'.variable_get('sopac_url_prefix', 'cat/seek').'/record/'.$bnum.'/download?type=album">'.$text.'</a>';
         }
-        else if ($mattype == 'Streaming')
+        else if ($mattype == 'Stream')
           $text = 'Watch Online Below';
         else {
           $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
@@ -569,7 +569,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
     else if($mattype == 'Music Download'){
       $text = l(t('Log in to Download'), 'user/login', array('query' => drupal_get_destination()));
     }
-    else if ($mattype == 'Streaming')
+    else if ($mattype == 'Stream')
           $text = l(t('Login to Watch'), 'user/login', array('query' => drupal_get_destination()));
     else {
       $text = l(t('Log in to request'), 'user/login', array('query' => drupal_get_destination()));
