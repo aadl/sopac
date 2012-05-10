@@ -273,8 +273,8 @@ if($item_status) {
         <li class="button"><a href="<?php print $item['db_link']; ?>">Visit Website</a></li>
       <?php }
       else {
-        print sopac_put_request_link($item['bnum'], 1, 0, $locum_config['formats'][$item['mat_code']]);
-        if(user_access('staff request')){
+        print sopac_put_request_link($item['_id'], 1, 0, $locum_config['formats'][$item['mat_code']]);
+        if(user_access('staff request') && $item['bnum']){
               print sopac_put_staff_request_link($item['bnum']);
         }
       }
@@ -362,6 +362,9 @@ if($item_status) {
       elseif ($item['db_link']) { ?>
         <p>This item is a database that AADL subscribes to. <a href="<?php print $item['db_link']; ?>">You can access it online.</a></p>
       <?php }
+      elseif ($item['stream_filename']) { ?>
+        <p>This item is available for instant online streaming to logged-in AADL cardholders. Just click play below to watch in its entirety!</p>
+      <?php }
       else {
         if (!$no_avail_mat_codes) {
           print '<p>No copies found.</p>';
@@ -372,8 +375,51 @@ if($item_status) {
       }
       ?>
     </div>
-    
-    <?php if($item['machinetags']['bctg']) { ?>
+    <?php
+    if($item['stream_filename']){
+      $verified == FALSE;
+      if($user->uid && $user->bcode_verified){
+        $secret = $locum_config['api_config']['streaming_secret'];
+        $path   = '/streaming/'.$item['stream_filename'].'.mp4';
+        $expire = time() + 7200; # 2 hours
+        $md5 = base64_encode(md5($secret . $path . $expire, true));
+        $md5 = strtr($md5, '+/', '-_');
+        $md5 = str_replace('=', '', $md5);
+        $stream_link = 'http://media.aadl.org'.$path.'?st='.$md5.'&e='.$expire;
+        $picture_link = 'http://media.aadl.org/stream_covers/'.$item['stream_filename'].'.jpg';
+        $verified = TRUE;
+      }
+    ?>
+    <div id="item-trailer">
+      <h2>Watch Online</h2>
+      <?php if($verified){ ?>
+        <p><script type="text/javascript" src="http://media.aadl.org/jw59/jwplayer.js"></script>
+        <video
+          controls 
+          height="406" 
+          preload="none"
+          poster="<?php echo $picture_link; ?>"
+          src="<?php echo $stream_link; ?>" 
+          width="720" id="player1">
+        </video> 
+        <script type='text/javascript'>
+        		jwplayer("player1").setup({ 
+        			flashplayer: "http://media.aadl.org/jw59/player.swf",
+        			file: "<?php echo $stream_link; ?>",
+        			image: "<?php echo $picture_link; ?>",
+        			skin: 'http://media.aadl.org/jw59/glow/glow.zip',
+        			provider: "http",
+        			width: 720,
+        			height: 406		
+        		});
+        </script></p>
+        <?php } elseif ($user->uid) { ?>
+          <p><?php echo l(t('Register/Verify Card to Watch'), 'user/' . $user->uid); ?></p>
+        <?php } else { ?>
+          <p><?php echo l(t('Login to Watch'), 'user/login', array('query' => drupal_get_destination())); ?></p>
+        <?php } ?> 
+    </div>
+    <?php } if($item['machinetags']['bctg']) { ?>
     <div id="item-trailer">
       <h2>Additional Content</h2>
       <p>Each Book Club to Go kit contains a guide to facilitate group discussion and understanding of the book that includes summary information and reviews of the title, an author biography, a list of suggested discussion questions and read-alikes, and tips for book groups.  This guide is available for download:</p>
