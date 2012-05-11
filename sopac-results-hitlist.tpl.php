@@ -56,6 +56,9 @@ if ($locum_result['status']['holds'] > 0) {
 if($locum_result['mat_code'] == 'z') {
   $availtext = "This item is available for download";
 }
+if($locum_result['mat_code'] == 'q') {
+  $availtext = "This item is available for online streaming by AADL cardholders";
+}
 ?>
   <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
@@ -159,8 +162,9 @@ if($locum_result['mat_code'] == 'z') {
         <?php
           if($locum_result['mat_code'] == 'z') { ?>
             <li class="button green"><?php echo l("View Album", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
-       <?php  }
-          else if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
+       <?php  } elseif ($locum_result['mat_code'] == 'q') { ?>
+            <li class="button green"><?php echo l("Watch Online", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
+       <?php }  else if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
             <li class="button">Library Use Only</li>
         <?php } else if (in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
             <li class="button red">Not Requestable</li>
@@ -174,7 +178,7 @@ if($locum_result['mat_code'] == 'z') {
               print sopac_put_staff_request_link($locum_result['_id']);
             }
           }
-          if ($user->uid && $locum_result['mat_code'] != 'z') {
+          if ($user->uid && $locum_result['mat_code'] != 'z' && $locum_result['mat_code'] != 'q') {
             include_once('sopac_user.php');
             print sopac_put_list_links($locum_result['_id'], $list_display);
           }
