@@ -47,7 +47,7 @@ else {
 <div class="hitlist-top-bar">
 <?php echo $rss_link; ?>
 <?php if ($locum_result['changed'] == "yes") { ?>
-  <p class="resultswitch">No results found for <strong>ALL</strong> your keywords. Found <?php echo $result_info[num_results]; ?> results that match <strong>ANY</strong> terms.</p>
+  <p class="resultswitch">No results found for <strong>ALL</strong> your search terms. Found <?php echo $result_info[num_results]; ?> results that match <strong>ANY</strong> terms.</p>
 <?php } ?>
 <?php if ($locum_result['suggestion']) { ?>
 <div class="hitlist-suggestions">
