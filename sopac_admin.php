@@ -626,8 +626,8 @@ function sopac_admin_moderate_delete_confirm_submit($form, &$form_state) {
         if ($player = summergame_player_load(array('uid' => $review['uid']))) {
           // Delete the points from the player record if found
           db_query("DELETE FROM sg_ledger WHERE pid = %d AND type = 'Wrote Review' " .
-                   "AND metadata LIKE '%%bnum:%d' AND description LIKE '%s%%'",
-                   $player['pid'], $review['bnum'], $review['rev_title']);
+                   "AND metadata LIKE '%%bnum:%d%%'",
+                   $player['pid'], $review['bnum']);
           if (db_affected_rows()) {
             $player_link = l($points . ' Summer Game score card', 'summergame/player/' . $player['pid']);
             drupal_set_message("Removed points for this review from player's $player_link");
@@ -644,8 +644,8 @@ function sopac_admin_moderate_delete_confirm_submit($form, &$form_state) {
         if ($player = summergame_player_load(array('uid' => $tag['uid']))) {
           // Delete the points from the player record if found
           db_query("DELETE FROM sg_ledger WHERE pid = %d AND type = 'Tagged an Item' " .
-                   "AND metadata LIKE '%%bnum:%d' AND description LIKE '%%%s%%'",
-                   $player['pid'], $tag['bnum'], $tag['tag']);
+                   "AND metadata LIKE '%%bnum:%d%%'",
+                   $player['pid'], $tag['bnum']);
           if (db_affected_rows()) {
             $player_link = l($points . ' Summer Game score card', 'summergame/player/' . $player['pid']);
             drupal_set_message("Removed points for this tag from player's $player_link");
