@@ -163,13 +163,17 @@ function theme_sopac_tag_block($block_type) {
         $insurge->delete_user_tag($user->uid, urldecode($_GET['deltag']), $bnum);
         drupal_set_message('Tag "' . urldecode($_GET['deltag']) . '" Deleted');
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
-          // Delete the points from the player record if found
-          db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Tagged an Item' " .
-                   "AND description LIKE '%%bnum:%d' AND description LIKE '%%%s%%'",
-                   $player['pid'], $bnum, urldecode($_GET['deltag']));
-          if (db_affected_rows()) {
-            $player_link = l('Summer Game score card', 'summergame/player/' . $player['pid']);
-            drupal_set_message("Removed points for this tag from your $player_link");
+          // Check if the user has any more tags for this item
+          $tag_arr_user = $insurge->get_tag_totals($user->uid, $bnum_arr, NULL, FALSE, NULL, NULL, 'ORDER BY tag ASC');
+          if (!count($tag_arr_user)) {
+            // No more tags on this item for the player, remove points
+            db_query("DELETE FROM sg_ledger WHERE pid = %d AND type = 'Tagged an Item' " .
+                     "AND metadata LIKE '%%bnum:%d' AND description LIKE '%%%s%%'",
+                     $player['pid'], $bnum, urldecode($_GET['deltag']));
+            if (db_affected_rows()) {
+              $player_link = l('Summer Game score card', 'summergame/player/' . $player['pid']);
+              drupal_set_message("Removed points for tagging this item from your $player_link");
+            }
           }
         }
         drupal_goto($_GET[q]);
@@ -409,10 +413,19 @@ function sopac_tag_form_submit($form, &$form_state) {
   if (count($tids) && module_exists('summergame')) {
     if (variable_get('summergame_points_enabled', 0)) {
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
-        foreach ($tids as $tid) {
-          $tag = $insurge->get_tag($tid);
+        // Check if player has already tagged this item
+        $row = db_fetch_object(db_query("SELECT * FROM sg_ledger WHERE type = 'Tagged an Item' AND metadata LIKE '%%bnum:%d%%' LIMIT 1", $bnum));
+        if ($row->lid) {
+          drupal_set_message("No Summer Game points awarded, already tagged this item for $row->points points on " . date('F j, Y, g:i a', $row->timestamp));
+        }
+        else {
+          $tags = array();
+          foreach ($tids as $tid) {
+            $tag = $insurge->get_tag($tid);
+            $tags[] = $tag['tag'];
+          }
           $points = summergame_player_points($player['pid'], 10, 'Tagged an Item',
-                                             'Added ' . $tag['tag'] . ' bnum:' . $bnum);
+                                            'Added ' . implode(', ', $tags), 'bnum:' . $bnum);
           $points_link = l($points . ' Summer Game points', 'summergame/player');
           drupal_set_message("Earned $points_link for tagging an item in the catalog");
         }
@@ -665,7 +678,7 @@ function sopac_review_form_submit($form, &$form_state) {
 
   if ($user->uid) {
     // Strip HTML from review
-    $form_state['values']['rev_body'] = strip_tags($form_state['values']['rev_body']);
+    $form_state['values']['rev_body'] = trim(strip_tags($form_state['values']['rev_body']));
 
     $insurge = sopac_get_insurge();
     if ($form_state['values']['form_type'] == 'edit') {
@@ -677,10 +690,21 @@ function sopac_review_form_submit($form, &$form_state) {
       if (module_exists('summergame')) {
         if (variable_get('summergame_points_enabled', 0)) {
           if ($player = summergame_player_load(array('uid' => $user->uid))) {
-            $points = summergame_player_points($player['pid'], 100, 'Wrote Review',
-                                               $form_state['values']['rev_title'] . ' bnum:' . $form_state['values']['rev_bnum']);
-            $points_link = l($points . ' Summer Game points', 'summergame/player');
-            drupal_set_message("Earned $points_link for writing a review");
+            // Check for review uniqueness
+            $unique = TRUE;
+            $user_reviews = $insurge->get_reviews($user->uid, NULL, NULL, 100);
+            foreach ($user_reviews['reviews'] as $user_review) {
+              if ($form_state['values']['rev_body'] == $user_review['rev_body']) {
+                $unique == FALSE;
+                break;
+              }
+            }
+            if ($unique) {
+              $points = summergame_player_points($player['pid'], 50, 'Wrote Review',
+                                                 $form_state['values']['rev_title'], 'bnum:' . $form_state['values']['rev_bnum']);
+              $points_link = l($points . ' Summer Game points', 'summergame/player');
+              drupal_set_message("Earned $points_link for writing a review");
+            }
           }
         }
       }
@@ -776,8 +800,8 @@ function sopac_delete_review_form_submit($form, &$form_state) {
         $review = $reviews['reviews'][0];
 
         // Delete the points from the player record if found
-        db_query("DELETE FROM sg_ledger WHERE pid = %d AND code_text = 'Wrote Review' " .
-                 "AND description LIKE '%%bnum:%d' AND description LIKE '%s%%'",
+        db_query("DELETE FROM sg_ledger WHERE pid = %d AND type = 'Wrote Review' " .
+                 "AND metadata LIKE '%%bnum:%d' AND description LIKE '%s%%'",
                  $player['pid'], $review['bnum'], $review['rev_title']);
         if (db_affected_rows()) {
           $player_link = l($points . ' Summer Game score card', 'summergame/player');
@@ -816,15 +840,29 @@ function theme_sopac_get_rating_stars($bnum, $rating = NULL, $show_label = TRUE,
       if (variable_get('summergame_points_enabled', 0)) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
           // Check that player has not already rated this item
-          $res = db_query("SELECT lid FROM sg_ledger WHERE pid = %d AND code_text = 'Rated an Item' " .
-                          "AND description LIKE '%%bnum:%d' LIMIT 1",
+          $res = db_query("SELECT lid FROM sg_ledger WHERE pid = %d AND type = 'Rated an Item' " .
+                          "AND metadata LIKE '%%bnum:%d' LIMIT 1",
                           $player['pid'], $bnum);
           $rate_count = db_fetch_object($res);
           if (!$rate_count->lid) {
-            $points = summergame_player_points($player['pid'], 10, 'Rated an Item',
-                                               'Added a Rating to the Catalog bnum:' . $bnum);
+            $points = 10;
+
+            // Check if the item is in their checkout history
+            $ch_list = db_fetch_object(db_query("SELECT * FROM sopac_lists WHERE uid = %d and title = 'Checkout History'", $user->uid));
+            if ($ch_list->list_id) {
+              $ch_items = $insurge->get_list_items($ch_list->list_id);
+              foreach ($ch_items as $ch_item) {
+                if ($ch_item['bnum'] == $bnum) {
+                  $points = 50;
+                  $extra_message = ' from your ' . l('Checkout History', 'user/lists/' . $ch_list->list_id);
+                  break;
+                }
+              }
+            }
+            $points = summergame_player_points($player['pid'], $points, 'Rated an Item',
+                                               'Added a Rating to the Catalog', 'bnum:' . $bnum);
             $points_link = l($points . ' Summer Game points', 'summergame/player');
-            drupal_set_message("Earned $points_link for rating an item in the catalog");
+            drupal_set_message("Earned $points_link for rating an item in the catalog" . $extra_message);
           }
         }
       }

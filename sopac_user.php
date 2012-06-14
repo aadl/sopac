@@ -2011,7 +2011,7 @@ function sopac_list_edit_form_submit($form, &$form_state) {
       if (variable_get('summergame_points_enabled', 0)) {
         if ($player = summergame_player_load(array('uid' => $user->uid))) {
           $points = summergame_player_points($player['pid'], 50, 'Created List',
-                                             'Created List ' . trim($values['title']) . ' list:' . $list_id);
+                                             'Created List ' . trim($values['title']), 'list:' . $list_id);
           $points_link = l($points . ' Summer Game points', 'summergame/player');
           drupal_set_message("Earned $points_link for creating a new public list");
         }
@@ -2070,7 +2070,7 @@ function sopac_list_add($bnum, $list_id = 0) {
         if (variable_get('summergame_points_enabled', 0)) {
           if ($player = summergame_player_load(array('uid' => $user->uid))) {
             $points = summergame_player_points($player['pid'], 10, 'Add to List',
-                                               'Added an item to a list bnum:' . $bnum);
+                                               'Added an item to a list', 'bnum:' . $bnum);
             $points_link = l($points . ' Summer Game points', 'summergame/player');
             drupal_set_message("Earned $points_link for adding an item to a list");
           }
@@ -2464,8 +2464,10 @@ function sopac_update_history($list) {
       $total++;
       // Summer Game
       if ($player) {
+        $metadata = array('bnum' => $checkout['bibNum'],
+                          'daily_limit' => 1000);
         $points = summergame_player_points($player['pid'], 10, 'Checkout History',
-                                           'Item added from Checkout History bnum:' . $checkout['bibNum']);
+                                           'Item added from Checkout History', $metadata);
         $points_link = l($points . ' Summer Game points', 'summergame/player');
         drupal_set_message("Earned $points_link Summer Game points for a new checkout");
       }
