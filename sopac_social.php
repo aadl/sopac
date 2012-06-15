@@ -414,7 +414,7 @@ function sopac_tag_form_submit($form, &$form_state) {
     if (variable_get('summergame_points_enabled', 0)) {
       if ($player = summergame_player_load(array('uid' => $user->uid))) {
         // Check if player has already tagged this item
-        $row = db_fetch_object(db_query("SELECT * FROM sg_ledger WHERE type = 'Tagged an Item' AND metadata LIKE '%%bnum:%d%%' LIMIT 1", $bnum));
+        $row = db_fetch_object(db_query("SELECT * FROM sg_ledger WHERE type = 'Tagged an Item' AND metadata LIKE '%%bnum:%d%%' AND pid = %d LIMIT 1", $bnum, $player['pid']));
         if ($row->lid) {
           drupal_set_message("No Summer Game points awarded, already tagged this item for $row->points points on " . date('F j, Y, g:i a', $row->timestamp));
         }
