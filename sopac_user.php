@@ -2469,7 +2469,7 @@ function sopac_update_history($list) {
         $points = summergame_player_points($player['pid'], 10, 'Checkout History',
                                            'Item added from Checkout History', $metadata);
         $points_link = l($points . ' Summer Game points', 'summergame/player');
-        drupal_set_message("Earned $points_link Summer Game points for a new checkout");
+        drupal_set_message("Earned $points_link for a new checkout");
       }
     }
   }
