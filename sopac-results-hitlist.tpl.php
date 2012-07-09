@@ -40,7 +40,7 @@ if ($avail > 0) {
   $availtext = 'There ' . ($avail == 1 ? 'is' : 'are') . " currently $avail available";
 }
 else {
-  $availtext = 'There are no copies available';
+  $availtext = 'There are no copies currently available,';
 }
 if ($zooms_avail > 0) {
 //  $zoom_text = l('Zoom Lends', 'catalog/browse/unusual', array('alias' => TRUE, 'fragment' => 'ZOOM', 'query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe')));
@@ -50,8 +50,10 @@ if ($zooms_avail > 0) {
 if ($locum_result['status']['avail']) {
   $availtext .= ":";
 }
-if ($locum_result['status']['holds'] > 0) {
-  $reqtext = $locum_result['status']['holds'] . ' request' . ($locum_result['status']['holds'] == 1 ? '' : 's') . " on " . $locum_result['status']['total'] . ' ' . ($locum_result['status']['total'] == 1 ? 'copy' : 'copies');
+else {
+  $reqtext = ($locum_result['status']['holds'] ? $locum_result['status']['holds'] : 'No') .
+             ' request' . ($locum_result['status']['holds'] == 1 ? '' : 's') . " on " .
+             $locum_result['status']['total'] . ' ' . ($locum_result['status']['total'] == 1 ? 'copy' : 'copies');
 }
 if($locum_result['mat_code'] == 'z') {
   $availtext = "This item is available for download";
