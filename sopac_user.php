@@ -93,7 +93,7 @@ function sopac_user_info_table(&$account, &$locum) {
 
   if ($account->profile_pref_cardnum) {
     $cardnum = $account->profile_pref_cardnum;
-    $cardnum_link = l($cardnum, 'user/' . $account->uid . '/edit/Preferences');
+    $cardnum_link = $cardnum . " (" . l('Edit', 'user/' . $account->uid . '/edit/Preferences') . ")";
     $userinfo = $locum->get_patron_info($cardnum);
     $bcode_verify = sopac_bcode_isverified($account);
 
