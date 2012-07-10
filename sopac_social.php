@@ -692,7 +692,7 @@ function sopac_review_form_submit($form, &$form_state) {
           if ($player = summergame_player_load(array('uid' => $user->uid))) {
             // Check for review uniqueness
             $unique = TRUE;
-            $user_reviews = $insurge->get_reviews($user->uid, NULL, NULL, 100);
+            $user_reviews = $insurge->get_reviews($user->uid, NULL, NULL, 100, 1);
             foreach ($user_reviews['reviews'] as $user_review) {
               if ($form_state['values']['rev_body'] == $user_review['rev_body']) {
                 $unique = FALSE;
@@ -704,6 +704,9 @@ function sopac_review_form_submit($form, &$form_state) {
                                                  $form_state['values']['rev_title'], 'bnum:' . $form_state['values']['rev_bnum']);
               $points_link = l($points . ' Summer Game points', 'summergame/player');
               drupal_set_message("Earned $points_link for writing a review");
+            }
+            else {
+              drupal_set_message("Sorry, you already wrote that review on another item. Write unique reviews to earn Summer Game points.");
             }
           }
         }
