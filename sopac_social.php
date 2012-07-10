@@ -695,7 +695,7 @@ function sopac_review_form_submit($form, &$form_state) {
             $user_reviews = $insurge->get_reviews($user->uid, NULL, NULL, 100);
             foreach ($user_reviews['reviews'] as $user_review) {
               if ($form_state['values']['rev_body'] == $user_review['rev_body']) {
-                $unique == FALSE;
+                $unique = FALSE;
                 break;
               }
             }
