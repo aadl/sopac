@@ -47,7 +47,16 @@ if ($zooms_avail > 0) {
   $zoom_text = 'Zoom Lends';
   $availtext .= " ($zooms_avail $zoom_text " . ' available)';
 }
-if ($locum_result['status']['avail']) {
+if($locum_result['mat_code'] == 'z') {
+  $availtext = "This item is available for download";
+}
+else if($locum_result['mat_code'] == 'q') {
+  $availtext = "This item is available for online streaming by AADL cardholders";
+}
+else if($locum_result['db_link']) {
+  $availtext = "This item is a database that AADL subscribes to. You can access it online.";
+}
+else if ($locum_result['status']['avail']) {
   $availtext .= ":";
 }
 else {
@@ -55,12 +64,7 @@ else {
              ' request' . ($locum_result['status']['holds'] == 1 ? '' : 's') . " on " .
              $locum_result['status']['total'] . ' ' . ($locum_result['status']['total'] == 1 ? 'copy' : 'copies');
 }
-if($locum_result['mat_code'] == 'z') {
-  $availtext = "This item is available for download";
-}
-if($locum_result['mat_code'] == 'q') {
-  $availtext = "This item is available for online streaming by AADL cardholders";
-}
+
 ?>
   <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
     <td class="hitlist-number"><?php print $result_num; ?></td>
@@ -170,6 +174,9 @@ if($locum_result['mat_code'] == 'q') {
             <li class="button">Library Use Only</li>
         <?php } else if (in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
             <li class="button red">Not Requestable</li>
+        <?php }
+            else if ($locum_result['db_link']){ ?>
+            <li class="button"><a href="<?php print $locum_result['db_link']; ?>">Visit Website</a></li>
         <?php }
           else {
             print sopac_put_request_link($locum_result['_id'],
