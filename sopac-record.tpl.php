@@ -116,7 +116,7 @@ if($item_status) {
     <?php
     if (variable_get('sopac_social_enable', 1)) {
       print '<div class="item-rating">';
-      print theme_sopac_get_rating_stars($item['bnum']);
+      print theme_sopac_get_rating_stars($item['_id']);
       print '</div>';
     }
     ?>
