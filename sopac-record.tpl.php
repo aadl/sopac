@@ -362,8 +362,11 @@ if($item_status) {
       elseif ($item['db_link']) { ?>
         <p>This item is a database that AADL subscribes to. <a href="<?php print $item['db_link']; ?>">You can access it online.</a></p>
       <?php }
-      elseif ($item['stream_filename']) { ?>
+      elseif ($item['stream_filetype'] == 'mp4') { ?>
         <p>This item is available for instant online streaming to logged-in AADL cardholders. Just click play below to watch in its entirety!</p>
+      <?php }
+      elseif ($item['stream_filetype'] == 'pdf') { ?>
+        <p>This item is available for instant viewing to logged-in AADL cardholders. Just click the link below to open the PDF!</p>
       <?php }
       else {
         if (!$no_avail_mat_codes) {
@@ -392,7 +395,7 @@ if($item_status) {
     ?>
     <div id="item-trailer">
       <h2>View Online</h2>
-      <?php if($verified){ ?>
+      <?php if($verified){ if($item['stream_filetype'] == 'mp4') { ?>
         <p><script type="text/javascript" src="http://media.aadl.org/jw59/jwplayer.js"></script>
         <video
           controls 
@@ -413,12 +416,18 @@ if($item_status) {
         			height: 406		
         		});
         </script></p>
-        <?php } elseif ($user->uid) { ?>
+        <?php } 
+          elseif ($item['stream_filetype'] == 'pdf') { ?>
+          <p><a href="<?php echo $stream_link; ?>">View a PDF of this item online</a></p>
+          <p><a href="<?php echo $stream_link; ?>"><img src="<?php echo $picture_link; ?>" /></a></p>
+        <?php  }
+        }   
+        elseif ($user->uid) { ?>
           <p><?php echo l('<img src="' . $picture_link . '" alt="register to watch" />', 'user/login', array('query' => drupal_get_destination(), 'html' => TRUE)); ?></p>
-          <p><ul><li class="button green"><?php echo l(t('Register/Verify Card to Watch'), 'user/' . $user->uid); ?></li></ul></p>
+          <p><ul><li class="button green"><?php echo l(t('Register/Verify Card to View'), 'user/' . $user->uid); ?></li></ul></p>
         <?php } else { ?>
           <p><?php echo l('<img src="' . $picture_link . '" alt="login to watch" />', 'user/login', array('query' => drupal_get_destination(), 'html' => TRUE)); ?></p>
-          <p><ul><li class="button green"><?php echo l(t('Login to Watch'), 'user/login', array('query' => drupal_get_destination())); ?></li></ul></p>
+          <p><ul><li class="button green"><?php echo l(t('Login to View'), 'user/login', array('query' => drupal_get_destination())); ?></li></ul></p>
         <?php } ?> 
     </div>
     <?php } if($item['machinetags']['bctg']) { ?>
