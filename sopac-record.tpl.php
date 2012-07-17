@@ -379,7 +379,7 @@ if($item_status) {
     if($item['stream_filename']){
       $verified == FALSE;
         $secret = $locum_config['api_config']['streaming_secret'];
-        $path   = '/streaming/'.$item['stream_filename'].'.mp4';
+        $path   = '/streaming/'.$item['stream_filename'].'.'.$item['stream_filetype'];
         $expire = time() + 7200; # 2 hours
         $md5 = base64_encode(md5($secret . $path . $expire, true));
         $md5 = strtr($md5, '+/', '-_');
@@ -391,7 +391,7 @@ if($item_status) {
       }
     ?>
     <div id="item-trailer">
-      <h2>Watch Online</h2>
+      <h2>View Online</h2>
       <?php if($verified){ ?>
         <p><script type="text/javascript" src="http://media.aadl.org/jw59/jwplayer.js"></script>
         <video
