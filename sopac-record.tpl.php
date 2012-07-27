@@ -56,7 +56,7 @@ if($item_status) {
   // Get Zoom Lends copies
   $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
   $avail = $item_status['avail'] - $zooms_avail;
-  
+
   if ($avail > 0) {
     $reqtext = 'There ' . ($avail == 1 ? 'is' : 'are') . " currently $avail available";
   }
@@ -71,7 +71,7 @@ if($item_status) {
   if ($item_status['holds'] > 0) {
     $reqtext .= ' and ' . $item_status['holds'] . ' request' . ($item_status['holds'] == 1 ? '' : 's') . " on " . $item_status['total'] . ' ' . ($item_status['total'] == 1 ? 'copy' : 'copies');
   }
-  
+
   // Build the item availability array
   if (count($item_status['items'])) {
     foreach ($item_status['items'] as $copy_status) {
@@ -398,37 +398,37 @@ if($item_status) {
       <?php if($verified){ if($item['stream_filetype'] == 'mp4') { ?>
         <p><script type="text/javascript" src="http://media.aadl.org/jw59/jwplayer.js"></script>
         <video
-          controls 
-          height="406" 
+          controls
+          height="406"
           preload="none"
           poster="<?php echo $picture_link; ?>"
-          src="<?php echo $stream_link; ?>" 
+          src="<?php echo $stream_link; ?>"
           width="720" id="player1">
-        </video> 
+        </video>
         <script type='text/javascript'>
-        		jwplayer("player1").setup({ 
+        		jwplayer("player1").setup({
         			flashplayer: "http://media.aadl.org/jw59/player.swf",
         			file: "<?php echo $stream_link; ?>",
         			image: "<?php echo $picture_link; ?>",
         			skin: 'http://media.aadl.org/jw59/glow/glow.zip',
         			provider: "http",
         			width: 720,
-        			height: 406		
+        			height: 406
         		});
         </script></p>
-        <?php } 
+        <?php }
           elseif ($item['stream_filetype'] == 'pdf') { ?>
           <p><a href="<?php echo $stream_link; ?>">View a PDF of this item online</a></p>
           <p><a href="<?php echo $stream_link; ?>"><img src="<?php echo $picture_link; ?>" /></a></p>
         <?php  }
-        }   
+        }
         elseif ($user->uid) { ?>
           <p><?php echo l('<img src="' . $picture_link . '" alt="register to watch" />', 'user/login', array('query' => drupal_get_destination(), 'html' => TRUE)); ?></p>
           <p><ul><li class="button green"><?php echo l(t('Register/Verify Card to View'), 'user/' . $user->uid); ?></li></ul></p>
         <?php } else { ?>
           <p><?php echo l('<img src="' . $picture_link . '" alt="login to watch" />', 'user/login', array('query' => drupal_get_destination(), 'html' => TRUE)); ?></p>
           <p><ul><li class="button green"><?php echo l(t('Login to View'), 'user/login', array('query' => drupal_get_destination())); ?></li></ul></p>
-        <?php } ?> 
+        <?php } ?>
     </div>
     <?php } if($item['machinetags']['bctg']) { ?>
     <div id="item-trailer">
@@ -438,7 +438,7 @@ if($item_status) {
         <p><a href="<?php print $machinetag['value']; ?>">Guide<?php print ($machinetag['predicate'] == 'large') ? ' (large print)' : ''; print ($machinetag['predicate'] == 'text') ? ' (text file)' : ''; ?>: <?php print title_case($item['title']);?></a></p>
       <?php } ?>
     </div>
-    <?php } if($item['tq_item']){ ?>    
+    <?php } if($item['tq_item']){ ?>
     <div id="item-trailer">
     <h2><?php echo $item['tq_item']; ?></h2>
     <p><?php echo $item['tq_text']; ?></p>
@@ -555,6 +555,12 @@ if($item_status) {
         </div>
       </div>
     <?php } ?>
+
+    <!-- Embed iframe -->
+    <?php
+    if ($item['iframe']) {
+      print '<iframe width="100%" height="1000px" src="' . $item['iframe'] . '"></iframe>';
+    } ?>
   <!-- end right-hand column -->
   </div>
 
