@@ -209,7 +209,7 @@ function sopac_catalog_search() {
   $search_feed_url = sopac_update_url(request_uri(), 'output', 'rss');
   drupal_add_feed($search_feed_url, 'Search for "' . $search_term . '"');
 
-  return '<p>'. t($result_page) .'</p>';
+  return $result_page;
 
 }
 
@@ -1077,7 +1077,7 @@ function sopac_search_form_basic() {
   );
   // Start creating the basic search form
   $form['inline'] = array(
-    '#prefix' => '<div class="container-inline">',
+    '#prefix' => '<div class="basic-search-inline">',
     '#suffix' => '</div>'
   );
   $form['inline']['search_query'] = array(
@@ -1087,45 +1087,41 @@ function sopac_search_form_basic() {
     '#maxlength' => 255,
     '#attributes' => array('x-webkit-speech' => 'true'),
   );
-  $form['inline']['search_type'] = array(
-    '#type' => 'select',
-    '#title' => t(' by '),
-    '#default_value' => $stype_selected,
-    '#options' => $stypes,
-  );
-  $form['inline']['search_format'] = array(
-    '#type' => 'select',
-    '#title' => t(' in '),
-    '#default_value' => $_GET['search_format'],
-    '#selected' => $_GET['search_format'],
-    '#options' => $sformats,
-  );
   $form['inline']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Search'),
   );
-  $form['inline']['advanced_link'] = array(
-    '#prefix' => '<div class="searchtips">',
-    '#value' => l(" Advanced Search", variable_get('sopac_url_prefix', 'cat/seek') . '/advanced'),
+  
+  $form['filters'] = array(
+    '#prefix' => '<div id="filters">',
+    '#suffix' => '</div>'
   );
-  $form['inline']['search_tips'] = array(
-    '#value' => l("Search Tips", variable_get('sopac_url_prefix', 'cat/seek') . '/tips'),
-    '#suffix' => '</div>',
-  );
-  $form['inline2'] = array(
-    '#prefix' => '<div class="container-inline">',
-    '#suffix' => '</div>',
-  );
-  $form['inline2']['limit'] = array(
-    '#type' => 'checkbox',
-    '#default_value' => $getvars['limit'],
-  );
-  $form['inline2']['limit_avail'] = array(
+  $form['filters']['search_type'] = array(
     '#type' => 'select',
-    '#title' => 'limit to items available at',
-    '#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
+    '#title' => t('Search By'),
+    '#default_value' => $stype_selected,
+    '#options' => $stypes,
+  );
+  $form['filters']['search_format'] = array(
+    '#type' => 'select',
+    '#title' => t('Material'),
+    '#default_value' => $_GET['search_format'],
+    '#selected' => $_GET['search_format'],
+    '#options' => $sformats,
+  );
+  $form['filters']['limit_avail'] = array(
+    '#type' => 'select',
+    '#title' => 'Available At',
+    '#options' => array_merge(array('' => '--', 'any' => "Any Location"), $locum_cfg['branches']),
     '#default_value' => $getvars['limit_avail'],
   );
+/*
+  $form['advanced'] = array(
+    '#value' => l("Advanced Search", variable_get('sopac_url_prefix', 'cat/seek') . '/advanced') .
+                '&nbsp;' .
+                l("Search Tips", variable_get('sopac_url_prefix', 'cat/seek') . '/tips'),
+  );
+*/
   return $form;
 }
 
@@ -1363,6 +1359,10 @@ function sopac_search_catalog_submit($form, &$form_state) {
     }
 
     // Limit to Available
+    if ($form_state['values']['limit_avail']) {
+      $uris['limit_avail'] = $form_state['values']['limit_avail'];
+    }
+/*
     if ($form_state['values']['limit_avail'] || $form_state['values']['limit']) {
       if (variable_get('sopac_multi_branch_enable', 0)) {
         if ($form_state['values']['limit_avail'] && $form_state['values']['limit']) {
@@ -1373,6 +1373,7 @@ function sopac_search_catalog_submit($form, &$form_state) {
         $uris['limit_avail'] = 'any';
       }
     }
+*/
 
     // Publisher Search
     if ($form_state['values']['publisher']) {
