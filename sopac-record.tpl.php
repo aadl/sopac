@@ -52,7 +52,7 @@ $no_avail_mat_codes = in_array($item['mat_code'], $locum->csv_parser($locum_conf
 $location_label = $item['loc_code'] || ($item['loc_code'] != 'none') ? $locum_config['locations'][$item['loc_code']] : '';
 $note_arr = $item['notes'];
 
-if($item_status) {
+if ($item_status) {
   // Get Zoom Lends copies
   $zooms_avail = $item_status['callnums']['Zoom Lends DVD']['avail'] + $item_status['callnums']['Zoom Lends Book']['avail'];
   $avail = $item_status['avail'] - $zooms_avail;
