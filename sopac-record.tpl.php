@@ -362,11 +362,11 @@ if ($item_status) {
       elseif ($item['db_link']) { ?>
         <p>This item is a database that AADL subscribes to. <a href="<?php print $item['db_link']; ?>">You can access it online.</a></p>
       <?php }
-      elseif ($item['stream_filetype'] == 'mp4') { ?>
+      elseif ($item['stream_filetype'] == 'mp4') { $stream_action = 'View'; ?>
         <p>This item is available for instant online streaming to logged-in AADL cardholders. Just click play below to watch in its entirety!</p>
       <?php }
-      elseif ($item['stream_filetype'] == 'pdf') { ?>
-        <p>This item is available for instant viewing to logged-in AADL cardholders. Just click the link below to open the PDF!</p>
+      elseif ($item['stream_filetype'] == 'pdf') { $stream_action = 'Download'; ?>
+        <p>This item is available for instant download to logged-in AADL cardholders. Just click the link below to open the PDF!</p>
       <?php }
       else {
         if (!$no_avail_mat_codes) {
@@ -394,7 +394,7 @@ if ($item_status) {
       }
     ?>
     <div id="item-trailer">
-      <h2>View Online</h2>
+      <h2><?php echo $stream_action; ?> This Item</h2>
       <?php if($verified){ if($item['stream_filetype'] == 'mp4') { ?>
         <p><script type="text/javascript" src="http://media.aadl.org/jw59/jwplayer.js"></script>
         <video
@@ -418,7 +418,7 @@ if ($item_status) {
         </script></p>
         <?php }
           elseif ($item['stream_filetype'] == 'pdf') { ?>
-          <p><a href="<?php echo $stream_link; ?>">View a PDF of this item online</a></p>
+          <p><a href="<?php echo $stream_link; ?>">Download a PDF of this item</a></p>
           <p><a href="<?php echo $stream_link; ?>"><img src="<?php echo $picture_link; ?>" /></a></p>
         <?php  }
         }

@@ -166,7 +166,10 @@ else {
     <td class="hitlist-actions">
       <ul>
         <?php
-          if($locum_result['mat_code'] == 'z') { ?>
+          if ($locum_result['stream_filetype'] == 'pdf') { ?>
+            <li class="button green"><?php echo l("Download Available", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
+          <?php }
+          else if($locum_result['mat_code'] == 'z') { ?>
             <li class="button green"><?php echo l("View Album", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
        <?php  } elseif ($locum_result['mat_code'] == 'q') { ?>
             <li class="button green"><?php echo l("Watch Online", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
