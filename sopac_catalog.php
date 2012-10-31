@@ -263,7 +263,7 @@ function sopac_bib_record() {
       $item['machinetags'][$machinetag['namespace']][] = $machinetag;
     }
   }
-  if($item['magnatune_url'] || $item['mat_code'] == 'z'){
+  if(($item['magnatune_url'] || $item['mat_code'] == 'z') && !$item['stream_filetype']){
     $result_page = theme('sopac_record_musicdownload', $item, $locum->locum_config, $rev_arr, $rev_form);
   }
   else if ($item['mat_code']) {
@@ -514,7 +514,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
           $options = array('query' => array('lightbox' => 1), 'attributes' => array('rel' => 'lightframe'), 'alias' => TRUE);
         }
 
-        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'Music Download' && $mattype != 'Stream') {
+        if (variable_get('sopac_multi_branch_enable', 0) && $mattype != 'Music Download' && $mattype != 'Stream' && $mattype != 'Download') {
           $locum = sopac_get_locum();
           $branches = $locum->locum_config['branches'];
           $class .= ' hassub';
@@ -543,8 +543,12 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         else if($mattype == 'Music Download') {
           $text = '<a href="/'.variable_get('sopac_url_prefix', 'cat/seek').'/record/'.$bnum.'/download?type=album">'.$text.'</a>';
         }
-        else if ($mattype == 'Stream')
+        else if ($mattype == 'Stream') {
           $text = 'View Online Below';
+        }
+        else if ($mattype == 'Download') {
+          $text = 'Download Below';
+        }
         else {
           $text = l($text, variable_get('sopac_url_prefix', 'cat/seek') . '/request/' . $bnum, array('alias' => TRUE));
         }

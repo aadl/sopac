@@ -454,8 +454,11 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
 
   // loop through the tag array
   foreach ($tags as $tag => $value) {
-    if(preg_match("/^([a-z](?:[a-z0-9_]+))\:([a-z](?:[a-z0-9_]+))\=(.*)/i",$tag, $mt)) {
+    if (preg_match("/^([a-z](?:[a-z0-9_]+))\:([a-z](?:[a-z0-9_]+))\=(.*)/i", $tag, $mt)) {
       $machinetags[] = $mt;
+      if ($mt[1] == 'sg' && $mt[2] == 'code') {
+        $game_codes[] = $mt[3];
+      }
     }
     else {
       if ($cloud_type == 'personal') {
@@ -474,29 +477,24 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
       $cloud .= l($disp_tag, $link, array('attributes' => $attributes)) . ' ';
     }
   }
-  if ($machinetags) {
+  if ($game_codes) {
     $content .= '<h3>Game Code</h3><ul>';
     global $user;
-    if ($user->uid) {
-      $player = summergame_player_load(array('uid' => $user->uid));
-    }
-    foreach ($machinetags as $machinetag) {
-      if ($machinetag[1] == 'sg') {
-        $text = strtoupper($machinetag[3]);
-        $content .= '<li>';
-        if ($player['pid']) {
-          $content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $player['pid'],
-                        array('query' => array('text' => $text)));
-        }
-        else {
-          $content .= l($text, 'http://play.aadl.org/summergame/player');
-        }
-        $content .= '</li>';
+    foreach ($game_codes as $game_code) {
+      $text = strtoupper($game_code);
+      $content .= '<li>';
+      if ($user->player['pid']) {
+        $content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $player['pid'],
+                      array('query' => array('text' => $text)));
       }
+      else {
+        $content .= l($text, 'http://play.aadl.org/summergame/player');
+      }
+      $content .= '</li>';
     }
     $content .= '</ul>';
   }
-  if($cloud){
+  if ($cloud) {
     $content .=  '<h3>Tags</h3><div class="tag-cloud">' . $cloud . '</div>';
   } else {
     $content .= '<h3>Tags</h3>'.t('No tags.');
