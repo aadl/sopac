@@ -113,9 +113,9 @@ else {
 </div>
 <?php } ?>
 
-<table class="hitlist-content">
+<div class="hitlist-content">
 <?php print $hitlist_content; ?>
-</table>
+</div>
 
 <div class="hitlist-pager">
 <?php print $hitlist_pager; ?>

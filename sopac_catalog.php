@@ -1095,7 +1095,7 @@ function sopac_search_form_basic() {
     '#type' => 'submit',
     '#value' => t('Search'),
   );
-  
+
   $form['filters'] = array(
     '#prefix' => '<div id="filters">',
     '#suffix' => '</div>'

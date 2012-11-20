@@ -4,10 +4,10 @@
     <tr>
       <th>Cancel</th>
       <th>Title</th>
-      <th>Format</th>
-      <th>Author</th>
+      <th class="hide-narrow">Format</th>
+      <th class="hide-narrow">Author</th>
       <th>Status</th>
-      <th>Pickup Location</th>
+      <th class="hide-narrow">Pickup Location</th>
     <?php if ($freezes_enabled) { ?>
       <th>Freeze</th>
     <?php } ?>
@@ -22,10 +22,10 @@
     <tr class="<?php print $zebra ?>">
       <td><?php print $hold['cancel'] ?></td>
       <td><?php print $hold['title_link'] ?></td>
-      <td><?php print $hold['format'] ?></td>
-      <td><?php print $hold['author'] ?></td>
+      <td class="hide-narrow"><?php print $hold['format'] ?></td>
+      <td class="hide-narrow"><?php print $hold['author'] ?></td>
       <td class="<?php print $hold['ready'] ?>"><?php print $hold['status'] ?></td>
-      <td><?php print $hold['pickup'] ?></td>
+      <td class="hide-narrow"><?php print $hold['pickup'] ?></td>
     <?php if ($freezes_enabled) { ?>
       <td><?php print $hold['freeze'] ?></td>
     <?php } ?>

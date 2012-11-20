@@ -226,7 +226,14 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     }
 
     $locum_cfg = $locum->locum_config;
-    $header = array('', t('Title'), t('Format'), t('Author'), t('Renews'), t('Due Date'));
+    $header = array(
+      '',
+      t('Title'),
+      array('data' => t('Format'), 'class' => 'hide-narrow'),
+      array('data' => t('Author'), 'class' => 'hide-narrow'),
+      array('data' => t('Renews'), 'class' => 'hide-narrow'),
+      t('Due Date'),
+    );
     $now = time();
     $ill_bnums = array(1358991, 1356138, 1358990, 1358993, 1358992); // Make config option
 
@@ -298,9 +305,9 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
       $rows[] = array(
         $checkbox,
         $title,
-        $locum_cfg['formats'][$co['bib']['mat_code']],
-        $author,
-        $co['numrenews'],
+        array('data' => $locum_cfg['formats'][$co['bib']['mat_code']], 'class' => 'hide-narrow'),
+        array('data' => $author, 'class' => 'hide-narrow'),
+        array('data' => $co['numrenews'], 'class' => 'hide-narrow'),
         $duedate . $dayspan,
       );
     }
