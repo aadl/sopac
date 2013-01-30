@@ -1119,13 +1119,14 @@ function sopac_search_form_basic() {
     '#options' => array_merge(array('' => '--', 'any' => "Any Location"), $locum_cfg['branches']),
     '#default_value' => $getvars['limit_avail'],
   );
-/*
   $form['advanced'] = array(
-    '#value' => l("Advanced Search", variable_get('sopac_url_prefix', 'cat/seek') . '/advanced') .
-                '&nbsp;' .
-                l("Search Tips", variable_get('sopac_url_prefix', 'cat/seek') . '/tips'),
+    '#value' => '<div class="basic-search-links">' .
+                l("Advanced Search", variable_get('sopac_url_prefix', 'cat/seek') . '/advanced') .
+                '&nbsp;|&nbsp;' .
+                l("Search Tips", variable_get('sopac_url_prefix', 'cat/seek') . '/tips') .
+                '</div>',
   );
-*/
+
   return $form;
 }
 

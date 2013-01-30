@@ -456,10 +456,11 @@ table.availtable {
   padding-left: 10px;
 }
 
-div.searchtips {
-  right: 10px;
-  text-align: right;
-  clear: left;
+.basic-search-links {
+  color: #736F49;
+  margin: auto;
+  padding-top: 0.5em;
+  max-width: 480px;
 }
 
 #sopac-search-form-basic .form-item label {
@@ -506,6 +507,7 @@ div.searchtips {
   margin: auto;
   max-width: 480px;
   width: 100%;
+  padding-top: 0.25em;
 }
 
 #sopac-search-form-basic #filters:after {
@@ -520,7 +522,7 @@ div.searchtips {
 #sopac-search-form-basic #edit-search-format-wrapper,
 #sopac-search-form-basic #edit-limit-avail-wrapper {
   float: left;
-  width: 33%;
+  width: 33.33%;
   margin: 0;
 }
 
