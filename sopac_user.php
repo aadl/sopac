@@ -1809,8 +1809,6 @@ function sopac_list_item_search_form(&$form_state, $search = NULL) {
 
 function sopac_list_item_search_form_submit($form, &$form_state) {
   $path = $_GET['q'];
-  unset($_GET['q']);
-  $query = $_GET;
   $query['search'] = $form_state['values']['search'];
   drupal_goto($path, $query);
 }
