@@ -431,6 +431,15 @@ function sopac_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['user/%/lists'] = array(
+    'title' => 'User Lists',
+    'page callback' => 'sopac_lists_listing_page',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'file' => 'sopac_user.php',
+    'type' => MENU_CALLBACK,
+  );
+  
   $items['user/lists/edit'] = array(
     'title' => 'Modify List',
     'page callback' => 'drupal_get_form',
