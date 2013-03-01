@@ -175,6 +175,10 @@ function sopac_user_info_table(&$account, &$locum) {
   if ($account->mail && variable_get('sopac_email_enable', 1)) {
     $email_link = l(t($account->mail), 'user/' . $account->uid . '/edit');
     $rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $email_link);
+    if ($userinfo['email']) {
+      $email_link = l(t($userinfo['email']), 'user/' . $account->uid . '/edit/Preferences');
+      $rows[] = array(array('data' => t('Notifications Email'), 'class' => 'attr_name'), $email_link);
+    }
   }
 
   // Begin creating the user information display content
@@ -1385,8 +1389,10 @@ function sopac_update_locum_acct($op, &$edit, &$account, $category) {
     return 0;
   }
 
-  if ($edit['mail'] && $pnum) {
-    // TODO update email. etc.
+  if ($edit['mail'] && $userinfo['pnum'] &&
+      ($userinfo['email'] != 'nonotices@aadl.org') &&
+      ($edit['mail'] != $userinfo['email'])) {
+    $locum->set_patron_info($userinfo['cardnum'], $edit['mail'], '');
   }
 
   if ($op == 'submit' && $category == 'Preferences') {
