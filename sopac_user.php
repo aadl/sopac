@@ -172,11 +172,13 @@ function sopac_user_info_table(&$account, &$locum) {
     }
   }
 
-  if ($account->mail && variable_get('sopac_email_enable', 1)) {
-    $email_link = l(t($account->mail), 'user/' . $account->uid . '/edit');
-    $rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $email_link);
+  if (variable_get('sopac_email_enable', 1)) {
+    if ($account->mail) {
+      $email_link = l(t($account->mail), 'user/' . $account->uid . '/edit');
+      $rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $email_link);
+    }
     if ($userinfo['email']) {
-      $email_link = l(t($userinfo['email']), 'user/' . $account->uid . '/edit/Preferences');
+      $email_link = l($userinfo['email'], 'user/' . $account->uid . '/edit/notifications');
       $rows[] = array(array('data' => t('Notifications Email'), 'class' => 'attr_name'), $email_link);
     }
   }
@@ -192,6 +194,68 @@ function sopac_user_info_table(&$account, &$locum) {
   }
 
   return $user_info_disp;
+}
+
+/**
+ * Modify the Notification email in SOPAC
+ */
+function sopac_notifications_form(&$form_state, $account) {
+  if (sopac_bcode_isverified($account)) {
+    $locum = sopac_get_locum();
+    $userinfo = $locum->get_patron_info($account->profile_pref_cardnum);
+
+    $form['cardnum'] = array(
+      '#type' => 'value',
+      '#value' => $userinfo['cardnum'],
+    );
+    $form['uid'] = array(
+      '#type' => 'value',
+      '#value' => $account->uid,
+    );
+    $form['email'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Notification Email'),
+      '#size' => 32,
+      '#maxlength' => 64,
+      '#default_value' => $userinfo['email'],
+      '#description' => t('Email for Hold Pickups, Courtesy, and Overdue Notifications'),
+    );
+    $form['inline'] = array(
+      '#prefix' => "<div class=\"container-inline\">",
+      '#suffix' => "</div>",
+    );
+    $form['inline']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+    );
+    $form['inline']['cancel'] = array(
+      '#value' => l('Cancel', 'user/' . $account->uid),
+    );
+  }
+  else {
+    drupal_set_message('Unable to change notification email without a verified library card', 'error');
+    drupal_goto('user/' . $account->uid);
+  }
+
+  return $form;
+}
+
+function sopac_notifications_form_validate($form, &$form_state) {
+  if (!valid_email_address($form_state['values']['email'])) {
+    form_set_error('email', 'Please enter a valid email address');
+  }
+}
+
+function sopac_notifications_form_submit($form, &$form_state) {
+  $email = $form_state['values']['email'];
+  $cardnum = $form_state['values']['cardnum'];
+  $uid = $form_state['values']['uid'];
+
+  $locum = sopac_get_locum();
+  $locum->set_patron_info($cardnum, $email, '');
+
+  drupal_set_message("Notifications for Library Card $cardnum will be sent to $email");
+  drupal_goto('user/' . $form_state['values']['uid']);
 }
 
 /**
@@ -1387,12 +1451,6 @@ function sopac_update_locum_acct($op, &$edit, &$account, $category) {
   }
   if (!$account->valid_card || !$bcode_verify) {
     return 0;
-  }
-
-  if ($edit['mail'] && $userinfo['pnum'] &&
-      ($userinfo['email'] != 'nonotices@aadl.org') &&
-      ($edit['mail'] != $userinfo['email'])) {
-    $locum->set_patron_info($userinfo['cardnum'], $edit['mail'], '');
   }
 
   if ($op == 'submit' && $category == 'Preferences') {
