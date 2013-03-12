@@ -113,14 +113,14 @@ function sopac_user_info_table(&$account, &$locum) {
     // Construct the user details table based on what is configured in the admin interface
     if ($account->valid_card && $bcode_verify) {
       if (variable_get('sopac_pname_enable', 1)) {
-        $rows[] = array(array('data' => t('Patron Name'), 'class' => 'attr_name'), $userinfo['name']);
+        $rows[] = array(array('data' => t('Patron Name:'), 'class' => 'attr_name'), $userinfo['name']);
       }
       if (variable_get('sopac_lcard_enable', 1)) {
-        $rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
+        $rows[] = array(array('data' => t('Library Card Number:'), 'class' => 'attr_name'), $cardnum_link);
       }
       // Add row for home branch if appropriate
       if ($home_branch_link) {
-        $rows[] = array(array('data' => t('Home Branch'), 'class' => 'attr_name'), $home_branch_link);
+        $rows[] = array(array('data' => t('Default Pickup Location:'), 'class' => 'attr_name'), $home_branch_link);
       }
       // Checkout history, if it's turned on
       if (variable_get('sopac_checkout_history_enable', 0)) {
@@ -135,10 +135,10 @@ function sopac_user_info_table(&$account, &$locum) {
         }
         // Reset cache age
         db_query("UPDATE {sopac_last_hist_check} SET last_hist_check = NOW()");
-        $rows[] = array(array('data' => t('Checkout History'), 'class' => 'attr_name'), l($cohist_enabled, 'user/checkout/history'));
+        $rows[] = array(array('data' => t('Checkout History:'), 'class' => 'attr_name'), l($cohist_enabled, 'user/checkout/history'));
       }
       if (variable_get('sopac_numco_enable', 1)) {
-        $rows[] = array(array('data' => t('Items Checked Out'), 'class' => 'attr_name'), $userinfo['checkouts']);
+        $rows[] = array(array('data' => t('Items Checked Out:'), 'class' => 'attr_name'), $userinfo['checkouts']);
       }
       if (variable_get('sopac_fines_display', 1) && variable_get('sopac_fines_enable', 1)) {
         if (variable_get('sopac_fines_warning_amount', 0) > 0 && $userinfo['balance'] > variable_get('sopac_fines_warning_amount', 0)) {
@@ -150,36 +150,36 @@ function sopac_user_info_table(&$account, &$locum) {
         if ($userinfo['balance'] > 0) {
           $balance = l($balance, 'user/fines');
         }
-        $rows[] = array(array('data' => t('Fine Balance'), 'class' => 'attr_name'), $balance);
+        $rows[] = array(array('data' => t('Account Balance:'), 'class' => 'attr_name'), $balance);
       }
       if (variable_get('sopac_cardexp_enable', 1)) {
-        $rows[] = array(array('data' => t('Card Expiration Date'), 'class' => 'attr_name'), date('m-d-Y', $userinfo['expires']));
+        $rows[] = array(array('data' => t('Card Expiration Date:'), 'class' => 'attr_name'), date('m-d-Y', $userinfo['expires']));
       }
       if (variable_get('sopac_tel_enable', 1)) {
-        $rows[] = array(array('data' => t('Telephone'), 'class' => 'attr_name'), $userinfo['tel1']);
+        $rows[] = array(array('data' => t('Telephone:'), 'class' => 'attr_name'), $userinfo['tel1']);
       }
     }
     else {
-      $rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
+      $rows[] = array(array('data' => t('Library Card Number:'), 'class' => 'attr_name'), $cardnum_link);
     }
   }
   else {
     $cardnum_link = l(t('Click to add your library card'), 'user/' . $account->uid . '/edit/Preferences');
-    $rows[] = array(array('data' => t('Library Card Number'), 'class' => 'attr_name'), $cardnum_link);
+    $rows[] = array(array('data' => t('Library Card Number:'), 'class' => 'attr_name'), $cardnum_link);
     // add row for home branch if appropriate
     if ($home_branch_link) {
-      $rows[] = array(array('data' => t('Home Branch'), 'class' => 'attr_name'), $home_branch_link);
+      $rows[] = array(array('data' => t('Default Pickup Location:'), 'class' => 'attr_name'), $home_branch_link);
     }
   }
 
   if (variable_get('sopac_email_enable', 1)) {
     if ($account->mail) {
       $email_link = l(t($account->mail), 'user/' . $account->uid . '/edit');
-      $rows[] = array(array('data' => t('Email'), 'class' => 'attr_name'), $email_link);
+      $rows[] = array(array('data' => t('Account Email:'), 'class' => 'attr_name'), $email_link);
     }
     if ($userinfo['email']) {
       $email_link = l($userinfo['email'], 'user/' . $account->uid . '/edit/notifications');
-      $rows[] = array(array('data' => t('Notifications Email'), 'class' => 'attr_name'), $email_link);
+      $rows[] = array(array('data' => t('Notifications Sent To:'), 'class' => 'attr_name'), $email_link);
     }
   }
 
@@ -218,7 +218,7 @@ function sopac_notifications_form(&$form_state, $account) {
       '#size' => 32,
       '#maxlength' => 64,
       '#default_value' => $userinfo['email'],
-      '#description' => t('Email for Hold Pickups, Courtesy, and Overdue Notifications'),
+      '#description' => t('Email for Catalog Request Pick Up, Courtesy, and Overdue Notifications'),
     );
     $form['inline'] = array(
       '#prefix' => "<div class=\"container-inline\">",
