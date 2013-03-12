@@ -1241,7 +1241,7 @@ function sopac_fine_payment_form_submit($form, &$form_state) {
     $payment_details['state'] = $form_state['values']['state'];
     $payment_details['zip'] = $form_state['values']['zip'];
     $payment_details['email'] = $form_state['values']['email'];
-    $payment_details['ccnum'] = $form_state['values']['ccnum'];
+    $payment_details['ccnum'] = preg_replace('/[^\d]/', '', $form_state['values']['ccnum']);
     $payment_details['ccexpmonth'] = $form_state['values']['ccexpmonth'];
     $payment_details['ccexpyear'] = $form_state['values']['ccexpyear'];
     $payment_details['ccseccode'] = $form_state['values']['ccseccode'];
@@ -1754,6 +1754,38 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
   return $output;
 }
 
+function sopac_lists_listing_page($uid = 0) {
+  global $user;
+  $insurge = sopac_get_insurge();
+  $sopac_admin = user_access('administer sopac');
+
+  $account = user_load($uid);
+  if (empty($account->uid)) {
+    drupal_not_found();
+    exit;
+  }
+  else {
+    $output .= "<p style=\"float: right\">" . l('See all Public Lists...', 'user/lists/public') . '</p>';
+    $output .= "<h1>Lists for $account->name</h1>";
+
+    // display lists
+    $res = db_query("SELECT * FROM {sopac_lists} WHERE uid = %d", $account->uid);
+    while ($list = db_fetch_array($res)) {
+      if ($sopac_admin || $list['public']) {
+        $list['items'] = $insurge->get_list_items($list['list_id']);
+        $output .= theme('sopac_list', $list);
+        $lists_displayed = TRUE;
+      }
+    }
+
+    if (!$lists_displayed) {
+      $output .= '<p>This user has no lists to display.</p>';
+    }
+  }
+
+  return $output;
+}
+
 function sopac_list_search_form(&$form_state, $search_query = NULL) {
   $form['inline'] = array(
     '#prefix' => '<div class="container-inline">',
@@ -1816,8 +1848,6 @@ function sopac_list_item_search_form(&$form_state, $search = NULL) {
 
 function sopac_list_item_search_form_submit($form, &$form_state) {
   $path = $_GET['q'];
-  unset($_GET['q']);
-  $query = $_GET;
   $query['search'] = $form_state['values']['search'];
   drupal_goto($path, $query);
 }
@@ -2221,6 +2251,10 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
         $list_username = "Staff Member " . $list_username;
         break;
       }
+    }
+    if ($expanded) {
+      $list_username = l($list_username, 'user/' . $list_user->uid . '/lists',
+                         array('attributes' => array('title' => 'View other Lists from this user')));
     }
     $top .= "<span> by $list_username</span>";
   }
