@@ -178,8 +178,10 @@ function sopac_user_info_table(&$account, &$locum) {
       $rows[] = array(array('data' => t('Account Email:'), 'class' => 'attr_name'), $email_link);
     }
     if ($userinfo['email']) {
+      $asterisk_link = l('*', 'user/' . $account->uid . '/edit/notifications',
+                         array('attributes' => array('title' => "What's This?", 'style' => 'text-decoration:none')));
       $email_link = l($userinfo['email'], 'user/' . $account->uid . '/edit/notifications');
-      $rows[] = array(array('data' => t('Notifications Sent To:'), 'class' => 'attr_name'), $email_link);
+      $rows[] = array(array('data' => t('Notifications Sent To') . $asterisk_link . ':', 'class' => 'attr_name'), $email_link);
     }
   }
 
