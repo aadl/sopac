@@ -66,18 +66,23 @@ else {
 }
 
 ?>
-  <tr class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
-    <td class="hitlist-number"><?php print $result_num; ?></td>
+  <div class="hitlist-item <?php if($locum_result['status']['avail']) print "available"; ?>">
+    <div class="hitlist-number"><?php print $result_num; ?></div>
     <?php if($minimal) { ?>
-    <td><strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); if($locum_result[title_medium]){ print ' ['.$locum_result[title_medium].']'; } ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if($locum_result['callnum']) {echo $locum_result['callnum'];} ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
+    <div><strong><?php print l(mb_convert_case($locum_result['title'],MB_CASE_TITLE, "UTF-8"), $url_prefix . '/record/' . $locum_result['_id'],array('alias' => TRUE)); if($locum_result[title_medium]){ print ' ['.$locum_result[title_medium].']'; } ?></strong></td><td><?php if($new_author_str) { print l($new_author_str, $url_prefix . '/search/author/' . urlencode($new_author_str),array('alias' => TRUE)); } ?></td><td><?php if($locum_result['callnum']) {echo $locum_result['callnum'];} ?></td><td><?php if ($list_display) { echo str_replace(', 12:00 am', '', date("F j, Y, g:i a", strtotime($locum_result['tag_date']))); } ?></td>
     <?php
     }
     else {
     ?>
-    <td class="hitlist-cover">
+    <div class="hitlist-cover">
       <?php print $cover_img; ?>
-    </td>
-    <td class="hitlist-info">
+    </div>
+    <div class="hitlist-format">
+      <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $locum_result['mat_code'] . '.png' ?>">
+      <br />
+      <?php print wordwrap($locum_config['formats'][$locum_result['mat_code']], 8, '<br />'); ?>
+    </div>
+    <div class="hitlist-info">
       <?php
         if ($locum_result['active'] == '0') {
           print '<div class="suppressed">This Record is Suppressed</div>';
@@ -162,8 +167,8 @@ else {
         <li class="button"><?php print l("Watch Trailer / Previews", $url_prefix . '/record/' . $locum_result['_id']); ?></li>
     <?php  } ?>
     </ul>
-    </td>
-    <td class="hitlist-actions">
+    </div>
+    <div class="hitlist-actions">
       <ul>
         <?php
           if ($locum_result['stream_filetype'] == 'pdf') { ?>
@@ -208,11 +213,6 @@ else {
           }
         ?>
       </ul>
-    </td>
-    <td class="hitlist-format-icon">
-      <img src="<?php print base_path() . drupal_get_path('module', 'sopac') . '/images/' . $locum_result['mat_code'] . '.png' ?>">
-      <br />
-      <?php print wordwrap($locum_config['formats'][$locum_result['mat_code']], 8, '<br />'); ?>
-    </td>
+    </div>
   <?php } ?>
-  </tr>
+  </div>
