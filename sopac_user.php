@@ -1302,7 +1302,7 @@ function sopac_fine_payment_form_submit($form, &$form_state) {
     $payment_details['state'] = $form_state['values']['state'];
     $payment_details['zip'] = $form_state['values']['zip'];
     $payment_details['email'] = $form_state['values']['email'];
-    $payment_details['ccnum'] = $form_state['values']['ccnum'];
+    $payment_details['ccnum'] = preg_replace('/[^\d]/', '', $form_state['values']['ccnum']);
     $payment_details['ccexpmonth'] = $form_state['values']['ccexpmonth'];
     $payment_details['ccexpyear'] = $form_state['values']['ccexpyear'];
     $payment_details['ccseccode'] = $form_state['values']['ccseccode'];
