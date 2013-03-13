@@ -180,7 +180,7 @@ else {
             <li class="button green"><?php echo l("Watch Online", variable_get('sopac_url_prefix', 'cat/seek') . '/record/' . $locum_result['_id'], array('alias' => TRUE)); ?></li>
        <?php }  else if ($locum_result['status']['libuse'] > 0 && $locum_result['status']['libuse'] == $locum_result['status']['total']) { ?>
             <li class="button">Library Use Only</li>
-        <?php } else if (in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
+        <?php } else if ($locum_result['disable_requests'] || in_array($locum_result['loc_code'], $no_circ) || in_array($locum_result['mat_code'], $no_circ)) { ?>
             <li class="button red">Not Requestable</li>
         <?php }
             else if ($locum_result['db_link']){ ?>
