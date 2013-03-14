@@ -239,7 +239,7 @@ if ($lexile_count) {
   print "<li$li_prop><span class=\"folder\">by Lexile</span> <small>($lexile_count)</small><ul>\n";
   foreach ($locum_result['facets']['lexile'] as $lexile => $bib_lexile_count) {
     if (in_array($lexile, $facet_lexile)) {
-      print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $lexile . "-" . ($lexile + 9) . "</strong></li>\n";
+      print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $lexile . "-" . ($lexile + 99) . "</strong></li>\n";
     }
     else {
       $getvars_tmp = $getvars;
@@ -247,7 +247,7 @@ if ($lexile_count) {
       if (isset($getvars_tmp['page'])) {
         $getvars_tmp['page'] = '';
       }
-      $link = l($lexile . '-' . ($lexile + 9), $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp))));
+      $link = l($lexile . '-' . ($lexile + 99), $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp))));
       print '<li id="tree-kid">» ' . $link . ' <small>(' . $bib_lexile_count . ")</small></li>\n";
       unset($getvars_tmp);
     }
