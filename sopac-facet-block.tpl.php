@@ -227,6 +227,35 @@ if ($decade_count) {
   print "</ul></li>\n";
 }
 
+$facet_lexile = is_array($getvars['facet_lexile']) ? $getvars['facet_lexile'] : array();
+$lexile_count = count($locum_result['facets']['lexile']);
+if ($lexile_count) {
+  if (!is_array($getvars['facet_lexile'])) {
+    $li_prop = ' class="closed"';
+  }
+  else {
+    $li_prop = NULL;
+  }
+  print "<li$li_prop><span class=\"folder\">by Lexile</span> <small>($lexile_count)</small><ul>\n";
+  foreach ($locum_result['facets']['lexile'] as $lexile => $bib_lexile_count) {
+    if (in_array($lexile, $facet_lexile)) {
+      print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $lexile . "-" . ($lexile + 9) . "</strong></li>\n";
+    }
+    else {
+      $getvars_tmp = $getvars;
+      $getvars_tmp['facet_lexile'][] = urlencode($lexile);
+      if (isset($getvars_tmp['page'])) {
+        $getvars_tmp['page'] = '';
+      }
+      $link = l($lexile . '-' . ($lexile + 9), $uri, array('query' => sopac_make_pagevars(sopac_parse_get_vars($getvars_tmp))));
+      print '<li id="tree-kid">» ' . $link . ' <small>(' . $bib_lexile_count . ")</small></li>\n";
+      unset($getvars_tmp);
+    }
+  }
+  print "</ul></li>\n";
+}
+
+
 /* Uncomment for subjects facet
 $facet_subject = is_array($getvars['facet_subject']) ? $getvars['facet_subject'] : array();
 $subject_count = count($locum_result['facets']['subject']);

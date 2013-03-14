@@ -807,7 +807,7 @@ function sopac_parse_uri($strip_prefix = TRUE) {
 function sopac_parse_get_vars($override = array()) {
 
   // TODO - Hard-coding this is not the best way to do it, but for now it is what it is... Revisit for 2.2?
-  $implode = array('search_format', 'pub_year', 'location', 'collection', 'facet_series', 'facet_lang', 'facet_year', 'facet_decade', 'age', 'facet_subject');
+  $implode = array('search_format', 'pub_year', 'location', 'collection', 'facet_series', 'facet_lang', 'facet_year', 'facet_decade', 'age', 'facet_subject', 'facet_lexile');
 
   foreach ($_GET as $name => $value) {
     if (in_array($name, $implode)) {

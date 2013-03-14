@@ -107,6 +107,9 @@ function sopac_catalog_search() {
     if (count($getvars['facet_subject'])) {
       $facet_args['facet_subject'] = $getvars['facet_subject'];
     }
+    if (count($getvars['facet_lexile'])) {
+      $facet_args['facet_lexile'] = $getvars['facet_lexile'];
+    }
 
     // Hide suppressed records unless permission
     $show_inactive = user_access('show suppressed records');
