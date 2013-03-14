@@ -149,6 +149,16 @@ if ($item_status) {
         <li><strong>Rated:</strong> <span class="mpaa_rating"><?php echo $item['mpaa_rating']; ?></span></li>
       <?php } ?>
     </ul>
+    <?php if ($item['reading_level']){ ?>
+      <h3>Reading Level</h3>
+      <ul>
+    <?php
+      if($item['reading_level']['lexile']){
+        print '<li><strong>Lexile:</strong>  '.$item['reading_level']['lexile'].'</li>';
+      }
+      print '</ul>';
+    }
+    ?>
     <?php if (($item['stdnum'] && is_array($item['stdnum'])) || ($item['upc'] && is_array($item['upc']) )) { ?>
     <h3>ISBN/Standard Number</h3>
     <ul>
