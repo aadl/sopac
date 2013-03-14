@@ -241,7 +241,7 @@ if ($lexile_count) {
     if (in_array($lexile, $facet_lexile)) {
       print '<li id="tree-kid" class="facet-item-selected"><strong>» ' . $lexile . "-" . ($lexile + 99) . "</strong></li>\n";
     }
-    else {
+    elseif ($lexile >= 100) {
       $getvars_tmp = $getvars;
       $getvars_tmp['facet_lexile'][] = urlencode($lexile);
       if (isset($getvars_tmp['page'])) {
