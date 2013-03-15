@@ -1213,15 +1213,10 @@ function sopac_search_form_adv() {
     '#title' => 'in age group',
     '#options' => array('' => "Any Age Group", 'adult' => "Adult", 'teen' => "Teen", 'youth' => "Youth"),
   );
-  $form['limit'] = array(
-    '#prefix' => '<div class="container-inline">',
-    '#type' => 'checkbox',
-    '#default_value' => $getvars['limit'],
-  );
   $form['limit_avail'] = array(
     '#type' => 'select',
     '#title' => 'limit to items available at',
-    '#options' => array_merge(array('any' => "Any Location"), $locum_cfg['branches']),
+    '#options' => array_merge(array('' => '--', 'any' => "Any Location"), $locum_cfg['branches']),
     '#default_value' => $getvars['limit_avail'],
     '#suffix' => "</div>",
   );
