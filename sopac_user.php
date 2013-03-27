@@ -401,7 +401,8 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
    $token = $locum->set_token($account->uid);
   }
   if ($token) {
-    $path_to_images = path_to_theme() . '/images/';
+    global $base_url;
+    $path_to_images = $base_url . '/' . path_to_theme() . '/images/';
     $content .= '<p><a href="http://api.aadl.org/user/checkouts?token=' . $token . '"><img src="' . $path_to_images . 'feed.png" alt="Syndicate Your Checkouts" /></a> <a href="webcal://api.aadl.org/user/ical?token=' . $token . '"><img src="' . $path_to_images . 'ical.png" alt="iCal feed for Checkouts" /></a></p>';
   }
 
