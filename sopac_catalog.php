@@ -751,7 +751,7 @@ function sopac_request_item() {
     $varname = $actions[3] ? $actions[3] : NULL;
     $bib_item = $locum->get_bib_item($bnum, TRUE);
     $barcode = $user->profile_pref_cardnum;
-    if($staff_request && $patron_bcode && user_access('staff request')) {
+    if ($staff_request && $patron_bcode && user_access('staff request')) {
       $barcode = $patron_bcode;
       $patron_info = $locum->get_patron_info($barcode);
     }
@@ -914,10 +914,13 @@ function sopac_request_item() {
       // reverse to show latest issues first
       krsort($issues);
 
+      // Find 'Magazine' material code
+      $magazine_code = array_search('Magazine', $locum->locum_config['formats']);
+
       foreach ($issues as $issue) {
         $selection = array();
 
-        if (!$first_issue_found) {
+        if (!$first_issue_found && $bib_item['mat_code'] == $magazine_code) {
           // First issue isn't requestable
           $selection = $issue[0];
           $selection['location'] = 'N/A';
