@@ -306,6 +306,7 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
     );
     $now = time();
     $ill_bnums = array(1358991, 1356138, 1358990, 1358993, 1358992); // Make config option
+    $nr_inums = $locum->redis->smembers('sopac:nonrenewable_inums');
 
     foreach ($checkouts as $co) {
       if ($max_disp && $total > $max_disp && ++$checkout_num > $max_disp) {
@@ -368,7 +369,8 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
             strpos($co['callnum'], 'Zoom Lends') === FALSE &&
             $co['bib']['mat_code'] != 's' &&
             $co['bib']['mat_code'] != 'p' &&
-            !($co['ill'] == 1 && $co['numrenews'] > 0)) {
+            !($co['ill'] == 1 && $co['numrenews'] > 0) &&
+            !(in_array($co['inum'], $nr_inums))) {
           $checkbox = '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">';
         }
       }
