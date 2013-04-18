@@ -261,7 +261,7 @@ if ($item_status) {
     <!-- Supressed record notification -->
     <?php
       if ($item['active'] == '0') {
-        print '<div class="suppressed">This Record is Suppressed</div>';
+        print '<div class="suppressed">AADL currently owns no copies of this item</div>';
       }
     ?>
 

@@ -85,7 +85,7 @@ else {
     <div class="hitlist-info">
       <?php
         if ($locum_result['active'] == '0') {
-          print '<div class="suppressed">This Record is Suppressed</div>';
+          print '<div class="suppressed">AADL currently owns no copies of this item</div>';
         }
       ?>
       <ul>

@@ -2348,30 +2348,29 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
       foreach ($list['items'] as $item) {
         $item['bib'] = $locum->get_bib_item($item['bnum']);
         $item['cover_img'] = $item['bib']['cover_img'];
-        if ($item['active'] || user_access('show suppressed records')) {
-          // Check updated date
-          if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
-            $last_updated = $tag_date;
-          }
-          if (!$minimal) {
-            // Grab item status
-            $item['status'] = $locum->get_item_status($item['bnum']);
-            if ($item['status']['avail']) {
-              $avail_count++;
-            }
-            // Grab Syndetics reviews, etc..
-            $review_links = $locum->get_syndetics($item['stdnum'][0]);
-            if (count($review_links)) {
-              $item['review_links'] = $review_links;
-            }
-          }
-          // Check if list display order should be frozen
-          if ($list['title'] == "Checkout History") {
-            $item['freeze'] = TRUE;
-          }
 
-          $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ, $minimal);
+        // Check updated date
+        if (($tag_date = strtotime($item['tag_date'])) > $last_updated) {
+          $last_updated = $tag_date;
         }
+        if (!$minimal) {
+          // Grab item status
+          $item['status'] = $locum->get_item_status($item['bnum']);
+          if ($item['status']['avail']) {
+            $avail_count++;
+          }
+          // Grab Syndetics reviews, etc..
+          $review_links = $locum->get_syndetics($item['stdnum'][0]);
+          if (count($review_links)) {
+            $item['review_links'] = $review_links;
+          }
+        }
+        // Check if list display order should be frozen
+        if ($list['title'] == "Checkout History") {
+          $item['freeze'] = TRUE;
+        }
+
+        $content .= theme('sopac_results_hitlist', $item['value'], $item['cover_img'], $item, $locum->locum_config, $no_circ, $minimal);
       }
       $content .= '</table>';
       $top .= '<strong>Last updated:</strong> ' . date("F j, Y, g:i a", $last_updated) . '<br />';
