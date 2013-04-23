@@ -365,12 +365,13 @@ function sopac_user_chkout_table(&$account, &$locum, $max_disp = NULL) {
           $title = $co['title'];
         }
         $author = l($new_author_str, variable_get('sopac_url_prefix', 'cat/seek') . '/search/author/' . urlencode($new_author_str));
-        if ($co['avail']['holds'] == 0 &&
-            strpos($co['callnum'], 'Zoom Lends') === FALSE &&
-            $co['bib']['mat_code'] != 's' &&
-            $co['bib']['mat_code'] != 'p' &&
-            !($co['ill'] == 1 && $co['numrenews'] > 0) &&
-            !(in_array($co['inum'], $nr_inums))) {
+        if ($co['bib']['mat_code'] == 's' || // Always show renewal checkbox for magazines
+            ($co['avail']['holds'] == 0 &&
+             strpos($co['callnum'], 'Zoom Lends') === FALSE &&
+             $co['bib']['mat_code'] != 's' &&
+             $co['bib']['mat_code'] != 'p' &&
+             !($co['ill'] == 1 && $co['numrenews'] > 0) &&
+             !(in_array($co['inum'], $nr_inums)))) {
           $checkbox = '<input type="checkbox" name="inum[' . $co['inum'] . ']" value="' . $co['varname'] . '">';
         }
       }
