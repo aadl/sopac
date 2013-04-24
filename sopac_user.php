@@ -2313,22 +2313,20 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
 
   $top .= "<div class=\"sopac-list-title\">";
   $top .= "<h2>$title</h2>";
-  if ($user->uid != $list['uid']) {
-    $list_user = user_load($list['uid']);
-    $list_username = $list_user->name;
-    $staff_roles = variable_get('sopac_lists_staff_roles', array());
-    foreach(array_keys($list_user->roles) as $role_id) {
-      if (in_array($role_id, $staff_roles)) {
-        $list_username = "Staff Member " . $list_username;
-        break;
-      }
+
+  $list_user = user_load($list['uid']);
+  $list_username = $list_user->name;
+  $staff_roles = variable_get('sopac_lists_staff_roles', array());
+  foreach(array_keys($list_user->roles) as $role_id) {
+    if (in_array($role_id, $staff_roles)) {
+      $list_username = "Staff Member " . $list_username;
+      break;
     }
-    if ($expanded) {
-      $list_username = l($list_username, 'user/' . $list_user->uid . '/lists',
-                         array('attributes' => array('title' => 'View other Lists from this user')));
-    }
-    $top .= "<span> by $list_username</span>";
   }
+  $list_username = l($list_username, 'user/' . $list_user->uid . '/lists',
+                     array('attributes' => array('title' => 'View other Lists from this user')));
+  $top .= "<span> by $list_username</span>";
+
   $top .= "</div>";
   $top .= '<p class="sopac-list-details">';
   $top .= '<strong>Description</strong>: ' . $list['description'] . '<br />';
@@ -2459,7 +2457,8 @@ function theme_sopac_list_block($block_type = 'public') {
   $sql = "SELECT sopac_lists.list_id AS list_id, " .
          "sopac_lists.title AS title, " .
          "sopac_lists.description AS description, " .
-         "users.name AS name " .
+         "users.name AS name, " .
+         "sopac_lists.uid AS uid " .
          "FROM sopac_lists, users " .
          "WHERE sopac_lists.uid = users.uid " .
          "AND public = 1 " .
@@ -2467,10 +2466,13 @@ function theme_sopac_list_block($block_type = 'public') {
   $res = db_query($sql, $limit);
 
   while ($list = db_fetch_array($res)) {
+    $list_username = l($list['name'], 'user/' . $list['uid'] . '/lists',
+                       array('attributes' => array('title' => 'View other Lists from this user')));
+
     $output .= '<div class="sopac-list-block-item">';
     $output .= '<div class="sopac-list-block-title">';
     $output .= '<strong>' . l($list['title'], 'user/lists/' . $list['list_id']) . '</strong>' ;
-    $output .= ' by ' . $list['name'];
+    $output .= ' by ' . $list_username;
     $output .= '</div>';
     if ($list['description']) {
       $output .= '<div class="sopac-list-block-description">' . $list['description'] . '</div>';
