@@ -939,7 +939,8 @@ function sopac_request_item() {
                 break;
               }
             }
-            else {
+            // Grab a requestable issue only if no selection yet
+            else if (empty($selection)) {
               if ($issue_item['varname']) {
                 $selection = $issue_item;
               }
