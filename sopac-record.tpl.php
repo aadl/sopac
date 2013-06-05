@@ -388,7 +388,22 @@ if ($item_status) {
       }
       ?>
     </div>
-    <?php
+    <?php if($item['overview']) { ?>
+    <div id="item-trailer">
+    <h2>Overview</h2>
+    <p><?php echo $item['overview']; ?></p>
+    </div>
+    <?php } if($item['specifications']) { ?>
+    <div id="item-trailer">
+    <h2>Specifications</h2>
+    <p><ul><?php foreach($item['specifications'] as $spec_type => $spec_value) { echo '<li><b>'.$spec_type.'</b>: '.$spec_value.'</li>'; } ?></ul></p>
+    </div>
+    <?php } if($item['contents']) { ?>
+    <div id="item-trailer">
+    <h2>Contents</h2>
+    <p><ul><?php foreach($item['contents'] as $contents_part) { echo '<li>'.$contents_part.'</li>'; } ?></ul></p>
+    </div>
+    <?php }
     if($item['stream_filename']){
       $verified == FALSE;
         $secret = $locum_config['api_config']['streaming_secret'];
