@@ -1423,6 +1423,7 @@ function array2xml($array) {
 
 function sopac_linkfromcallnum($callnum)
 {
-    $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
-    return l($callnum, $url_prefix . '/search/callnum/"' . urlencode($callnum) .'"',array('alias' => TRUE));
+  $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
+  $callnum = str_replace('&apos;', "'", $callnum);
+  return l($callnum, $url_prefix . '/search/callnum/"' . urlencode($callnum) .'"',array('alias' => TRUE));
 }
