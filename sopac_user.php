@@ -1658,6 +1658,31 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 
   if ($validated) {
     db_query("INSERT INTO {sopac_card_verify} VALUES ($uid, '$cardnum', 1, NOW())");
+    // Summer Game, Check for unawarded referral bonus
+    if (module_exists('summergame')) {
+      if (variable_get('summergame_points_enabled', 0)) {
+        if ($player = summergame_player_load(array('uid' => $uid))) {
+          // Check if library card is already a referral bonus
+          $existing_bonus = db_fetch_object(db_query("SELECT * FROM sg_ledger WHERE metadata LIKE '%referral_bonus_lcard:%s%'", $cardnum));
+          if ($existing_bonus->points) {
+            drupal_set_message("This Library Card has already earned Summer Game referral points");
+          }
+          else {
+            $row = db_fetch_object(db_query("SELECT * FROM sg_ledger WHERE pid = %d AND points = 0 AND metadata LIKE '%referred_by:%'", $player['pid']));
+            if ($row->lid) {
+              // Delete existing row, and award referral bonus
+              $referring_pid = (int) str_replace('referred_by:', '', $row->metadata);
+              db_query("DELETE FROM sg_ledger WHERE lid = %d", $row->lid);
+              summergame_player_points($player['pid'], 500, 'Referral',
+                                       'Referred by Player #' . $referring_pid);
+              summergame_player_points($referring_pid, 500, 'Referral',
+                                       'Referral Bonus for Player #' . $player['pid'], 'referral_bonus_lcard:' . $cardnum);
+              drupal_set_message('You were referred by Player #' . $referring_pid . ' and you each earned a 500 point bonus!');
+            }
+          }
+        }
+      }
+    }
   }
 
 }
