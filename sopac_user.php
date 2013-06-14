@@ -2598,10 +2598,11 @@ function sopac_update_history($list) {
   }
 
   while ($checkout = db_fetch_array($res)) {
-    if ($insurge->add_list_item($account->uid, $list['list_id'], $checkout['bibNum'], strtotime($checkout['checkOut']))) {
+    $checkoutTimestamp = strtotime($checkout['checkOut']);
+    if ($insurge->add_list_item($account->uid, $list['list_id'], $checkout['bibNum'], $checkoutTimestamp)) {
       $total++;
       // Summer Game
-      if ($player) {
+      if ($player && $checkoutTimestamp > 1371182400) { // after June 14, 2013 12:00:00 AM
         $metadata = array('bnum' => $checkout['bibNum']);
         $points = summergame_player_points($player['pid'], 50, 'Checkout History',
                                            'Item added from Checkout History', $metadata);
