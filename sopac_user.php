@@ -2602,9 +2602,8 @@ function sopac_update_history($list) {
       $total++;
       // Summer Game
       if ($player) {
-        $metadata = array('bnum' => $checkout['bibNum'],
-                          'daily_limit' => 1000);
-        $points = summergame_player_points($player['pid'], 10, 'Checkout History',
+        $metadata = array('bnum' => $checkout['bibNum']);
+        $points = summergame_player_points($player['pid'], 50, 'Checkout History',
                                            'Item added from Checkout History', $metadata);
         $points_link = l($points . ' Summer Game points', 'summergame/player');
         drupal_set_message("Earned $points_link for a new checkout");
