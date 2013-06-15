@@ -484,7 +484,7 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
       $text = strtoupper($game_code);
       $content .= '<li>';
       if ($user->player['pid']) {
-        $content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $player['pid'],
+        $content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $user->player['pid'],
                       array('query' => array('text' => $text)));
       }
       else {
