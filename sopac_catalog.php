@@ -1219,7 +1219,7 @@ function sopac_search_form_adv() {
   );
   $form['limit_avail'] = array(
     '#type' => 'select',
-    '#title' => 'limit to items available at',
+    '#title' => 'limit to items on shelf at',
     '#options' => array_merge(array('' => '--', 'any' => "Any Location"), $locum_cfg['branches']),
     '#default_value' => $getvars['limit_avail'],
     '#suffix' => "</div>",
