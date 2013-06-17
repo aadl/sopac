@@ -1122,7 +1122,7 @@ function sopac_search_form_basic() {
   );
   $form['filters']['limit_avail'] = array(
     '#type' => 'select',
-    '#title' => 'Available At',
+    '#title' => 'On Shelf At',
     '#options' => array_merge(array('' => '--', 'any' => "Any Location"), $locum_cfg['branches']),
     '#default_value' => $getvars['limit_avail'],
   );
