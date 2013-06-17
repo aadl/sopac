@@ -403,6 +403,16 @@ if ($item_status) {
     <h2>Contents</h2>
     <p><ul><?php foreach($item['contents'] as $contents_part) { echo '<li>'.$contents_part.'</li>'; } ?></ul></p>
     </div>
+    <?php } if($item['documentation']) { ?>
+    <div id="item-trailer">
+    <h2>Documentation</h2>
+    <?php foreach($item['documentation'] as $doc) { echo $doc; } ?>
+    </div>
+    <?php } if($item['preview']) { ?>
+    <div id="item-trailer">
+    <h2>Preview</h2>
+    <?php foreach($item['preview'] as $preview) { echo '<p>'.$preview.'</p>'; } ?>
+    </div>
     <?php }
     if($item['stream_filename']){
       $verified == FALSE;
