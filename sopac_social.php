@@ -490,6 +490,11 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
       else {
         $content .= l($text, 'http://play.aadl.org/summergame/player');
       }
+      // Lookup term for Game Code
+      $row = db_fetch_object(db_query("SELECT * FROM sg_game_codes WHERE text = '%s'", $text));
+      if ($row->code_id) {
+        $content .= "<br>(from $row->game_term)";
+      }
       $content .= '</li>';
     }
     $content .= '</ul>';
