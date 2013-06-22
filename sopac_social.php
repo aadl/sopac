@@ -180,6 +180,33 @@ function theme_sopac_tag_block($block_type) {
       }
       $tag_arr = $insurge->get_tag_totals(NULL, $bnum_arr);
       $tag_arr_user = $insurge->get_tag_totals($user->uid, $bnum_arr, NULL, FALSE, NULL, NULL, 'ORDER BY tag ASC');
+
+      // Handle Game Code
+      if ($machine_tags = $insurge->get_machine_tags($bnum)) {
+        foreach ($machine_tags as $machine_tag) {
+          if ($machine_tag['namespace'] == 'sg' && $machine_tag['predicate'] == 'code') {
+            $gc_content .= '<h3>Game Code</h3><ul>';
+            global $user;
+            $text = strtoupper($machine_tag['value']);
+            $gc_content .= '<li>';
+            if ($user->player['pid']) {
+              $gc_content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $user->player['pid'],
+                            array('query' => array('text' => $text)));
+            }
+            else {
+              $gc_content .= l($text, 'http://play.aadl.org/summergame/player');
+            }
+            // Lookup term for Game Code
+            $row = db_fetch_object(db_query("SELECT * FROM sg_game_codes WHERE text = '%s'", $text));
+            if ($row->code_id) {
+              $gc_content .= "<br>(from $row->game_term)";
+            }
+            $gc_content .= '</li>';
+            $gc_content .= '</ul>';
+          }
+        }
+      }
+
       static $put_tag_form = 1;
       static $put_personal_tag_list = 1;
       break;
@@ -217,7 +244,7 @@ function theme_sopac_tag_block($block_type) {
   else {
     $cloud = t('No tags, currently.');
   }
-  $cloud .= $block_suffix;
+  $cloud .= $gc_content . $block_suffix;
 
   return $cloud;
 }
@@ -456,9 +483,6 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
   foreach ($tags as $tag => $value) {
     if (preg_match("/^([a-z](?:[a-z0-9_]+))\:([a-z](?:[a-z0-9_]+))\=(.*)/i", $tag, $mt)) {
       $machinetags[] = $mt;
-      if ($mt[1] == 'sg' && $mt[2] == 'code') {
-        $game_codes[] = $mt[3];
-      }
     }
     else {
       if ($cloud_type == 'personal') {
@@ -476,28 +500,6 @@ function theme_sopac_tag_cloud($tags, $cloud_type = 'catalog', $min_size = 10, $
       $attributes = array('title' => $value . ' things tagged with ' . $tag, 'style' => 'font-size: ' . $size . 'px');
       $cloud .= l($disp_tag, $link, array('attributes' => $attributes)) . ' ';
     }
-  }
-  if ($game_codes) {
-    $content .= '<h3>Game Code</h3><ul>';
-    global $user;
-    foreach ($game_codes as $game_code) {
-      $text = strtoupper($game_code);
-      $content .= '<li>';
-      if ($user->player['pid']) {
-        $content .= l($text, 'http://play.aadl.org/summergame/player/gamecode/' . $user->player['pid'],
-                      array('query' => array('text' => $text)));
-      }
-      else {
-        $content .= l($text, 'http://play.aadl.org/summergame/player');
-      }
-      // Lookup term for Game Code
-      $row = db_fetch_object(db_query("SELECT * FROM sg_game_codes WHERE text = '%s'", $text));
-      if ($row->code_id) {
-        $content .= "<br>(from $row->game_term)";
-      }
-      $content .= '</li>';
-    }
-    $content .= '</ul>';
   }
   if ($cloud) {
     $content .=  '<h3>Tags</h3><div class="tag-cloud">' . $cloud . '</div>';
