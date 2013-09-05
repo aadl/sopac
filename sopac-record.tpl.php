@@ -388,7 +388,12 @@ if ($item_status) {
       }
       ?>
     </div>
-    <?php if($item['overview']) { ?>
+    <?php if($item['how_to_use']) { ?>
+    <div id="item-trailer">
+    <h2>How To Use</h2>
+    <p><?php echo $item['how_to_use']; ?></p>
+    </div>
+    <?php } if($item['overview']) { ?>
     <div id="item-trailer">
     <h2>Overview</h2>
     <p><?php echo $item['overview']; ?></p>
