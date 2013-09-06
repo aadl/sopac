@@ -371,7 +371,7 @@ function sopac_bib_record_download($bnum = NULL) {
         else {
           $filename = $paddedtrack."-".str_replace(array(' ','(',')'),'-', $trackname).".mp3";
         }
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".str_replace(array(' ','(',')'),'-', $bib['title'])."/".urlencode($filename)."?name=".urlencode($filename);
+        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".str_replace(array(' ','(',')','/'),'-', $bib['title'])."/".urlencode($filename)."?name=".urlencode($filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         //readfile($path);
         header("Location: $path");
