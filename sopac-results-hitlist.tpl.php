@@ -11,11 +11,11 @@ if($locum_result['artist']){
 }
 $url_prefix = variable_get('sopac_url_prefix', 'cat/seek');
 global $user;
-if (!module_exists('covercache') || $locum_result['magnatune_id']) {
+if (!module_exists('covercache') || $locum_result['zipmd5']) {
   if (strpos($locum_result['cover_img'], 'http://') !== FALSE) {
     $cover_img = $locum_result['cover_img'];
   }
-  else if($locum_result['magnatune_id']) {
+  else if($locum_result['zipmd5']) {
     $cover_img = "http://media.aadl.org/magnatune/".$locum_result['_id']."/data/cover.jpg";
     $locum_result['mat_code'] = 'z';
   }
