@@ -53,19 +53,21 @@ function sec2hms ($sec, $padHours = false) {
     <!-- Item Details -->
     <ul>
       <?php
+      if ($item['pub_info']) {
+        print '<li><b>Published:</b> ' . $item['pub_info'] . '</li>';
+      }
       if ($item['release_date']) {
-        print '<li><b>Magnatune Release:</b> ' . $item['release_date'] . '</li>';
+        print '<li><b>Release Date:</b> ' . $item['release_date'] . '</li>';
       }
       if ($item['pub_year']) {
         print '<li><b>Year Published:</b> ' . $item['pub_year'] . '</li>';
       }
-      if($item['magnatune_id']){
+      if($item['zipmd5']){
       ?>
       <li><b>Format:</b> 320Kbps MP3</li>
-      <li><b>Collection:</b> Magnatune</li>
       <?php } ?>
     </ul>
-    <?php if($verified && $item['magnatune_id']) { ?>
+    <?php if($verified && $item['zipmd5']) { ?>
     <h3>All Formats</h3>
     <ul>
     <li><a href="<?php echo '/'.$url_prefix . '/record/'.$item['_id'].'/download?type=album'; ?>">Download MP3 Album</a></li>
@@ -175,7 +177,17 @@ function sec2hms ($sec, $padHours = false) {
 <?php } } ?>
 </ul>
 </div>
-<?php } ?>
+<?php } 
+if (is_array($item['notes'])) {
+      print '<div id="item-notes">';
+      print '<h2>Additional Details</h2>';
+      foreach($item['notes'] as $note) {
+        print '<p>' . $note . '</p>';
+      }
+      print '</div>';
+    }
+    ?>
+
     <!-- Community / SOPAC Reviews -->
     <div id="item-reviews">
       <h2>Community Reviews</h2>
