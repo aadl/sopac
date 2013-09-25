@@ -2096,11 +2096,9 @@ function sopac_list_edit_form($form_state, $list_id = 0) {
     );
   }
   $form['description'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Description'),
     '#default_value' => $list['description'],
-    '#size' => 64,
-    '#maxlength' => 256,
     '#description' => t('Describe your list (optional)'),
   );
   $form['public'] = array(
@@ -2326,7 +2324,18 @@ function sopac_list_confirm_item_delete_submit($form, &$form_state) {
 
 function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
   global $user;
-  $title = ($expanded ? $list['title'] : l($list['title'], 'user/lists/' . $list['list_id']));
+  if ($expanded) {
+    $title = $list['title'];
+    $description = nl2br(filter_xss($list['description']));
+  }
+  else {
+    $title = l($list['title'], 'user/lists/' . $list['list_id']);
+    $description = filter_xss($list['description']);
+    if (strlen($description) > 256) {
+      $description = substr($description, 0, 256) . '...';
+    }
+  }
+
   $list_class = "sopac-list";
 
   if (sopac_lists_access($list['list_id'])) {
@@ -2354,7 +2363,7 @@ function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
 
   $top .= "</div>";
   $top .= '<p class="sopac-list-details">';
-  $top .= '<strong>Description</strong>: ' . $list['description'] . '<br />';
+  $top .= '<strong>Description</strong>: ' . $description . '<br />';
   $top .= ($list['public'] ? 'This list is <strong>publicly viewable</strong>' : 'This list is <strong>private</strong>') . '<br />';
 
   if ($expanded) {
@@ -2500,7 +2509,11 @@ function theme_sopac_list_block($block_type = 'public') {
     $output .= ' by ' . $list_username;
     $output .= '</div>';
     if ($list['description']) {
-      $output .= '<div class="sopac-list-block-description">' . $list['description'] . '</div>';
+      $description = filter_xss($list['description']);
+      if (strlen($description) > 100) {
+        $description = substr($description, 0, 100) . '...';
+      }
+      $output .= '<div class="sopac-list-block-description">' . $description . '</div>';
     }
     $output .= '</div>';
   }
