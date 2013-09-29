@@ -388,7 +388,12 @@ if ($item_status) {
       }
       ?>
     </div>
-    <?php if($item['how_to_use']) { ?>
+    <?php if($item['contents']) { ?>
+    <div id="item-trailer">
+    <h2>Contents</h2>
+    <p><ul><?php foreach($item['contents'] as $contents_part) { echo '<li>'.$contents_part.'</li>'; } ?></ul></p>
+    </div>
+    <?php } if($item['how_to_use']) { ?>
     <div id="item-trailer">
     <h2>How To Use</h2>
     <p><?php echo $item['how_to_use']; ?></p>
@@ -402,11 +407,6 @@ if ($item_status) {
     <div id="item-trailer">
     <h2>Specifications</h2>
     <p><ul><?php foreach($item['specifications'] as $spec_type => $spec_value) { echo '<li><b>'.$spec_type.'</b>: '.$spec_value.'</li>'; } ?></ul></p>
-    </div>
-    <?php } if($item['contents']) { ?>
-    <div id="item-trailer">
-    <h2>Contents</h2>
-    <p><ul><?php foreach($item['contents'] as $contents_part) { echo '<li>'.$contents_part.'</li>'; } ?></ul></p>
     </div>
     <?php } if($item['documentation']) { ?>
     <div id="item-trailer">
