@@ -2286,7 +2286,7 @@ function sopac_list_confirm_delete_submit($form, &$form_state) {
   drupal_goto('user/lists');
 }
 
-function sopac_list_confirm_item_delete(&$form_state, $list_id, $bnum) {
+function sopac_list_confirm_item_delete(&$form_state, $list_id, $bnum, $page = 0) {
   $insurge = sopac_get_insurge();
   $items = $insurge->get_list_items($list_id);
   $item = array();
@@ -2298,7 +2298,7 @@ function sopac_list_confirm_item_delete(&$form_state, $list_id, $bnum) {
     }
   }
   if ($item['bnum']) {
-    $form = array('#list_id' => $list_id, '#item' => $item);
+    $form = array('#list_id' => $list_id, '#item' => $item, '#page' => $page);
     return confirm_form(
       $form,
       t('Delete Item'),
@@ -2319,7 +2319,11 @@ function sopac_list_confirm_item_delete_submit($form, &$form_state) {
   $insurge->delete_list_item($form['#list_id'], $form['#item']['value']);
 
   drupal_set_message(t('The item has been removed from the list.'));
-  drupal_goto('user/lists/' . $form['#list_id']);
+  $query = array();
+  if ($form['#page']) {
+    $query['page'] = $form['#page'];
+  }
+  drupal_goto('user/lists/' . $form['#list_id'], $query);
 }
 
 function theme_sopac_list($list, $expanded = FALSE, $minimal = NULL) {
