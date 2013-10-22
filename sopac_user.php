@@ -1687,7 +1687,7 @@ function sopac_bcode_verify_form_validate($form, $form_state) {
 
 }
 
-function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
+function sopac_lists_page($list_id = 0, $op = NULL, $search = NULL) {
   global $user;
   profile_load_profile(&$user);
   require_once('sopac_social.php');
@@ -1698,16 +1698,24 @@ function sopac_lists_page($list_id = 0, $op = NULL, $term = NULL) {
     $count = 10;
 
     if ($op == "search") {
-      $output .= drupal_get_form('sopac_list_search_form', $term);
-      $search_sql = "AND (title LIKE '%%%s%%' OR description LIKE '%%%s%%')";
-    } else {
+      $output .= drupal_get_form('sopac_list_search_form', $search);
+      $search_sql = 'AND (0 ';
+      $args = array();
+      foreach (explode(' ', $search) as $term) {
+        $search_sql .= "OR title LIKE '%%%s%%' OR description LIKE '%%%s%%'";
+        $args[] = $term;
+        $args[] = $term;
+      }
+      $search_sql .= ')';
+    }
+    else {
       $output .= drupal_get_form('sopac_list_search_form');
     }
 
     $output .= "<h1>Public Lists:</h1>";
     $sql = "SELECT * FROM {sopac_lists} WHERE public = 1 $search_sql ORDER BY list_id DESC";
     $countsql = "SELECT COUNT(*) FROM {sopac_lists} WHERE public = 1 $search_sql ORDER BY list_id DESC";
-    $res = pager_query($sql, $count, 0, $countsql, $term, $term);
+    $res = pager_query($sql, $count, 0, $countsql, $args);
 
     $output .= theme('pager', NULL, $count);
     while ($list = db_fetch_array($res)) {
