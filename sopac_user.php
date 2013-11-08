@@ -177,10 +177,11 @@ function sopac_user_info_table(&$account, &$locum) {
       $email_link = l(t($account->mail), 'user/' . $account->uid . '/edit');
       $rows[] = array(array('data' => t('Account Email:'), 'class' => 'attr_name'), $email_link);
     }
-    if ($userinfo['email']) {
+    if ($userinfo['pnum']) {
       $asterisk_link = l('*', 'user/' . $account->uid . '/edit/notifications',
                          array('attributes' => array('title' => "What's This?", 'style' => 'text-decoration:none')));
-      $email_link = l($userinfo['email'], 'user/' . $account->uid . '/edit/notifications');
+      $link_text = ($userinfo['email'] ? $userinfo['email'] : 'Add a notification email address');
+      $email_link = l($link_text, 'user/' . $account->uid . '/edit/notifications');
       $rows[] = array(array('data' => t('Notifications Sent To') . $asterisk_link . ':', 'class' => 'attr_name'), $email_link);
     }
   }
