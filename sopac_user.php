@@ -1700,14 +1700,12 @@ function sopac_lists_page($list_id = 0, $op = NULL, $search = NULL) {
 
     if ($op == "search") {
       $output .= drupal_get_form('sopac_list_search_form', $search);
-      $search_sql = 'AND (0 ';
       $args = array();
       foreach (explode(' ', $search) as $term) {
-        $search_sql .= "OR title LIKE '%%%s%%' OR description LIKE '%%%s%%'";
+        $search_sql .= " AND (title LIKE '%%%s%%' OR description LIKE '%%%s%%')";
         $args[] = $term;
         $args[] = $term;
       }
-      $search_sql .= ')';
     }
     else {
       $output .= drupal_get_form('sopac_list_search_form');
