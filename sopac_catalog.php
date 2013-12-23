@@ -342,17 +342,18 @@ function sopac_bib_record_download($bnum = NULL) {
   }
   $bib = $locum->get_bib_item($bnum);
   $type = $_GET['type'];
+  $license = isset($bib['licensed_from']) ? $bib['licensed_from'] : 'magnatune';
   global $user;
   if ($user->uid && $user->bcode_verified && $type && $bib['zipmd5']) {
     switch($type){
       case 'album':
         $locum->count_download($bnum,"album");
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5'].".zip?name=$bnum.zip";
+        $path = "http://media.aadl.org/music/$license/$bnum/derivatives/".$bib['zipmd5'].".zip?name=$bnum.zip";
         header("Location: $path");
         break;
       case 'flac':
         $locum->count_download($bnum,"flac");
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".$bib['zipmd5']."-flac.zip?name=$bnum-flac.zip";
+        $path = "http://media.aadl.org/music/$license/$bnum/derivatives/".$bib['zipmd5']."-flac.zip?name=$bnum-flac.zip";
         header("Location: $path");
         break;
       case 'track':
@@ -371,7 +372,7 @@ function sopac_bib_record_download($bnum = NULL) {
         else {
           $filename = $paddedtrack."-".str_replace(array(' ','(',')'),'-', $trackname).".mp3";
         }
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/".str_replace(array(' ','(',')','/'),'-', $bib['title'])."/".urlencode($filename)."?name=".urlencode($filename);
+        $path = "http://media.aadl.org/music/$license/$bnum/derivatives/".str_replace(array(' ','(',')','/'),'-', $bib['title'])."/".urlencode($filename)."?name=".urlencode($filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         //readfile($path);
         header("Location: $path");
@@ -387,7 +388,7 @@ function sopac_bib_record_download($bnum = NULL) {
         else {
           $filename = $paddedtrack."-".str_replace(array(' ','(',')'),'-', $trackname).".mp3";
         }
-        $path = "http://media.aadl.org/magnatune/$bnum/derivatives/streaming/".rawurlencode($filename);
+        $path = "http://media.aadl.org/music/$license/$bnum/derivatives/streaming/".rawurlencode($filename);
         //header('Content-Disposition: attachment; filename="'.$path.'"');
         header('Content-Type: audio/mpeg');
         readfile($path);
@@ -549,7 +550,7 @@ function sopac_put_request_link($bnum, $avail = 0, $holds = 0, $mattype = 'item'
         else if ($mattype == 'Stream') {
           $text = 'View Online Below';
         }
-        else if ($mattype == 'Download') {
+        else if (strpos($mattype,'Download') !== FALSE) {
           $text = 'Download Below';
         }
         else {

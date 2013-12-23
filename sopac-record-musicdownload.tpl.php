@@ -26,6 +26,7 @@ function sec2hms ($sec, $padHours = false) {
     $hms .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
     return $hms;
 }
+$license = isset($item['licensed_from']) ? $item['licensed_from'] : 'magnatune';
 ?>
 
 <!-- begin item record -->
@@ -36,7 +37,7 @@ function sec2hms ($sec, $padHours = false) {
 
     <!-- Cover Image -->
     <?php
-      $cover_img = "http://media.aadl.org/magnatune/".$item['_id']."/data/cover.jpg";
+      $cover_img = "http://media.aadl.org/music/$license/".$item['_id']."/data/cover.jpg";
       $cover_img = '<img class="item-cover" width="200" src="' . $cover_img . '">';
     print $cover_img;
     ?>
