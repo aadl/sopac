@@ -16,7 +16,8 @@ if (!module_exists('covercache') || $locum_result['zipmd5']) {
     $cover_img = $locum_result['cover_img'];
   }
   else if($locum_result['zipmd5']) {
-    $cover_img = "http://media.aadl.org/magnatune/".$locum_result['_id']."/data/cover.jpg";
+    $license = isset($locum_result['licensed_from']) ? $locum_result['licensed_from'] : 'magnatune';
+    $cover_img = "http://media.aadl.org/music/$license/".$locum_result['_id']."/data/cover.jpg";
     $locum_result['mat_code'] = 'z';
   }
   else {
