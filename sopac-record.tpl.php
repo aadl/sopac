@@ -470,7 +470,20 @@ if ($item_status) {
           <p><ul><li class="button green"><?php echo l(t('Login to View'), 'user/login', array('query' => drupal_get_destination())); ?></li></ul></p>
         <?php } ?>
     </div>
-    <?php } if($item['machinetags']['bctg']) { ?>
+    <?php if($verified && $item['stream_altformats']){ ?>
+    <div id="item-trailer">
+    <h2>Additional Formats</h2>
+    <?php if(in_array('epub',$item['stream_altformats'])) { 
+      $path   = '/streaming/'.$item['stream_filename'].'.epub';
+      $md5 = base64_encode(md5($secret . $path . $expire, true));
+      $md5 = strtr($md5, '+/', '-_');
+      $md5 = str_replace('=', '', $md5);
+      $stream_link = 'http://media.aadl.org'.$path.'?st='.$md5.'&e='.$expire;
+    ?>
+    <p><a href="<?php echo $stream_link; ?>">Download an EPUB version of this item</a> (<a href="http://www.aadl.org/downloadhelp#epub">What Is This?</a>)</p>
+    <?php } ?>
+    </div>
+    <?php } } if($item['machinetags']['bctg']) { ?>
     <div id="item-trailer">
       <h2>Additional Content</h2>
       <p>Each Book Club to Go kit contains a guide to facilitate group discussion and understanding of the book that includes summary information and reviews of the title, an author biography, a list of suggested discussion questions and read-alikes, and tips for book groups.  This guide is available for download:</p>
