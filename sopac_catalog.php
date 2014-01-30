@@ -282,10 +282,10 @@ function sopac_bib_record() {
     }
     $lists = $insurge->get_item_list_ids($item['bnum']);
     if(count($lists)){
-      $lists = array_slice($lists, 0, 10);
       $sql = "SELECT * FROM {sopac_lists} WHERE public = 1 and list_id IN (".implode($lists,',').") ORDER BY list_id DESC";
       $res = db_query($sql);
-      while ($record = db_fetch_array($res)) {
+      for ($i = 1; $i <= 10; $i++) {
+        $record = db_fetch_array($res);
         $item['lists'][] = $record;
       }
     }
